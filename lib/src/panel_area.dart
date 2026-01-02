@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'layout_controller.dart';
 import 'layout_panel.dart';
@@ -13,7 +13,6 @@ class PanelArea extends StatelessWidget {
     required this.controller,
     required this.panelIds,
     required this.panelBuilder,
-    this.headerBuilder,
     this.axis = Axis.horizontal,
     super.key,
   });
@@ -27,17 +26,11 @@ class PanelArea extends StatelessWidget {
   /// Builder to provide the widget content for a panel.
   final Widget Function(BuildContext context, PanelId id) panelBuilder;
 
-  /// Optional builder for panel headers.
-  final Widget Function(BuildContext context, PanelId id, PanelController controller)? headerBuilder;
-
   /// The main axis of the layout.
   final Axis axis;
 
   @override
   Widget build(BuildContext context) {
-    // We listen to all panels in this area so that we rebuild the layout structure
-    // (e.g., adding/removing panels from Flex, updating Expanded weights)
-    // whenever a panel's state (visibility, sizing) changes.
     final panels = panelIds
         .map((id) => controller.getPanel(id))
         .whereType<PanelController>()
@@ -52,34 +45,27 @@ class PanelArea extends StatelessWidget {
 
             final inlinePanels = <Widget>[];
             final overlayPanels = <Widget>[];
+            final visibleInlinePanels = <PanelController>[];
 
-            // 1. Separate panels into inline and overlay
-            final visiblePanels = <PanelController>[];
             for (final panel in panels) {
               if (panel.mode == PanelMode.overlay) {
                 overlayPanels.add(
                   _buildOverlayPanel(context, panel, totalSize),
                 );
               } else if (panel.isVisible) {
-                visiblePanels.add(panel);
+                visibleInlinePanels.add(panel);
               }
             }
 
-            // 2. Build inline panels with resize handles
-            for (var i = 0; i < visiblePanels.length; i++) {
-              final panel = visiblePanels[i];
-              final isLast = i == visiblePanels.length - 1;
+            for (var i = 0; i < visibleInlinePanels.length; i++) {
+              final panel = visibleInlinePanels[i];
+              final isLast = i == visibleInlinePanels.length - 1;
 
-              // Wrap LayoutPanel
               Widget panelWidget = LayoutPanel(
                 controller: panel,
-                headerBuilder: headerBuilder != null 
-                    ? (ctx, ctrl) => headerBuilder!(ctx, panel.id, ctrl) 
-                    : null,
                 child: panelBuilder(context, panel.id),
               );
 
-              // Handle sizing wrappers for Flex
               if (panel.sizing is FlexibleSizing) {
                 final weight = (panel.sizing as FlexibleSizing).weight;
                 panelWidget = Expanded(
@@ -90,9 +76,8 @@ class PanelArea extends StatelessWidget {
 
               inlinePanels.add(panelWidget);
 
-              // Add resize handle if not last
               if (!isLast) {
-                final nextPanel = visiblePanels[i + 1];
+                final nextPanel = visibleInlinePanels[i + 1];
                 if (_shouldAddHandle(panel, nextPanel)) {
                   inlinePanels.add(
                     PanelResizeHandle(
@@ -102,7 +87,7 @@ class PanelArea extends StatelessWidget {
                         panel,
                         nextPanel,
                         totalSize,
-                        visiblePanels,
+                        visibleInlinePanels,
                       ),
                     ),
                   );
@@ -110,17 +95,14 @@ class PanelArea extends StatelessWidget {
               }
             }
 
-            // 3. Assemble the final stack
             return Stack(
               fit: StackFit.expand,
               children: [
-                // The main flex layout
                 Flex(
                   direction: axis,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: inlinePanels,
                 ),
-                // Overlay panels
                 ...overlayPanels,
               ],
             );
@@ -130,18 +112,12 @@ class PanelArea extends StatelessWidget {
     );
   }
 
-  /// Determines if a resize handle should be placed between two panels.
   bool _shouldAddHandle(PanelController prev, PanelController next) {
     if (prev.isCollapsed && next.isCollapsed) return false;
-
-    if (prev.sizing is ContentSizing && next.sizing is ContentSizing) {
-      return false;
-    }
-
+    if (prev.sizing is ContentSizing && next.sizing is ContentSizing) return false;
     return prev.isResizable || next.isResizable;
   }
 
-  /// Handles the drag logic for resizing panels.
   void _handleResize(
     double delta,
     PanelController prev,
@@ -192,9 +168,6 @@ class PanelArea extends StatelessWidget {
   ) {
     final Widget content = LayoutPanel(
       controller: panel,
-      headerBuilder: headerBuilder != null 
-          ? (ctx, ctrl) => headerBuilder!(ctx, panel.id, ctrl) 
-          : null,
       child: panelBuilder(context, panel.id),
     );
 

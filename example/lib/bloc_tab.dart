@@ -42,7 +42,6 @@ class BlocLayoutBody extends StatelessWidget {
           sizing: const FixedSizing(200),
           mode: PanelMode.inline,
           anchor: PanelAnchor.left,
-          visuals: const PanelVisuals(showBorders: true),
         );
         controller.registerPanel(
           const PanelId('center'),
@@ -55,7 +54,6 @@ class BlocLayoutBody extends StatelessWidget {
           sizing: const FixedSizing(200),
           mode: PanelMode.inline,
           anchor: PanelAnchor.right,
-          visuals: const PanelVisuals(showBorders: true),
         );
 
         return BlocListener<LayoutCubit, LayoutState>(
@@ -89,7 +87,13 @@ class BlocLayoutBody extends StatelessWidget {
                 if (id.value == 'center') {
                   return const Center(child: Text('Main Content\n(Controlled by BLoC)'));
                 }
-                return Center(child: Text(id.value));
+                // Styling handled here
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Center(child: Text(id.value)),
+                );
               },
             ),
           ),

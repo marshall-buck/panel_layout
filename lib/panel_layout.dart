@@ -1,5 +1,3 @@
-library panel_layout;
-
 export 'src/layout_controller.dart';
 export 'src/panel_area.dart';
 export 'src/panel_controller.dart';

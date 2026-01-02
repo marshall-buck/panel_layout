@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'panel_theme.dart';
 
@@ -65,7 +65,7 @@ class _PanelResizeHandleState extends State<PanelResizeHandle> {
           // Hit target size (larger than visible line)
           width: isVertical ? theme.resizeHandleHitTestWidth : double.infinity,
           height: isVertical ? double.infinity : theme.resizeHandleHitTestWidth,
-          color: Colors.transparent,
+          color: const Color(0x00000000), // Colors.transparent
           child: Center(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
