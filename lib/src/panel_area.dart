@@ -35,86 +35,96 @@ class PanelArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final totalSize = axis == Axis.horizontal ? constraints.maxWidth : constraints.maxHeight;
+    // We listen to all panels in this area so that we rebuild the layout structure
+    // (e.g., adding/removing panels from Flex, updating Expanded weights)
+    // whenever a panel's state (visibility, sizing) changes.
+    final panels = panelIds
+        .map((id) => controller.getPanel(id))
+        .whereType<PanelController>()
+        .toList();
 
-        final inlinePanels = <Widget>[];
-        final overlayPanels = <Widget>[];
+    return ListenableBuilder(
+      listenable: Listenable.merge(panels),
+      builder: (context, _) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final totalSize = axis == Axis.horizontal ? constraints.maxWidth : constraints.maxHeight;
 
-        // 1. Separate panels into inline and overlay
-        final visiblePanels = <PanelController>[];
-        for (final id in panelIds) {
-          final panel = controller.getPanel(id);
-          if (panel != null) {
-            if (panel.mode == PanelMode.overlay) {
-              overlayPanels.add(
-                _buildOverlayPanel(context, panel, totalSize),
-              );
-            } else if (panel.isVisible) {
-              visiblePanels.add(panel);
+            final inlinePanels = <Widget>[];
+            final overlayPanels = <Widget>[];
+
+            // 1. Separate panels into inline and overlay
+            final visiblePanels = <PanelController>[];
+            for (final panel in panels) {
+              if (panel.mode == PanelMode.overlay) {
+                overlayPanels.add(
+                  _buildOverlayPanel(context, panel, totalSize),
+                );
+              } else if (panel.isVisible) {
+                visiblePanels.add(panel);
+              }
             }
-          }
-        }
 
-        // 2. Build inline panels with resize handles
-        for (var i = 0; i < visiblePanels.length; i++) {
-          final panel = visiblePanels[i];
-          final isLast = i == visiblePanels.length - 1;
+            // 2. Build inline panels with resize handles
+            for (var i = 0; i < visiblePanels.length; i++) {
+              final panel = visiblePanels[i];
+              final isLast = i == visiblePanels.length - 1;
 
-          // Wrap LayoutPanel
-          Widget panelWidget = LayoutPanel(
-            controller: panel,
-            headerBuilder: headerBuilder != null 
-                ? (ctx, ctrl) => headerBuilder!(ctx, panel.id, ctrl) 
-                : null,
-            child: panelBuilder(context, panel.id),
-          );
+              // Wrap LayoutPanel
+              Widget panelWidget = LayoutPanel(
+                controller: panel,
+                headerBuilder: headerBuilder != null 
+                    ? (ctx, ctrl) => headerBuilder!(ctx, panel.id, ctrl) 
+                    : null,
+                child: panelBuilder(context, panel.id),
+              );
 
-          // Handle sizing wrappers for Flex
-          if (panel.sizing is FlexibleSizing) {
-            final weight = (panel.sizing as FlexibleSizing).weight;
-            panelWidget = Expanded(
-              flex: (weight * 100).toInt(),
-              child: panelWidget,
-            );
-          }
+              // Handle sizing wrappers for Flex
+              if (panel.sizing is FlexibleSizing) {
+                final weight = (panel.sizing as FlexibleSizing).weight;
+                panelWidget = Expanded(
+                  flex: (weight * 100).toInt(),
+                  child: panelWidget,
+                );
+              }
 
-          inlinePanels.add(panelWidget);
+              inlinePanels.add(panelWidget);
 
-          // Add resize handle if not last
-          if (!isLast) {
-            final nextPanel = visiblePanels[i + 1];
-            if (_shouldAddHandle(panel, nextPanel)) {
-              inlinePanels.add(
-                PanelResizeHandle(
-                  axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
-                  onDragUpdate: (delta) => _handleResize(
-                    delta,
-                    panel,
-                    nextPanel,
-                    totalSize,
-                    visiblePanels,
-                  ),
+              // Add resize handle if not last
+              if (!isLast) {
+                final nextPanel = visiblePanels[i + 1];
+                if (_shouldAddHandle(panel, nextPanel)) {
+                  inlinePanels.add(
+                    PanelResizeHandle(
+                      axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
+                      onDragUpdate: (delta) => _handleResize(
+                        delta,
+                        panel,
+                        nextPanel,
+                        totalSize,
+                        visiblePanels,
+                      ),
+                    ),
+                  );
+                }
+              }
+            }
+
+            // 3. Assemble the final stack
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                // The main flex layout
+                Flex(
+                  direction: axis,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: inlinePanels,
                 ),
-              );
-            }
-          }
-        }
-
-        // 3. Assemble the final stack
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            // The main flex layout
-            Flex(
-              direction: axis,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: inlinePanels,
-            ),
-            // Overlay panels
-            ...overlayPanels,
-          ],
+                // Overlay panels
+                ...overlayPanels,
+              ],
+            );
+          },
         );
       },
     );
