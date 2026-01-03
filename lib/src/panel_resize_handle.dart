@@ -72,12 +72,23 @@ class _PanelResizeHandleState extends State<PanelResizeHandle> {
               // Visible line size
               width: isVertical ? (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0) : double.infinity,
               height: isVertical ? double.infinity : (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0),
-              decoration: BoxDecoration(
-                color: _isDragging
-                    ? theme.resizeHandleActiveColor
-                    : (_isHovered ? theme.resizeHandleHoverColor : theme.resizeHandleColor),
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: _isDragging
+                  ? (theme.resizeHandleActiveDecoration ??
+                      BoxDecoration(
+                        color: theme.resizeHandleActiveColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ))
+                  : (_isHovered
+                      ? (theme.resizeHandleHoverDecoration ??
+                          BoxDecoration(
+                            color: theme.resizeHandleHoverColor,
+                            borderRadius: BorderRadius.circular(2),
+                          ))
+                      : (theme.resizeHandleDecoration ??
+                          BoxDecoration(
+                            color: theme.resizeHandleColor,
+                            borderRadius: BorderRadius.circular(2),
+                          ))),
             ),
           ),
         ),

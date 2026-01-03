@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'panel_controller.dart';
 import 'panel_data.dart';
+import 'panel_theme.dart';
 
 /// A presentational widget that renders a single panel based on its [PanelController] state.
 ///
@@ -9,9 +10,9 @@ import 'panel_data.dart';
 /// - Visibility (via [PanelController.isVisible])
 /// - Sizing Animation (Fixed/Content)
 /// - Overlay Transitions
+/// - Optional Visual Styling (via [PanelThemeData.panelDecoration] and [PanelThemeData.panelPadding])
 ///
-/// It does NOT apply any visual styling (background, border). The [child] widget
-/// is responsible for rendering the panel's appearance.
+/// The [child] widget is responsible for rendering the panel's main content.
 class LayoutPanel extends StatelessWidget {
   /// Creates a [LayoutPanel].
   const LayoutPanel({
@@ -23,7 +24,7 @@ class LayoutPanel extends StatelessWidget {
   /// The controller that manages the panel's state.
   final PanelController controller;
 
-  /// The content of the panel (including any headers or styling).
+  /// The content of the panel.
   final Widget child;
 
   @override
@@ -31,8 +32,16 @@ class LayoutPanel extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
+        final theme = PanelTheme.of(context);
         final visuals = controller.visuals;
         final isCollapsed = controller.isCollapsed;
+
+        // Apply theme decoration and padding
+        final decoratedChild = Container(
+          decoration: theme.panelDecoration,
+          padding: theme.panelPadding,
+          child: child,
+        );
 
         // Determine size based on strategy
         final effectiveSize = controller.effectiveSize;
@@ -51,15 +60,15 @@ class LayoutPanel extends StatelessWidget {
               scrollDirection: isVertical ? Axis.horizontal : Axis.vertical,
               physics: const NeverScrollableScrollPhysics(), // Disable scrolling by user, it's just for clipping/layout
               child: isVertical
-                  ? SizedBox(width: effectiveSize, child: child)
-                  : SizedBox(height: effectiveSize, child: child),
+                  ? SizedBox(width: effectiveSize, child: decoratedChild)
+                  : SizedBox(height: effectiveSize, child: decoratedChild),
             ),
           );
         } else if (controller.sizing is ContentSizing) {
           final animatedContent = AnimatedSize(
             duration: visuals.animationDuration,
             curve: visuals.animationCurve,
-            child: controller.isVisible ? child : const SizedBox.shrink(),
+            child: controller.isVisible ? decoratedChild : const SizedBox.shrink(),
           );
 
           animatedPanel = isVertical
@@ -67,7 +76,7 @@ class LayoutPanel extends StatelessWidget {
               : IntrinsicHeight(child: animatedContent);
         } else {
           // For FlexibleSizing, we return the content directly.
-          animatedPanel = controller.isVisible ? child : const SizedBox.shrink();
+          animatedPanel = controller.isVisible ? decoratedChild : const SizedBox.shrink();
         }
 
         // For Overlay panels, we add a Slide transition

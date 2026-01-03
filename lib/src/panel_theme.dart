@@ -12,15 +12,26 @@ class PanelThemeData {
     this.resizeHandleActiveColor = const Color(0xFF0078D4),
     this.resizeHandleWidth = 4.0,
     this.resizeHandleHitTestWidth = 12.0,
+    this.resizeHandleDecoration,
+    this.resizeHandleHoverDecoration,
+    this.resizeHandleActiveDecoration,
+    this.panelDecoration,
+    this.panelPadding,
   });
 
   /// The color of the resize handle when idle.
+  ///
+  /// Ignored if [resizeHandleDecoration] is provided.
   final Color resizeHandleColor;
 
   /// The color of the resize handle when hovered.
+  ///
+  /// Ignored if [resizeHandleHoverDecoration] is provided.
   final Color resizeHandleHoverColor;
 
   /// The color of the resize handle when being dragged.
+  ///
+  /// Ignored if [resizeHandleActiveDecoration] is provided.
   final Color resizeHandleActiveColor;
 
   /// The visual width of the resize handle.
@@ -28,6 +39,27 @@ class PanelThemeData {
 
   /// The width of the area that captures mouse events for resizing.
   final double resizeHandleHitTestWidth;
+
+  /// The decoration of the resize handle when idle.
+  ///
+  /// Overrides [resizeHandleColor].
+  final Decoration? resizeHandleDecoration;
+
+  /// The decoration of the resize handle when hovered.
+  ///
+  /// Overrides [resizeHandleHoverColor].
+  final Decoration? resizeHandleHoverDecoration;
+
+  /// The decoration of the resize handle when being dragged.
+  ///
+  /// Overrides [resizeHandleActiveColor].
+  final Decoration? resizeHandleActiveDecoration;
+
+  /// The decoration to apply to the panel container.
+  final Decoration? panelDecoration;
+
+  /// The padding to apply to the panel content.
+  final EdgeInsetsGeometry? panelPadding;
 
   @override
   bool operator ==(Object other) {
@@ -37,7 +69,12 @@ class PanelThemeData {
         other.resizeHandleHoverColor == resizeHandleHoverColor &&
         other.resizeHandleActiveColor == resizeHandleActiveColor &&
         other.resizeHandleWidth == resizeHandleWidth &&
-        other.resizeHandleHitTestWidth == resizeHandleHitTestWidth;
+        other.resizeHandleHitTestWidth == resizeHandleHitTestWidth &&
+        other.resizeHandleDecoration == resizeHandleDecoration &&
+        other.resizeHandleHoverDecoration == resizeHandleHoverDecoration &&
+        other.resizeHandleActiveDecoration == resizeHandleActiveDecoration &&
+        other.panelDecoration == panelDecoration &&
+        other.panelPadding == panelPadding;
   }
 
   @override
@@ -47,6 +84,11 @@ class PanelThemeData {
         resizeHandleActiveColor,
         resizeHandleWidth,
         resizeHandleHitTestWidth,
+        resizeHandleDecoration,
+        resizeHandleHoverDecoration,
+        resizeHandleActiveDecoration,
+        panelDecoration,
+        panelPadding,
       );
 }
 
