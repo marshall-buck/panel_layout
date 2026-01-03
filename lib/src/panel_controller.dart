@@ -8,7 +8,7 @@ import 'panel_data.dart';
 /// - **Sizing**: How large it is ([PanelSizing]).
 /// - **Visibility**: Whether it is shown, hidden, or collapsed.
 /// - **Mode**: Whether it is inline or overlaid.
-/// - **Visuals**: Styling attributes like acrylic effects and borders.
+/// - **Visuals**: Styling attributes like borders and animations.
 ///
 /// It extends [ChangeNotifier], allowing the UI to rebuild reactively when properties change.
 class PanelController extends ChangeNotifier {

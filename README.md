@@ -12,7 +12,7 @@ A pure Flutter, dependency-free, state-management-agnostic panel system.
 -   **Modes**:
     -   `Inline`: Panels flow in a Row/Column (pushing content).
     -   `Overlay`: Panels float on top (like drawers/modals).
--   **Theming**: customizable borders, resize handles, and "Acrylic" blur effects via `PanelTheme`.
+-   **Theming**: customizable borders, resize handles, and visual effects via `PanelTheme`.
 -   **Granular Rebuilds**: Layout structure rebuilds only when necessary, keeping performance high.
 
 ## Getting Started
