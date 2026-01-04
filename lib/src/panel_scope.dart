@@ -1,26 +1,23 @@
 import 'package:flutter/widgets.dart';
-import 'layout_controller.dart';
 
-/// An inherited widget that exposes the [LayoutController] to the widget tree.
+import 'panel_layout_controller.dart';
+
+/// An inherited widget that exposes the [PanelLayoutController] to the widget tree.
 ///
 /// Use [PanelLayout.of] to access the controller.
 class PanelScope extends InheritedWidget {
   /// Creates a [PanelScope].
-  const PanelScope({
-    required this.controller,
-    required super.child,
-    super.key,
-  });
+  const PanelScope({required this.controller, required super.child, super.key});
 
   /// The layout controller being exposed.
-  final LayoutController controller;
+  final PanelLayoutController controller;
 
-  /// Retrieves the [LayoutController] from the closest [PanelScope] ancestor.
+  /// Retrieves the [PanelLayoutController] from the closest [PanelScope] ancestor.
   ///
   /// [listen] determines whether the context should rebuild when the *controller instance* changes
   /// (which is rare). To listen to panel state changes, use a [ListenableBuilder]
   /// on the returned controller or specific [PanelController]s.
-  static LayoutController of(BuildContext context, {bool listen = true}) {
+  static PanelLayoutController of(BuildContext context, {bool listen = true}) {
     final PanelScope? scope;
     if (listen) {
       scope = context.dependOnInheritedWidgetOfExactType<PanelScope>();
@@ -38,5 +35,6 @@ class PanelScope extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(PanelScope oldWidget) => controller != oldWidget.controller;
+  bool updateShouldNotify(PanelScope oldWidget) =>
+      controller != oldWidget.controller;
 }

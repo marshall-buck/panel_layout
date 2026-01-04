@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'layout_controller.dart';
+import 'panel_layout_controller.dart';
 import 'layout_panel.dart';
 import 'panel_controller.dart';
 import 'panel_data.dart';
@@ -18,7 +18,7 @@ class PanelArea extends StatelessWidget {
   });
 
   /// The layout controller managing the panels.
-  final LayoutController controller;
+  final PanelLayoutController controller;
 
   /// The list of panel IDs to include in this area.
   final List<PanelId> panelIds;
@@ -41,25 +41,33 @@ class PanelArea extends StatelessWidget {
       builder: (context, _) {
         return LayoutBuilder(
           builder: (context, constraints) {
-            final totalSize = axis == Axis.horizontal ? constraints.maxWidth : constraints.maxHeight;
+            final totalSize = axis == Axis.horizontal
+                ? constraints.maxWidth
+                : constraints.maxHeight;
 
             final inlinePanels = <Widget>[];
             final overlayPanels = <Widget>[];
-            final visibleInlinePanels = <PanelController>[];
+            final activeInlinePanels = <PanelController>[];
 
             for (final panel in panels) {
               if (panel.mode == PanelMode.overlay) {
                 overlayPanels.add(
                   _buildOverlayPanel(context, panel, totalSize),
                 );
-              } else if (panel.isVisible) {
-                visibleInlinePanels.add(panel);
+              } else {
+                // We include invisible panels if they are NOT flexible,
+                // to allow LayoutPanel to animate their size to 0.
+                // Flexible panels must be removed when hidden because Expanded
+                // would force them to take space even if empty.
+                if (panel.isVisible || panel.sizing is! FlexibleSizing) {
+                  activeInlinePanels.add(panel);
+                }
               }
             }
 
-            for (var i = 0; i < visibleInlinePanels.length; i++) {
-              final panel = visibleInlinePanels[i];
-              final isLast = i == visibleInlinePanels.length - 1;
+            for (var i = 0; i < activeInlinePanels.length; i++) {
+              final panel = activeInlinePanels[i];
+              final isLast = i == activeInlinePanels.length - 1;
 
               Widget panelWidget = LayoutPanel(
                 controller: panel,
@@ -77,17 +85,21 @@ class PanelArea extends StatelessWidget {
               inlinePanels.add(panelWidget);
 
               if (!isLast) {
-                final nextPanel = visibleInlinePanels[i + 1];
-                if (_shouldAddHandle(panel, nextPanel)) {
+                final nextPanel = activeInlinePanels[i + 1];
+                if (_shouldAddHandle(panel, nextPanel) &&
+                    panel.isVisible &&
+                    nextPanel.isVisible) {
                   inlinePanels.add(
                     PanelResizeHandle(
-                      axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
+                      axis: axis == Axis.horizontal
+                          ? Axis.vertical
+                          : Axis.horizontal,
                       onDragUpdate: (delta) => _handleResize(
                         delta,
                         panel,
                         nextPanel,
                         totalSize,
-                        visibleInlinePanels,
+                        activeInlinePanels,
                       ),
                     ),
                   );
@@ -114,7 +126,8 @@ class PanelArea extends StatelessWidget {
 
   bool _shouldAddHandle(PanelController prev, PanelController next) {
     if (prev.isCollapsed && next.isCollapsed) return false;
-    if (prev.sizing is ContentSizing && next.sizing is ContentSizing) return false;
+    if (prev.sizing is ContentSizing && next.sizing is ContentSizing)
+      return false;
     return prev.isResizable || next.isResizable;
   }
 
@@ -176,7 +189,8 @@ class PanelArea extends StatelessWidget {
       if (panel.anchor == PanelAnchor.right) alignment = Alignment.centerRight;
       if (panel.anchor == PanelAnchor.left) alignment = Alignment.centerLeft;
       if (panel.anchor == PanelAnchor.top) alignment = Alignment.topCenter;
-      if (panel.anchor == PanelAnchor.bottom) alignment = Alignment.bottomCenter;
+      if (panel.anchor == PanelAnchor.bottom)
+        alignment = Alignment.bottomCenter;
 
       return Align(alignment: alignment, child: content);
     }

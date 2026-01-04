@@ -5,11 +5,11 @@ import 'panel_data.dart';
 
 /// The central registry and orchestrator for all [PanelController]s in the application.
 ///
-/// The [LayoutController] maintains a map of all registered panels, allowing different
+/// The [PanelLayoutController] maintains a map of all registered panels, allowing different
 /// parts of the application to look up and modify panel state.
 ///
 /// It extends [ChangeNotifier] to notify listeners when panels are registered or removed.
-class LayoutController extends ChangeNotifier {
+class PanelLayoutController extends ChangeNotifier {
   final Map<PanelId, PanelController> _panels = {};
 
   /// Registers a panel with the controller.
