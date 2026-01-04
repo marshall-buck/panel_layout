@@ -53,6 +53,18 @@ class LayoutPanel extends StatelessWidget {
 
         // Apply sizing and animations
         if (panelController.sizing is FixedSizing || isCollapsed) {
+          double contentSize = effectiveSize;
+          // Fix for content disappearing during close animation:
+          // If not visible, effectiveSize is 0, but we want the inner content
+          // to remain at its target size so it gets clipped by the AnimatedContainer.
+          if (!panelController.isVisible) {
+            if (isCollapsed) {
+              contentSize = panelController.constraints.collapsedSize;
+            } else if (panelController.sizing is FixedSizing) {
+              contentSize = (panelController.sizing as FixedSizing).size;
+            }
+          }
+
           animatedPanel = AnimatedContainer(
             duration: visuals.animationDuration,
             curve: visuals.animationCurve,
@@ -63,8 +75,8 @@ class LayoutPanel extends StatelessWidget {
               physics:
                   const NeverScrollableScrollPhysics(), // Disable scrolling by user, it's just for clipping/layout
               child: isVertical
-                  ? SizedBox(width: effectiveSize, child: decoratedChild)
-                  : SizedBox(height: effectiveSize, child: decoratedChild),
+                  ? SizedBox(width: contentSize, child: decoratedChild)
+                  : SizedBox(height: contentSize, child: decoratedChild),
             ),
           );
         } else if (panelController.sizing is ContentSizing) {

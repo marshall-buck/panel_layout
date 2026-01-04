@@ -113,4 +113,88 @@ void main() {
 
     expect(sizeMid.width, 100.0, reason: 'Should be 100 at 50%');
   });
+
+  testWidgets(
+    'FixedSizing panel content remains full size during closing animation',
+    (tester) async {
+      final controller = PanelLayoutController();
+      const panelId = PanelId('fixed_panel');
+      const fixedWidth = 200.0;
+
+      controller.registerPanel(
+        panelId,
+        sizing: const FixedSizing(fixedWidth),
+        mode: PanelMode.inline,
+        anchor: PanelAnchor.right,
+        isVisible: true,
+        visuals: const PanelVisuals(
+          animationDuration: Duration(milliseconds: 1000),
+          animationCurve: Curves.linear,
+        ),
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: PanelScope(
+            controller: controller,
+            child: Center(
+              child: SizedBox(
+                height: 400,
+                width: 400,
+                child: PanelArea(
+                  panelLayoutController: controller,
+                  panelIds: const [panelId],
+                  panelBuilder: (context, id) {
+                    return Container(
+                      key: const ValueKey('content'),
+                      color: const Color(0xFF00FF00),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Initial state: Width 200
+      final layoutPanelFinder = find.byType(LayoutPanel);
+      final contentFinder = find.byKey(const ValueKey('content'));
+
+      expect(tester.getSize(layoutPanelFinder).width, fixedWidth);
+      expect(tester.getSize(contentFinder).width, fixedWidth);
+
+      // Close the panel
+      controller.getPanel(panelId)!.setVisible(visible: false);
+
+      // Pump start of animation
+      await tester.pump();
+
+      // Pump 50% (500ms)
+      await tester.pump(const Duration(milliseconds: 500));
+
+      final panelSizeMid = tester.getSize(layoutPanelFinder);
+      final contentSizeMid = tester.getSize(contentFinder);
+
+      // The panel itself should be shrinking (approx 100)
+      expect(
+        panelSizeMid.width,
+        closeTo(100.0, 1.0),
+        reason: 'Panel should be halfway closed',
+      );
+
+      // THE BUG CHECK:
+      // The content inside should still be full width (200), effectively clipped by the parent.
+      expect(
+        contentSizeMid.width,
+        fixedWidth,
+        reason:
+            'Content should remain full width during close animation',
+      );
+
+      await tester.pumpAndSettle();
+      expect(tester.getSize(layoutPanelFinder).width, 0.0);
+    },
+  );
 }
