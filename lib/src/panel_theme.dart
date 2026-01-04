@@ -79,34 +79,31 @@ class PanelThemeData {
 
   @override
   int get hashCode => Object.hash(
-        resizeHandleColor,
-        resizeHandleHoverColor,
-        resizeHandleActiveColor,
-        resizeHandleWidth,
-        resizeHandleHitTestWidth,
-        resizeHandleDecoration,
-        resizeHandleHoverDecoration,
-        resizeHandleActiveDecoration,
-        panelDecoration,
-        panelPadding,
-      );
+    resizeHandleColor,
+    resizeHandleHoverColor,
+    resizeHandleActiveColor,
+    resizeHandleWidth,
+    resizeHandleHitTestWidth,
+    resizeHandleDecoration,
+    resizeHandleHoverDecoration,
+    resizeHandleActiveDecoration,
+    panelDecoration,
+    panelPadding,
+  );
 }
 
 /// An inherited widget that provides [PanelThemeData] to its descendants.
 class PanelTheme extends InheritedWidget {
   /// Creates a [PanelTheme].
-  const PanelTheme({
-    required this.data,
-    required super.child,
-    super.key,
-  });
+  const PanelTheme({required this.data, required super.child, super.key});
 
   /// The styling data provided by this theme.
   final PanelThemeData data;
 
   /// Retrieves the [PanelThemeData] from the closest [PanelTheme] ancestor.
   static PanelThemeData of(BuildContext context) {
-    final PanelTheme? result = context.dependOnInheritedWidgetOfExactType<PanelTheme>();
+    final PanelTheme? result = context
+        .dependOnInheritedWidgetOfExactType<PanelTheme>();
     return result?.data ?? const PanelThemeData();
   }
 

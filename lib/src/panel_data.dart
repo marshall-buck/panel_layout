@@ -7,7 +7,10 @@ class PanelId {
   final String value;
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is PanelId && runtimeType == other.runtimeType && value == other.value;
+      identical(this, other) ||
+      other is PanelId &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
   @override
   int get hashCode => value.hashCode;
   @override
@@ -71,12 +74,7 @@ enum PanelMode {
 /// 1. The direction of resizing (e.g., [left] panels resize horizontally).
 /// 2. The alignment of overlay panels (e.g., [right] overlays align to the right).
 /// 3. The scroll direction if the content overflows.
-enum PanelAnchor {
-  left,
-  right,
-  top,
-  bottom,
-}
+enum PanelAnchor { left, right, top, bottom }
 
 @immutable
 class PanelConstraints {
@@ -105,10 +103,7 @@ class PanelVisuals {
   final Duration animationDuration;
   final Curve animationCurve;
 
-  PanelVisuals copyWith({
-    Duration? animationDuration,
-    Curve? animationCurve,
-  }) {
+  PanelVisuals copyWith({Duration? animationDuration, Curve? animationCurve}) {
     return PanelVisuals(
       animationDuration: animationDuration ?? this.animationDuration,
       animationCurve: animationCurve ?? this.animationCurve,

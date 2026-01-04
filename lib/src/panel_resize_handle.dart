@@ -45,16 +45,16 @@ class _PanelResizeHandleState extends State<PanelResizeHandle> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      cursor: isVertical ? SystemMouseCursors.resizeColumn : SystemMouseCursors.resizeRow,
+      cursor: isVertical
+          ? SystemMouseCursors.resizeColumn
+          : SystemMouseCursors.resizeRow,
       child: GestureDetector(
         onPanStart: (_) {
           setState(() => _isDragging = true);
           widget.onDragStart?.call();
         },
         onPanUpdate: (details) {
-          widget.onDragUpdate(
-            isVertical ? details.delta.dx : details.delta.dy,
-          );
+          widget.onDragUpdate(isVertical ? details.delta.dx : details.delta.dy);
         },
         onPanEnd: (_) {
           setState(() => _isDragging = false);
@@ -70,25 +70,29 @@ class _PanelResizeHandleState extends State<PanelResizeHandle> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               // Visible line size
-              width: isVertical ? (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0) : double.infinity,
-              height: isVertical ? double.infinity : (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0),
+              width: isVertical
+                  ? (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0)
+                  : double.infinity,
+              height: isVertical
+                  ? double.infinity
+                  : (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0),
               decoration: _isDragging
                   ? (theme.resizeHandleActiveDecoration ??
-                      BoxDecoration(
-                        color: theme.resizeHandleActiveColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ))
+                        BoxDecoration(
+                          color: theme.resizeHandleActiveColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ))
                   : (_isHovered
-                      ? (theme.resizeHandleHoverDecoration ??
-                          BoxDecoration(
-                            color: theme.resizeHandleHoverColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ))
-                      : (theme.resizeHandleDecoration ??
-                          BoxDecoration(
-                            color: theme.resizeHandleColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ))),
+                        ? (theme.resizeHandleHoverDecoration ??
+                              BoxDecoration(
+                                color: theme.resizeHandleHoverColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ))
+                        : (theme.resizeHandleDecoration ??
+                              BoxDecoration(
+                                color: theme.resizeHandleColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ))),
             ),
           ),
         ),

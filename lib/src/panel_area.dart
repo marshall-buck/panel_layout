@@ -70,6 +70,7 @@ class PanelArea extends StatelessWidget {
               final isLast = i == activeInlinePanels.length - 1;
 
               Widget panelWidget = LayoutPanel(
+                key: ValueKey(panel.id),
                 panelController: panel,
                 child: panelBuilder(context, panel.id),
               );
@@ -91,6 +92,7 @@ class PanelArea extends StatelessWidget {
                     nextPanel.isVisible) {
                   inlinePanels.add(
                     PanelResizeHandle(
+                      key: ValueKey('${panel.id.value}_handle'),
                       axis: axis == Axis.horizontal
                           ? Axis.vertical
                           : Axis.horizontal,
