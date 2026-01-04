@@ -10,7 +10,7 @@ import 'panel_resize_handle.dart';
 class PanelArea extends StatelessWidget {
   /// Creates a [PanelArea].
   const PanelArea({
-    required this.controller,
+    required this.panelLayoutController,
     required this.panelIds,
     required this.panelBuilder,
     this.axis = Axis.horizontal,
@@ -18,7 +18,7 @@ class PanelArea extends StatelessWidget {
   });
 
   /// The layout controller managing the panels.
-  final PanelLayoutController controller;
+  final PanelLayoutController panelLayoutController;
 
   /// The list of panel IDs to include in this area.
   final List<PanelId> panelIds;
@@ -32,7 +32,7 @@ class PanelArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final panels = panelIds
-        .map((id) => controller.getPanel(id))
+        .map((id) => panelLayoutController.getPanel(id))
         .whereType<PanelController>()
         .toList();
 
@@ -70,7 +70,7 @@ class PanelArea extends StatelessWidget {
               final isLast = i == activeInlinePanels.length - 1;
 
               Widget panelWidget = LayoutPanel(
-                controller: panel,
+                panelController: panel,
                 child: panelBuilder(context, panel.id),
               );
 
@@ -126,8 +126,9 @@ class PanelArea extends StatelessWidget {
 
   bool _shouldAddHandle(PanelController prev, PanelController next) {
     if (prev.isCollapsed && next.isCollapsed) return false;
-    if (prev.sizing is ContentSizing && next.sizing is ContentSizing)
+    if (prev.sizing is ContentSizing && next.sizing is ContentSizing) {
       return false;
+    }
     return prev.isResizable || next.isResizable;
   }
 
@@ -180,7 +181,7 @@ class PanelArea extends StatelessWidget {
     double totalSize,
   ) {
     final Widget content = LayoutPanel(
-      controller: panel,
+      panelController: panel,
       child: panelBuilder(context, panel.id),
     );
 
@@ -189,8 +190,9 @@ class PanelArea extends StatelessWidget {
       if (panel.anchor == PanelAnchor.right) alignment = Alignment.centerRight;
       if (panel.anchor == PanelAnchor.left) alignment = Alignment.centerLeft;
       if (panel.anchor == PanelAnchor.top) alignment = Alignment.topCenter;
-      if (panel.anchor == PanelAnchor.bottom)
+      if (panel.anchor == PanelAnchor.bottom) {
         alignment = Alignment.bottomCenter;
+      }
 
       return Align(alignment: alignment, child: content);
     }

@@ -9,7 +9,6 @@ class VanillaTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return PanelLayout(
       builder: (context, controller) {
-        
         controller.registerPanel(
           const PanelId('left'),
           sizing: const FixedSizing(250),
@@ -22,7 +21,7 @@ class VanillaTab extends StatelessWidget {
           const PanelId('center'),
           sizing: const FlexibleSizing(1.0),
           mode: PanelMode.inline,
-          anchor: PanelAnchor.left, 
+          anchor: PanelAnchor.left,
         );
 
         controller.registerPanel(
@@ -40,7 +39,7 @@ class VanillaTab extends StatelessWidget {
               const VanillaToolbar(),
               Expanded(
                 child: PanelArea(
-                  controller: controller,
+                  panelLayoutController: controller,
                   panelIds: const [
                     PanelId('left'),
                     PanelId('center'),
@@ -51,26 +50,38 @@ class VanillaTab extends StatelessWidget {
                       // Apply styling manually (e.g. border)
                       return Container(
                         decoration: BoxDecoration(
-                          border: Border(right: BorderSide(color: const Color(0xFFCCCCCC))),
+                          border: Border(
+                            right: BorderSide(color: const Color(0xFFCCCCCC)),
+                          ),
                         ),
                         child: const Center(
                           child: Text(
-                            'Left Sidebar', 
-                            style: TextStyle(color: Color(0xFF000000), fontSize: 14, decoration: TextDecoration.none),
-                          )
+                            'Left Sidebar',
+                            style: TextStyle(
+                              color: Color(0xFF000000),
+                              fontSize: 14,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
                         ),
                       );
                     }
                     if (id.value == 'right') {
                       return Container(
                         decoration: BoxDecoration(
-                          border: Border(left: BorderSide(color: const Color(0xFFCCCCCC))),
+                          border: Border(
+                            left: BorderSide(color: const Color(0xFFCCCCCC)),
+                          ),
                         ),
                         child: const Center(
                           child: Text(
                             'Right Inspector',
-                            style: TextStyle(color: Color(0xFF000000), fontSize: 14, decoration: TextDecoration.none),
-                          )
+                            style: TextStyle(
+                              color: Color(0xFF000000),
+                              fontSize: 14,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
                         ),
                       );
                     }
@@ -79,8 +90,13 @@ class VanillaTab extends StatelessWidget {
                       child: const Center(
                         child: Text(
                           'Main Content',
-                          style: TextStyle(color: Color(0xFF000000), fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.none),
-                        )
+                          style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -113,7 +129,12 @@ class VanillaToolbar extends StatelessWidget {
           const Spacer(),
           const Text(
             'Vanilla Layout (Pure Widgets)',
-            style: TextStyle(color: Color(0xFF000000), fontSize: 14, fontWeight: FontWeight.bold, decoration: TextDecoration.none),
+            style: TextStyle(
+              color: Color(0xFF000000),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.none,
+            ),
           ),
           const Spacer(),
           _SimpleButton(
@@ -156,7 +177,11 @@ class _SimpleButtonState extends State<_SimpleButton> {
           ),
           child: Text(
             widget.text,
-            style: const TextStyle(color: Color(0xFF000000), fontSize: 12, decoration: TextDecoration.none),
+            style: const TextStyle(
+              color: Color(0xFF000000),
+              fontSize: 12,
+              decoration: TextDecoration.none,
+            ),
           ),
         ),
       ),

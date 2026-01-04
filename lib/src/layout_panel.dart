@@ -16,13 +16,13 @@ import 'panel_theme.dart';
 class LayoutPanel extends StatelessWidget {
   /// Creates a [LayoutPanel].
   const LayoutPanel({
-    required this.controller,
+    required this.panelController,
     required this.child,
     super.key,
   });
 
   /// The controller that manages the panel's state.
-  final PanelController controller;
+  final PanelController panelController;
 
   /// The content of the panel.
   final Widget child;
@@ -30,11 +30,11 @@ class LayoutPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: controller,
+      listenable: panelController,
       builder: (context, _) {
         final theme = PanelTheme.of(context);
-        final visuals = controller.visuals;
-        final isCollapsed = controller.isCollapsed;
+        final visuals = panelController.visuals;
+        final isCollapsed = panelController.isCollapsed;
 
         // Apply theme decoration and padding
         final decoratedChild = Container(
@@ -44,13 +44,15 @@ class LayoutPanel extends StatelessWidget {
         );
 
         // Determine size based on strategy
-        final effectiveSize = controller.effectiveSize;
-        final isVertical = controller.anchor == PanelAnchor.left || controller.anchor == PanelAnchor.right;
+        final effectiveSize = panelController.effectiveSize;
+        final isVertical =
+            panelController.anchor == PanelAnchor.left ||
+            panelController.anchor == PanelAnchor.right;
 
         Widget animatedPanel;
 
         // Apply sizing and animations
-        if (controller.sizing is FixedSizing || isCollapsed) {
+        if (panelController.sizing is FixedSizing || isCollapsed) {
           animatedPanel = AnimatedContainer(
             duration: visuals.animationDuration,
             curve: visuals.animationCurve,
@@ -58,17 +60,20 @@ class LayoutPanel extends StatelessWidget {
             height: isVertical ? null : effectiveSize,
             child: SingleChildScrollView(
               scrollDirection: isVertical ? Axis.horizontal : Axis.vertical,
-              physics: const NeverScrollableScrollPhysics(), // Disable scrolling by user, it's just for clipping/layout
+              physics:
+                  const NeverScrollableScrollPhysics(), // Disable scrolling by user, it's just for clipping/layout
               child: isVertical
                   ? SizedBox(width: effectiveSize, child: decoratedChild)
                   : SizedBox(height: effectiveSize, child: decoratedChild),
             ),
           );
-        } else if (controller.sizing is ContentSizing) {
+        } else if (panelController.sizing is ContentSizing) {
           final animatedContent = AnimatedSize(
             duration: visuals.animationDuration,
             curve: visuals.animationCurve,
-            child: controller.isVisible ? decoratedChild : const SizedBox.shrink(),
+            child: panelController.isVisible
+                ? decoratedChild
+                : const SizedBox.shrink(),
           );
 
           animatedPanel = isVertical
@@ -76,18 +81,20 @@ class LayoutPanel extends StatelessWidget {
               : IntrinsicHeight(child: animatedContent);
         } else {
           // For FlexibleSizing, we return the content directly.
-          animatedPanel = controller.isVisible ? decoratedChild : const SizedBox.shrink();
+          animatedPanel = panelController.isVisible
+              ? decoratedChild
+              : const SizedBox.shrink();
         }
 
         // For Overlay panels, we add a Slide transition
-        if (controller.mode == PanelMode.overlay) {
+        if (panelController.mode == PanelMode.overlay) {
           return AnimatedSwitcher(
             duration: visuals.animationDuration,
             switchInCurve: visuals.animationCurve,
             switchOutCurve: visuals.animationCurve,
             transitionBuilder: (child, animation) {
               Offset begin;
-              switch (controller.anchor) {
+              switch (panelController.anchor) {
                 case PanelAnchor.right:
                   begin = const Offset(1, 0);
                 case PanelAnchor.left:
@@ -103,19 +110,16 @@ class LayoutPanel extends StatelessWidget {
                   begin: begin,
                   end: Offset.zero,
                 ).animate(animation),
-                child: FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
+                child: FadeTransition(opacity: animation, child: child),
               );
             },
-            child: controller.isVisible
+            child: panelController.isVisible
                 ? KeyedSubtree(
-                    key: ValueKey('panel_${controller.id.value}_visible'),
+                    key: ValueKey('panel_${panelController.id.value}_visible'),
                     child: animatedPanel,
                   )
                 : SizedBox.shrink(
-                    key: ValueKey('panel_${controller.id.value}_hidden'),
+                    key: ValueKey('panel_${panelController.id.value}_hidden'),
                   ),
           );
         }

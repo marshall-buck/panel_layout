@@ -16,6 +16,40 @@ class PanelLayoutController extends ChangeNotifier {
   ///
   /// If a panel with the same [id] already exists, it is returned directly.
   /// Otherwise, a new [PanelController] is created and stored.
+  ///
+  /// [id]: A unique identifier for the panel. Used to retrieve it later.
+  ///
+  /// [sizing]: Determines how the panel's size is calculated.
+  ///   - [FixedSizing(pixels)]: The panel has a fixed width/height in logical pixels.
+  ///   - [FlexibleSizing(weight)]: The panel takes up a proportion of remaining space (like Flex).
+  ///   - [ContentSizing()]: The panel shrinks to fit its child content.
+  ///
+  /// [mode]: Defines how the panel is positioned in the layout.
+  ///   - [PanelMode.inline]: The panel sits within the flow of the [PanelArea] (e.g., in the row/column).
+  ///   - [PanelMode.overlay]: The panel floats on top of other content, anchored to a side.
+  ///   - [PanelMode.detached]: The panel is registered but not shown in the main area (rare).
+  ///
+  /// [anchor]: Specifies which edge of the container the panel is attached to.
+  ///   - [PanelAnchor.left]/[PanelAnchor.right]: Vertical panels (width is sized).
+  ///   - [PanelAnchor.top]/[PanelAnchor.bottom]: Horizontal panels (height is sized).
+  ///
+  /// [constraints]: detailed limits on the panel's dimensions.
+  ///   - [minSize]: The minimum size (pixels) the user can resize it to.
+  ///   - [maxSize]: The maximum size (pixels) the user can resize it to.
+  ///   - [collapsedSize]: The size (pixels) when the panel is collapsed (if not 0).
+  ///
+  /// [visuals]: Configuration for animations and transitions.
+  ///   - [animationDuration]: How long resize/toggle animations take.
+  ///   - [animationCurve]: The easing curve for animations.
+  ///
+  /// [isCollapsed]: Whether the panel starts in a collapsed state.
+  ///
+  /// [isVisible]: Whether the panel is initially visible.
+  ///   - If `false`, the panel is hidden.
+  ///   - **Note**: Fixed/Content sized panels will animate to size 0 when hidden.
+  ///   - **Note**: Flexible panels are removed from the layout immediately when hidden.
+  ///
+  /// [isResizable]: Whether the user can drag the edge of this panel to resize it.
   PanelController registerPanel(
     PanelId id, {
     required PanelSizing sizing,

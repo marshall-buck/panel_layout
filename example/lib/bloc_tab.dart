@@ -12,8 +12,18 @@ class LayoutState {
 class LayoutCubit extends Cubit<LayoutState> {
   LayoutCubit() : super(LayoutState());
 
-  void toggleLeft() => emit(LayoutState(leftVisible: !state.leftVisible, rightVisible: state.rightVisible));
-  void toggleRight() => emit(LayoutState(leftVisible: state.leftVisible, rightVisible: !state.rightVisible));
+  void toggleLeft() => emit(
+    LayoutState(
+      leftVisible: !state.leftVisible,
+      rightVisible: state.rightVisible,
+    ),
+  );
+  void toggleRight() => emit(
+    LayoutState(
+      leftVisible: state.leftVisible,
+      rightVisible: !state.rightVisible,
+    ),
+  );
 }
 
 // --- Tab ---
@@ -81,11 +91,17 @@ class BlocLayoutBody extends StatelessWidget {
               ],
             ),
             body: PanelArea(
-              controller: controller,
-              panelIds: const [PanelId('left'), PanelId('center'), PanelId('right')],
+              panelLayoutController: controller,
+              panelIds: const [
+                PanelId('left'),
+                PanelId('center'),
+                PanelId('right'),
+              ],
               panelBuilder: (context, id) {
                 if (id.value == 'center') {
-                  return const Center(child: Text('Main Content\n(Controlled by BLoC)'));
+                  return const Center(
+                    child: Text('Main Content\n(Controlled by BLoC)'),
+                  );
                 }
                 // Styling handled here
                 return Container(
