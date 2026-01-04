@@ -68,17 +68,26 @@ class LayoutPanel extends StatelessWidget {
             ),
           );
         } else if (panelController.sizing is ContentSizing) {
-          final animatedContent = AnimatedSize(
+          Alignment alignment;
+          switch (panelController.anchor) {
+            case PanelAnchor.left:
+              alignment = Alignment.centerLeft;
+            case PanelAnchor.right:
+              alignment = Alignment.centerRight;
+            case PanelAnchor.top:
+              alignment = Alignment.topCenter;
+            case PanelAnchor.bottom:
+              alignment = Alignment.bottomCenter;
+          }
+
+          animatedPanel = AnimatedSize(
             duration: visuals.animationDuration,
             curve: visuals.animationCurve,
+            alignment: alignment,
             child: panelController.isVisible
                 ? decoratedChild
                 : const SizedBox.shrink(),
           );
-
-          animatedPanel = isVertical
-              ? IntrinsicWidth(child: animatedContent)
-              : IntrinsicHeight(child: animatedContent);
         } else {
           // For FlexibleSizing, we return the content directly.
           animatedPanel = panelController.isVisible
