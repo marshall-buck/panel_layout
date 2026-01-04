@@ -80,22 +80,37 @@ class LayoutPanel extends StatelessWidget {
             ),
           );
         } else if (panelController.sizing is ContentSizing) {
-          Alignment alignment;
+          Axis axis;
+          double axisAlignment;
+
           switch (panelController.anchor) {
             case PanelAnchor.left:
-              alignment = Alignment.centerLeft;
+              axis = Axis.horizontal;
+              axisAlignment = -1.0;
             case PanelAnchor.right:
-              alignment = Alignment.centerRight;
+              axis = Axis.horizontal;
+              axisAlignment = 1.0;
             case PanelAnchor.top:
-              alignment = Alignment.topCenter;
+              axis = Axis.vertical;
+              axisAlignment = -1.0;
             case PanelAnchor.bottom:
-              alignment = Alignment.bottomCenter;
+              axis = Axis.vertical;
+              axisAlignment = 1.0;
           }
 
-          animatedPanel = AnimatedSize(
+          animatedPanel = AnimatedSwitcher(
             duration: visuals.animationDuration,
-            curve: visuals.animationCurve,
-            alignment: alignment,
+            reverseDuration: visuals.animationDuration,
+            switchInCurve: visuals.animationCurve,
+            switchOutCurve: visuals.animationCurve,
+            transitionBuilder: (child, animation) {
+              return SizeTransition(
+                sizeFactor: animation,
+                axis: axis,
+                axisAlignment: axisAlignment,
+                child: child,
+              );
+            },
             child: panelController.isVisible
                 ? decoratedChild
                 : const SizedBox.shrink(),
