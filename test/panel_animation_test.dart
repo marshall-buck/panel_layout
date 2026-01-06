@@ -15,6 +15,7 @@ void main() {
     // Panel 1: Fixed, Visible
     controller.registerPanel(
       panelId1,
+      builder: (context, _) => Container(color: const Color(0xFF00FF00)),
       sizing: const FixedSizing(100),
       mode: PanelMode.inline,
       anchor: PanelAnchor.right,
@@ -24,6 +25,12 @@ void main() {
     // Panel 2: Content, Invisible initially
     controller.registerPanel(
       panelId2,
+      builder:
+          (context, _) => Container(
+            width: 200,
+            height: 200,
+            color: const Color(0xFFFF0000),
+          ),
       sizing: const ContentSizing(),
       mode: PanelMode.inline,
       anchor: PanelAnchor.right,
@@ -43,16 +50,6 @@ void main() {
               child: PanelArea(
                 panelLayoutController: controller,
                 panelIds: const [panelId1, panelId2],
-                panelBuilder: (context, id) {
-                  if (id == panelId1) {
-                    return Container(color: const Color(0xFF00FF00));
-                  }
-                  return Container(
-                    width: 200,
-                    height: 200,
-                    color: const Color(0xFFFF0000),
-                  );
-                },
               ),
             ),
           ),
@@ -123,6 +120,11 @@ void main() {
 
       controller.registerPanel(
         panelId,
+        builder:
+            (context, _) => Container(
+              key: const ValueKey('content'),
+              color: const Color(0xFF00FF00),
+            ),
         sizing: const FixedSizing(fixedWidth),
         mode: PanelMode.inline,
         anchor: PanelAnchor.right,
@@ -145,12 +147,6 @@ void main() {
                 child: PanelArea(
                   panelLayoutController: controller,
                   panelIds: const [panelId],
-                  panelBuilder: (context, id) {
-                    return Container(
-                      key: const ValueKey('content'),
-                      color: const Color(0xFF00FF00),
-                    );
-                  },
                 ),
               ),
             ),
@@ -206,6 +202,13 @@ void main() {
 
       controller.registerPanel(
         panelId,
+        builder:
+            (context, _) => Container(
+              key: const ValueKey('content'),
+              width: 200, // Explicit width for content
+              height: 200,
+              color: const Color(0xFF00FF00),
+            ),
         sizing: const ContentSizing(),
         mode: PanelMode.inline,
         anchor: PanelAnchor.right,
@@ -228,14 +231,6 @@ void main() {
                 child: PanelArea(
                   panelLayoutController: controller,
                   panelIds: const [panelId],
-                  panelBuilder: (context, id) {
-                    return Container(
-                      key: const ValueKey('content'),
-                      width: 200, // Explicit width for content
-                      height: 200,
-                      color: const Color(0xFF00FF00),
-                    );
-                  },
                 ),
               ),
             ),

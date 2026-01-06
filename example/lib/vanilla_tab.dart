@@ -15,6 +15,23 @@ class VanillaTab extends StatelessWidget {
           mode: PanelMode.inline,
           anchor: PanelAnchor.left,
           constraints: const PanelConstraints(minSize: 100, maxSize: 400),
+          builder: (context, _) => Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                right: BorderSide(color: Color(0xFFCCCCCC)),
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Left Sidebar',
+                style: TextStyle(
+                  color: Color(0xFF000000),
+                  fontSize: 14,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ),
         );
 
         controller.registerPanel(
@@ -22,6 +39,20 @@ class VanillaTab extends StatelessWidget {
           sizing: const FlexibleSizing(1.0),
           mode: PanelMode.inline,
           anchor: PanelAnchor.left,
+          builder: (context, _) => Container(
+            color: const Color(0xFFF0F0F0),
+            child: const Center(
+              child: Text(
+                'Main Content',
+                style: TextStyle(
+                  color: Color(0xFF000000),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ),
         );
 
         controller.registerPanel(
@@ -30,6 +61,23 @@ class VanillaTab extends StatelessWidget {
           mode: PanelMode.inline,
           anchor: PanelAnchor.right,
           constraints: const PanelConstraints(minSize: 200, maxSize: 500),
+          builder: (context, _) => Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                left: BorderSide(color: Color(0xFFCCCCCC)),
+              ),
+            ),
+            child: const Center(
+              child: Text(
+                'Right Inspector',
+                style: TextStyle(
+                  color: Color(0xFF000000),
+                  fontSize: 14,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ),
         );
 
         return Container(
@@ -45,61 +93,6 @@ class VanillaTab extends StatelessWidget {
                     PanelId('center'),
                     PanelId('right'),
                   ],
-                  panelBuilder: (context, id) {
-                    if (id.value == 'left') {
-                      // Apply styling manually (e.g. border)
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(color: const Color(0xFFCCCCCC)),
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Left Sidebar',
-                            style: TextStyle(
-                              color: Color(0xFF000000),
-                              fontSize: 14,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    if (id.value == 'right') {
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            left: BorderSide(color: const Color(0xFFCCCCCC)),
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Right Inspector',
-                            style: TextStyle(
-                              color: Color(0xFF000000),
-                              fontSize: 14,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    return Container(
-                      color: const Color(0xFFF0F0F0),
-                      child: const Center(
-                        child: Text(
-                          'Main Content',
-                          style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.none,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
                 ),
               ),
             ],

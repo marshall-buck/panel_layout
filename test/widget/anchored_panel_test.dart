@@ -15,6 +15,7 @@ void main() {
       // Register Panel A (Standard)
       controller.registerPanel(
         panelA,
+        builder: (context, _) => Text(panelA.value),
         sizing: const FlexibleSizing(1.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -23,6 +24,7 @@ void main() {
       // Register Panel B (Anchored to A, Left)
       controller.registerPanel(
         panelB,
+        builder: (context, _) => Text(panelB.value),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -39,7 +41,6 @@ void main() {
                 panelA,
                 panelB,
               ], // Order in list doesn't matter for anchored
-              panelBuilder: (context, id) => Text(id.value),
             ),
           ),
         ),
@@ -69,6 +70,7 @@ void main() {
 
       controller.registerPanel(
         panelA,
+        builder: (context, _) => Text(panelA.value),
         sizing: const FlexibleSizing(1.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -76,6 +78,7 @@ void main() {
 
       controller.registerPanel(
         panelB,
+        builder: (context, _) => Text(panelB.value),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.right,
@@ -89,7 +92,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: controller,
               panelIds: const [panelA, panelB],
-              panelBuilder: (context, id) => Text(id.value),
             ),
           ),
         ),
@@ -109,6 +111,7 @@ void main() {
 
         controller.registerPanel(
           panelA,
+          builder: (context, _) => Text(panelA.value),
           sizing: const FlexibleSizing(1.0),
           mode: PanelMode.inline,
           anchor: PanelAnchor.left,
@@ -116,6 +119,7 @@ void main() {
 
         controller.registerPanel(
           panelB,
+          builder: (context, _) => Text(panelB.value),
           sizing: const FixedSizing(200),
           mode: PanelMode.overlay,
           anchor: PanelAnchor.right, // Should attach to Right of A
@@ -129,7 +133,6 @@ void main() {
               child: PanelArea(
                 panelLayoutController: controller,
                 panelIds: const [panelA, panelB],
-                panelBuilder: (context, id) => Text(id.value),
               ),
             ),
           ),
@@ -150,6 +153,7 @@ void main() {
 
       controller.registerPanel(
         panelA,
+        builder: (context, _) => Text(panelA.value),
         sizing: const FlexibleSizing(1.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -157,6 +161,7 @@ void main() {
 
       controller.registerPanel(
         panelB,
+        builder: (context, _) => Text(panelB.value),
         sizing: const FixedSizing(200),
         mode: PanelMode.overlay,
         anchor: PanelAnchor.right,
@@ -170,7 +175,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: controller,
               panelIds: const [panelA, panelB],
-              panelBuilder: (context, id) => Text(id.value),
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import 'panel_controller.dart';
 import 'panel_data.dart';
@@ -55,6 +55,7 @@ class PanelLayoutController extends ChangeNotifier {
   /// [isResizable]  Whether the user can drag the edge of this panel to resize it.
   PanelController registerPanel(
     PanelId id, {
+    required Widget Function(BuildContext, PanelController) builder,
     required PanelSizing sizing,
     required PanelMode mode,
     required PanelAnchor anchor,
@@ -71,6 +72,7 @@ class PanelLayoutController extends ChangeNotifier {
 
     final controller = PanelController(
       id: id,
+      builder: builder,
       sizing: sizing,
       mode: mode,
       anchor: anchor,

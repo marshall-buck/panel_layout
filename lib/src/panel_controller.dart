@@ -15,6 +15,7 @@ class PanelController extends ChangeNotifier {
   /// Creates a new [PanelController] for the panel with the given [id].
   PanelController({
     required this.id,
+    required this.builder,
     required PanelSizing sizing,
     required PanelMode mode,
     required PanelAnchor anchor,
@@ -35,6 +36,9 @@ class PanelController extends ChangeNotifier {
 
   /// The unique identifier for this panel.
   final PanelId id;
+
+  /// The builder function that creates the widget tree for this panel.
+  final Widget Function(BuildContext context, PanelController controller) builder;
 
   /// Whether this panel allows user resizing via drag handles.
   final bool isResizable;

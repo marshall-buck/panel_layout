@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/src/panel_controller.dart';
 import 'package:panel_layout/src/panel_data.dart';
@@ -10,6 +11,7 @@ void main() {
     setUp(() {
       controller = PanelController(
         id: panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(200.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -36,6 +38,7 @@ void main() {
     test('resize respects constraints', () {
       controller = PanelController(
         id: panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -52,6 +55,7 @@ void main() {
     test('resize updates flexible weight', () {
       controller = PanelController(
         id: panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FlexibleSizing(1.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -65,6 +69,7 @@ void main() {
     test('resize ignored if not resizable', () {
       controller = PanelController(
         id: panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(200.0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -78,6 +83,7 @@ void main() {
     test('resize ignored for ContentSizing', () {
       controller = PanelController(
         id: panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const ContentSizing(),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,

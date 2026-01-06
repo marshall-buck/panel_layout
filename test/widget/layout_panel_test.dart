@@ -21,6 +21,7 @@ void main() {
     testWidgets('renders child when visible (FixedSizing)', (tester) async {
       final controller = layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -44,6 +45,7 @@ void main() {
     testWidgets('animates to size 0 when hidden (FixedSizing)', (tester) async {
       final controller = layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -94,6 +96,7 @@ void main() {
     testWidgets('ContentSizing uses AnimatedSwitcher', (tester) async {
        final controller = layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const ContentSizing(),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,

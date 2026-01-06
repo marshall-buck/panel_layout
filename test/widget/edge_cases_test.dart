@@ -18,12 +18,14 @@ void main() {
     testWidgets('Panel with 0 size (FixedSizing)', (tester) async {
       layoutController.registerPanel(
         const PanelId('zero'),
+        builder: (context, _) => const Text('Content PanelId(zero)'),
         sizing: const FixedSizing(0),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       layoutController.registerPanel(
         const PanelId('content'),
+        builder: (context, _) => const Text('Content PanelId(content)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -36,7 +38,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: layoutController,
               panelIds: const [PanelId('zero'), PanelId('content')],
-              panelBuilder: (context, id) => Text('Content $id'),
             ),
           ),
         ),
@@ -55,7 +56,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: layoutController,
               panelIds: const [],
-              panelBuilder: (context, id) => Text('Content $id'),
             ),
           ),
         ),
@@ -68,6 +68,7 @@ void main() {
     testWidgets('Rapid visibility toggling', (tester) async {
       final panel = layoutController.registerPanel(
         const PanelId('toggle'),
+        builder: (context, _) => Container(color: Colors.red),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -81,7 +82,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: layoutController,
               panelIds: const [PanelId('toggle')],
-              panelBuilder: (context, id) => Container(color: Colors.red),
             ),
           ),
         ),
@@ -115,12 +115,14 @@ void main() {
 
       layoutController.registerPanel(
         const PanelId('p1'),
+        builder: (context, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       layoutController.registerPanel(
         const PanelId('p2'),
+        builder: (context, _) => const SizedBox(),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -138,7 +140,6 @@ void main() {
                   child: PanelArea(
                     panelLayoutController: layoutController,
                     panelIds: const [PanelId('p1'), PanelId('p2')],
-                    panelBuilder: (context, id) => const SizedBox(),
                   ),
                 ),
               );

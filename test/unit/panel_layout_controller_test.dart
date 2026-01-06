@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/src/panel_data.dart';
 import 'package:panel_layout/src/panel_layout_controller.dart';
@@ -18,6 +19,7 @@ void main() {
     test('registerPanel creates and stores new panel', () {
       final controller = layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -31,6 +33,7 @@ void main() {
     test('registerPanel returns existing panel if ID matches', () {
       final controller1 = layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -38,6 +41,7 @@ void main() {
 
       final controller2 = layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(200), // Different config
         mode: PanelMode.overlay,
         anchor: PanelAnchor.right,
@@ -62,6 +66,7 @@ void main() {
     test('removePanel removes and disposes controller', () {
       layoutController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -84,6 +89,7 @@ void main() {
       
       localController.registerPanel(
         panelId,
+        builder: (c, _) => const SizedBox(),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,

@@ -20,12 +20,14 @@ void main() {
     testWidgets('renders inline panels correctly', (tester) async {
       layoutController.registerPanel(
         const PanelId('left'),
+        builder: (context, _) => const Text('Content PanelId(left)'),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       layoutController.registerPanel(
         const PanelId('center'),
+        builder: (context, _) => const Text('Content PanelId(center)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left, // Anchor mostly relevant for overlays/resize dir
@@ -37,7 +39,6 @@ void main() {
           child: PanelArea(
             panelLayoutController: layoutController,
             panelIds: const [PanelId('left'), PanelId('center')],
-            panelBuilder: (context, id) => Text('Content $id'),
           ),
         ),
       );
@@ -50,12 +51,14 @@ void main() {
     testWidgets('renders overlay panels correctly', (tester) async {
       layoutController.registerPanel(
         const PanelId('main'),
+        builder: (context, _) => const Text('Content PanelId(main)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       layoutController.registerPanel(
         const PanelId('drawer'),
+        builder: (context, _) => const Text('Content PanelId(drawer)'),
         sizing: const FixedSizing(200),
         mode: PanelMode.overlay,
         anchor: PanelAnchor.right,
@@ -67,7 +70,6 @@ void main() {
           child: PanelArea(
             panelLayoutController: layoutController,
             panelIds: const [PanelId('main'), PanelId('drawer')],
-            panelBuilder: (context, id) => Text('Content $id'),
           ),
         ),
       );
@@ -88,12 +90,14 @@ void main() {
     testWidgets('resizing fixed panel updates width', (tester) async {
       final leftPanel = layoutController.registerPanel(
         const PanelId('left'),
+        builder: (context, _) => const Text('PanelId(left)'),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       layoutController.registerPanel(
         const PanelId('center'),
+        builder: (context, _) => const Text('PanelId(center)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -108,7 +112,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: layoutController,
               panelIds: const [PanelId('left'), PanelId('center')],
-              panelBuilder: (context, id) => Text('$id'),
             ),
           ),
         ),
@@ -126,12 +129,14 @@ void main() {
     testWidgets('resizing flexible panels redistributes weight', (tester) async {
       final leftPanel = layoutController.registerPanel(
         const PanelId('left'),
+        builder: (context, _) => const Text('PanelId(left)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       final rightPanel = layoutController.registerPanel(
         const PanelId('right'),
+        builder: (context, _) => const Text('PanelId(right)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.right,
@@ -147,7 +152,6 @@ void main() {
             child: PanelArea(
               panelLayoutController: layoutController,
               panelIds: const [PanelId('left'), PanelId('right')],
-              panelBuilder: (context, id) => Text('$id'),
             ),
           ),
         ),
@@ -173,6 +177,7 @@ void main() {
     testWidgets('hiding panel updates layout', (tester) async {
       final leftPanel = layoutController.registerPanel(
         const PanelId('left'),
+        builder: (context, _) => const Text('Content PanelId(left)'),
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -180,6 +185,7 @@ void main() {
       );
       layoutController.registerPanel(
         const PanelId('center'),
+        builder: (context, _) => const Text('Content PanelId(center)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -191,7 +197,6 @@ void main() {
           child: PanelArea(
             panelLayoutController: layoutController,
             panelIds: const [PanelId('left'), PanelId('center')],
-            panelBuilder: (context, id) => Text('Content $id'),
           ),
         ),
       );
@@ -220,12 +225,14 @@ void main() {
     testWidgets('hiding flexible panel removes it from layout', (tester) async {
       final leftPanel = layoutController.registerPanel(
         const PanelId('left'),
+        builder: (context, _) => const Text('Content PanelId(left)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
       );
       layoutController.registerPanel(
         const PanelId('center'),
+        builder: (context, _) => const Text('Content PanelId(center)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
@@ -237,7 +244,6 @@ void main() {
           child: PanelArea(
             panelLayoutController: layoutController,
             panelIds: const [PanelId('left'), PanelId('center')],
-            panelBuilder: (context, id) => Text('Content $id'),
           ),
         ),
       );

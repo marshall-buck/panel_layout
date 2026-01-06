@@ -12,7 +12,6 @@ class PanelArea extends StatelessWidget {
   const PanelArea({
     required this.panelLayoutController,
     required this.panelIds,
-    required this.panelBuilder,
     this.axis = Axis.horizontal,
     super.key,
   });
@@ -22,9 +21,6 @@ class PanelArea extends StatelessWidget {
 
   /// The list of panel IDs to include in this area.
   final List<PanelId> panelIds;
-
-  /// Builder to provide the widget content for a panel.
-  final Widget Function(BuildContext context, PanelId id) panelBuilder;
 
   /// The main axis of the layout.
   final Axis axis;
@@ -84,7 +80,7 @@ class PanelArea extends StatelessWidget {
                 child: LayoutPanel(
                   key: ValueKey(panel.id),
                   panelController: panel,
-                  child: panelBuilder(context, panel.id),
+                  child: panel.builder(context, panel),
                 ),
               );
 
@@ -244,7 +240,7 @@ class PanelArea extends StatelessWidget {
       link: panel.layerLink,
       child: LayoutPanel(
         panelController: panel,
-        child: panelBuilder(context, panel.id),
+        child: panel.builder(context, panel),
       ),
     );
 
