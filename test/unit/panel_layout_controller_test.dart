@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/src/panel_data.dart';
-import 'package:panel_layout/src/panel_controller.dart';
 import 'package:panel_layout/src/panel_layout_controller.dart';
 
 void main() {
@@ -61,7 +60,7 @@ void main() {
     });
 
     test('removePanel removes and disposes controller', () {
-      final controller = layoutController.registerPanel(
+      layoutController.registerPanel(
         panelId,
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import 'panel_data.dart';
 
@@ -18,6 +18,7 @@ class PanelController extends ChangeNotifier {
     required PanelSizing sizing,
     required PanelMode mode,
     required PanelAnchor anchor,
+    PanelId? anchorPanel,
     PanelConstraints constraints = const PanelConstraints(),
     PanelVisuals visuals = const PanelVisuals(),
     bool isCollapsed = false,
@@ -26,6 +27,7 @@ class PanelController extends ChangeNotifier {
   }) : _sizing = sizing,
        _mode = mode,
        _anchor = anchor,
+       _anchorPanel = anchorPanel,
        _constraints = constraints,
        _visuals = visuals,
        _isCollapsed = isCollapsed,
@@ -37,9 +39,14 @@ class PanelController extends ChangeNotifier {
   /// Whether this panel allows user resizing via drag handles.
   final bool isResizable;
 
+  /// A stable handle for this panel's geometry in the render tree.
+  /// Used as a target for [CompositedTransformFollower] by panels anchored to this one.
+  final LayerLink layerLink = LayerLink();
+
   PanelSizing _sizing;
   PanelMode _mode;
   final PanelAnchor _anchor;
+  final PanelId? _anchorPanel;
   final PanelConstraints _constraints;
   PanelVisuals _visuals;
 
@@ -54,6 +61,11 @@ class PanelController extends ChangeNotifier {
 
   /// The edge of the container to which this panel is anchored.
   PanelAnchor get anchor => _anchor;
+
+  /// The ID of the panel to which this panel is anchored (if any).
+  ///
+  /// If null, the panel is anchored to the layout container's edge.
+  PanelId? get anchorPanel => _anchorPanel;
 
   /// The constraint boundaries for this panel.
   PanelConstraints get constraints => _constraints;

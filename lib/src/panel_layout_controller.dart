@@ -33,6 +33,9 @@ class PanelLayoutController extends ChangeNotifier {
   ///   - [PanelAnchor.left]/[PanelAnchor.right]: Vertical panels (width is sized).
   ///   - [PanelAnchor.top]/[PanelAnchor.bottom]: Horizontal panels (height is sized).
   ///
+  /// [anchorPanel] Optional ID of another panel to anchor this panel to.
+  ///   - If provided, the [anchor] property determines the position relative to this target panel.
+  ///
   /// [constraints] detailed limits on the panel's dimensions.
   ///   - [minSize]: The minimum size (pixels) the user can resize it to.
   ///   - [maxSize]: The maximum size (pixels) the user can resize it to.
@@ -55,6 +58,7 @@ class PanelLayoutController extends ChangeNotifier {
     required PanelSizing sizing,
     required PanelMode mode,
     required PanelAnchor anchor,
+    PanelId? anchorPanel,
     PanelConstraints constraints = const PanelConstraints(),
     PanelVisuals visuals = const PanelVisuals(),
     bool isCollapsed = false,
@@ -70,6 +74,7 @@ class PanelLayoutController extends ChangeNotifier {
       sizing: sizing,
       mode: mode,
       anchor: anchor,
+      anchorPanel: anchorPanel,
       constraints: constraints,
       visuals: visuals,
       isCollapsed: isCollapsed,

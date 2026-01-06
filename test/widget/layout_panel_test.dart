@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/src/layout_panel.dart';
-import 'package:panel_layout/src/panel_controller.dart';
 import 'package:panel_layout/src/panel_data.dart';
 import 'package:panel_layout/src/panel_layout_controller.dart';
 import 'package:panel_layout/src/panel_scope.dart';

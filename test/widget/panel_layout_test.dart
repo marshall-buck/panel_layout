@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/src/panel_layout.dart';
 import 'package:panel_layout/src/panel_layout_controller.dart';
-import 'package:panel_layout/src/panel_scope.dart';
 
 void main() {
   group('PanelLayout', () {
