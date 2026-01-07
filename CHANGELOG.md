@@ -1,3 +1,9 @@
+## 0.3.0
+
+*   **Feat**: Added `alignment`, `anchorLink`, and `crossAxisAlignment` to `PanelController` and `PanelLayoutController`.
+*   **Feat**: Enabled arbitrary global positioning for overlay panels (e.g., Top Center).
+*   **Feat**: Enabled anchoring overlay panels to arbitrary `LayerLink` targets (widgets outside the layout system).
+
 ## 0.2.0
 
 *   **Breaking**: `registerPanel` now requires a `builder` function. This moves the definition of "what to render" into the registration phase, eliminating the need for a separate `panelBuilder` in `PanelArea`.
