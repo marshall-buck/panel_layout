@@ -78,7 +78,7 @@ void main() {
       expect(visuals.animationDuration, const Duration(milliseconds: 300));
     });
 
-     test('copyWith with nulls keeps original', () {
+    test('copyWith with nulls keeps original', () {
       const visuals = PanelVisuals(animationDuration: Duration(seconds: 1));
       final sameVisuals = visuals.copyWith();
 

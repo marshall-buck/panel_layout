@@ -49,7 +49,7 @@ class PanelArea extends StatelessWidget {
 
             for (final panel in panels) {
               if (panel.mode == PanelMode.detached) continue;
-              
+
               if (panel.mode == PanelMode.overlay) {
                 overlayPanels.add(
                   _buildOverlayPanel(context, panel, totalSize),
@@ -162,8 +162,8 @@ class PanelArea extends StatelessWidget {
       final targetIndex = ordered.indexWhere((p) => p.id == panel.anchorPanel);
       if (targetIndex != -1) {
         // Insert based on anchor direction relative to target
-        bool insertBefore = panel.anchor == PanelAnchor.left ||
-            panel.anchor == PanelAnchor.top;
+        bool insertBefore =
+            panel.anchor == PanelAnchor.left || panel.anchor == PanelAnchor.top;
 
         // If target is right/bottom anchored itself, logic might flip depending on
         // strictly visual vs logical. Assuming logical: Left/Top = Before.
@@ -250,13 +250,11 @@ class PanelArea extends StatelessWidget {
 
     // 2. Determine Logic Strategy (Global vs Relative)
     if (panel.anchorLink != null) {
-      return _buildRelativeOverlay(
-          context, panel, content, panel.anchorLink!);
+      return _buildRelativeOverlay(context, panel, content, panel.anchorLink!);
     } else if (panel.anchorPanel != null) {
       final target = panelLayoutController.getPanel(panel.anchorPanel!);
       if (target != null) {
-        return _buildRelativeOverlay(
-            context, panel, content, target.layerLink);
+        return _buildRelativeOverlay(context, panel, content, target.layerLink);
       }
     }
 
@@ -265,7 +263,10 @@ class PanelArea extends StatelessWidget {
   }
 
   Widget _buildGlobalOverlay(
-      BuildContext context, PanelController panel, Widget content) {
+    BuildContext context,
+    PanelController panel,
+    Widget content,
+  ) {
     // Resolve alignment
     Alignment alignment;
     if (panel.alignment != null) {
@@ -340,8 +341,12 @@ class PanelArea extends StatelessWidget {
     );
   }
 
-  Widget _buildRelativeOverlay(BuildContext context, PanelController panel,
-      Widget content, LayerLink targetLink) {
+  Widget _buildRelativeOverlay(
+    BuildContext context,
+    PanelController panel,
+    Widget content,
+    LayerLink targetLink,
+  ) {
     // Determine follower alignment
     Alignment followerAnchor = Alignment.center;
     Alignment targetAnchor = Alignment.center;

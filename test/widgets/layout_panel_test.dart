@@ -77,21 +77,23 @@ void main() {
       controller.setVisible(visible: false);
       await tester.pump(); // Start animation
       await tester.pump(const Duration(milliseconds: 50)); // Halfway
-      
+
       // Verify animating (size < 100)
-      double currentWidth = tester.getSize(find.byType(AnimatedContainer)).width;
-      
+      double currentWidth = tester
+          .getSize(find.byType(AnimatedContainer))
+          .width;
+
       // Linear: 100 -> 0. At 50%, should be 50.
       expect(currentWidth, closeTo(50.0, 1.0));
 
       await tester.pumpAndSettle(); // Finish animation
-      
+
       // Should be 0 width
       expect(tester.getSize(find.byType(AnimatedContainer)).width, 0.0);
     });
-    
+
     testWidgets('ContentSizing uses AnimatedSwitcher', (tester) async {
-       final controller = layoutController.registerPanel(
+      final controller = layoutController.registerPanel(
         panelId,
         builder: (c, _) => const SizedBox(),
         sizing: const ContentSizing(),
@@ -110,13 +112,13 @@ void main() {
           ),
         ),
       );
-      
+
       expect(find.byType(AnimatedSwitcher), findsOneWidget);
       expect(find.text('Panel Content'), findsOneWidget);
-      
+
       controller.setVisible(visible: false);
       await tester.pumpAndSettle();
-      
+
       // Text should be gone (replaced by SizedBox.shrink)
       expect(find.text('Panel Content'), findsNothing);
     });

@@ -6,11 +6,11 @@ class PanelConstraints extends Equatable {
     this.maxSize = double.infinity,
     this.collapsedSize = 48.0,
   });
-  
+
   final double minSize;
   final double maxSize;
   final double collapsedSize;
-  
+
   @override
   List<Object?> get props => [minSize, maxSize, collapsedSize];
 }

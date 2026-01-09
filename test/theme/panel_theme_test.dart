@@ -29,11 +29,11 @@ void main() {
     });
 
     test('equality works with decorations', () {
-       const decor = BoxDecoration(color: Color(0xFF000000));
-       const theme1 = PanelThemeData(resizeHandleDecoration: decor);
-       const theme2 = PanelThemeData(resizeHandleDecoration: decor);
-       
-       expect(theme1, equals(theme2));
+      const decor = BoxDecoration(color: Color(0xFF000000));
+      const theme1 = PanelThemeData(resizeHandleDecoration: decor);
+      const theme2 = PanelThemeData(resizeHandleDecoration: decor);
+
+      expect(theme1, equals(theme2));
     });
   });
 
@@ -64,11 +64,11 @@ void main() {
 
     testWidgets('updateShouldNotify notifies on change', (tester) async {
       // This is implicitly tested by Flutter framework, but good to sanity check
-      // if we were manually managing listeners. For inherited widgets, 
+      // if we were manually managing listeners. For inherited widgets,
       // simple usage test covers it.
     });
 
-     testWidgets('fallback to default if no theme present', (tester) async {
+    testWidgets('fallback to default if no theme present', (tester) async {
       late PanelThemeData retrievedData;
 
       await tester.pumpWidget(

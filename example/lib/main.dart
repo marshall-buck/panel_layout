@@ -14,10 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Panel Layout Example',
-      theme: ThemeData(
-        useMaterial3: true,
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(useMaterial3: true, primarySwatch: Colors.blue),
       home: const HomeScreen(),
     );
   }
@@ -40,12 +37,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: [
-            VanillaTab(),
-            BlocTab(),
-          ],
-        ),
+        body: const TabBarView(children: [VanillaTab(), BlocTab()]),
       ),
     );
   }

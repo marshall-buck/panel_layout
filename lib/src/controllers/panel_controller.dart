@@ -48,7 +48,8 @@ class PanelController extends ChangeNotifier {
   final PanelId id;
 
   /// The builder function that creates the widget tree for this panel.
-  final Widget Function(BuildContext context, PanelController controller) builder;
+  final Widget Function(BuildContext context, PanelController controller)
+  builder;
 
   /// Whether this panel allows user resizing via drag handles.
   final bool isResizable;

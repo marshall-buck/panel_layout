@@ -4,7 +4,9 @@ import 'package:panel_layout/panel_layout.dart';
 
 void main() {
   group('Interactive Overlay Panels', () {
-    testWidgets('Button triggers panel slide in from Top-Center', (tester) async {
+    testWidgets('Button triggers panel slide in from Top-Center', (
+      tester,
+    ) async {
       final layoutController = PanelLayoutController();
       const mainId = PanelId('main');
       const overlayId = PanelId('overlay');
@@ -83,8 +85,10 @@ void main() {
 
       await tester.pumpAndSettle(); // Finish animations
     });
-    
-     testWidgets('Overlay panel can be dismissed (visibility toggled off)', (tester) async {
+
+    testWidgets('Overlay panel can be dismissed (visibility toggled off)', (
+      tester,
+    ) async {
       final layoutController = PanelLayoutController();
       const overlayId = PanelId('overlay');
 
@@ -118,7 +122,9 @@ void main() {
       expect(find.text('Overlay Content'), findsNothing);
     });
 
-    testWidgets('Button triggers panel slide in from Bottom-Center', (tester) async {
+    testWidgets('Button triggers panel slide in from Bottom-Center', (
+      tester,
+    ) async {
       final layoutController = PanelLayoutController();
       const mainId = PanelId('main');
       const bottomId = PanelId('bottom');
@@ -170,8 +176,11 @@ void main() {
         matching: find.byType(Align),
       );
       expect(alignFinder, findsOneWidget);
-      expect(tester.widget<Align>(alignFinder).alignment, Alignment.bottomCenter);
-      
+      expect(
+        tester.widget<Align>(alignFinder).alignment,
+        Alignment.bottomCenter,
+      );
+
       await tester.pumpAndSettle();
     });
 
@@ -227,7 +236,7 @@ void main() {
       );
       expect(alignFinder, findsOneWidget);
       expect(tester.widget<Align>(alignFinder).alignment, Alignment.centerLeft);
-      
+
       await tester.pumpAndSettle();
     });
   });

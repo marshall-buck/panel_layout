@@ -52,36 +52,32 @@ class BlocLayoutBody extends StatelessWidget {
           sizing: const FixedSizing(200),
           mode: PanelMode.inline,
           anchor: PanelAnchor.left,
-          builder:
-              (context, _) => Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: const Center(child: Text('left')),
-              ),
+          builder: (context, _) => Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: const Center(child: Text('left')),
+          ),
         );
         controller.registerPanel(
           const PanelId('center'),
           sizing: const FlexibleSizing(1),
           mode: PanelMode.inline,
           anchor: PanelAnchor.left,
-          builder:
-              (context, _) => const Center(
-                child: Text('Main Content\n(Controlled by BLoC)'),
-              ),
+          builder: (context, _) =>
+              const Center(child: Text('Main Content\n(Controlled by BLoC)')),
         );
         final right = controller.registerPanel(
           const PanelId('right'),
           sizing: const FixedSizing(200),
           mode: PanelMode.inline,
           anchor: PanelAnchor.right,
-          builder:
-              (context, _) => Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: const Center(child: Text('right')),
-              ),
+          builder: (context, _) => Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: const Center(child: Text('right')),
+          ),
         );
 
         return BlocListener<LayoutCubit, LayoutState>(

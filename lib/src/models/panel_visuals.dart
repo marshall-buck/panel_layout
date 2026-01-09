@@ -21,7 +21,7 @@ class PanelVisuals extends Equatable {
       animationCurve: animationCurve ?? this.animationCurve,
     );
   }
-  
+
   @override
   List<Object?> get props => [animationDuration, animationCurve];
 }

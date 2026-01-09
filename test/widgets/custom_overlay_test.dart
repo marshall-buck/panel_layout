@@ -14,67 +14,79 @@ void main() {
       layoutController.dispose();
     });
 
-    testWidgets('Global Overlay respects custom alignment and crossAxisAlignment', (tester) async {
-      layoutController.registerPanel(
-        const PanelId('main'),
-        builder: (context, _) => Container(color: const Color(0xFFCCCCCC)),
-        sizing: const FlexibleSizing(1),
-        mode: PanelMode.inline,
-        anchor: PanelAnchor.left,
-      );
+    testWidgets(
+      'Global Overlay respects custom alignment and crossAxisAlignment',
+      (tester) async {
+        layoutController.registerPanel(
+          const PanelId('main'),
+          builder: (context, _) => Container(color: const Color(0xFFCCCCCC)),
+          sizing: const FlexibleSizing(1),
+          mode: PanelMode.inline,
+          anchor: PanelAnchor.left,
+        );
 
-      layoutController.registerPanel(
-        const PanelId('top_center_dropdown'),
-        builder: (context, _) => Container(
-          width: 200, 
-          height: 100, 
-          color: const Color(0xFFFF0000),
-          child: const Text('Dropdown'),
-        ),
-        sizing: const FixedSizing(100),
-        mode: PanelMode.overlay,
-        anchor: PanelAnchor.top,
-        alignment: Alignment.topCenter,
-        crossAxisAlignment: CrossAxisAlignment.center, // Don't stretch to full width
-      );
+        layoutController.registerPanel(
+          const PanelId('top_center_dropdown'),
+          builder: (context, _) => Container(
+            width: 200,
+            height: 100,
+            color: const Color(0xFFFF0000),
+            child: const Text('Dropdown'),
+          ),
+          sizing: const FixedSizing(100),
+          mode: PanelMode.overlay,
+          anchor: PanelAnchor.top,
+          alignment: Alignment.topCenter,
+          crossAxisAlignment:
+              CrossAxisAlignment.center, // Don't stretch to full width
+        );
 
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: SizedBox(
-            width: 800,
-            height: 600,
-            child: PanelArea(
-              panelLayoutController: layoutController,
-              panelIds: const [PanelId('main'), PanelId('top_center_dropdown')],
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: SizedBox(
+              width: 800,
+              height: 600,
+              child: PanelArea(
+                panelLayoutController: layoutController,
+                panelIds: const [
+                  PanelId('main'),
+                  PanelId('top_center_dropdown'),
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Verify alignment
-      final alignFinder = find.ancestor(
-        of: find.text('Dropdown'),
-        matching: find.byType(Align),
-      );
-      expect(alignFinder, findsOneWidget);
-      expect(tester.widget<Align>(alignFinder).alignment, Alignment.topCenter);
+        // Verify alignment
+        final alignFinder = find.ancestor(
+          of: find.text('Dropdown'),
+          matching: find.byType(Align),
+        );
+        expect(alignFinder, findsOneWidget);
+        expect(
+          tester.widget<Align>(alignFinder).alignment,
+          Alignment.topCenter,
+        );
 
-      // Verify it is NOT stretched
-      // We find the Flex that is the parent of the panel
-      final flexFinder = find.ancestor(
-        of: find.text('Dropdown'),
-        matching: find.byType(Flex),
-      ).first; 
-      
-      expect(tester.widget<Flex>(flexFinder).crossAxisAlignment, CrossAxisAlignment.center);
-    });
+        // Verify it is NOT stretched
+        // We find the Flex that is the parent of the panel
+        final flexFinder = find
+            .ancestor(of: find.text('Dropdown'), matching: find.byType(Flex))
+            .first;
+
+        expect(
+          tester.widget<Flex>(flexFinder).crossAxisAlignment,
+          CrossAxisAlignment.center,
+        );
+      },
+    );
 
     testWidgets('Relative Overlay uses anchorLink', (tester) async {
       final layerLink = LayerLink();
 
       // Register panel first to ensure it's picked up
-       layoutController.registerPanel(
+      layoutController.registerPanel(
         const PanelId('tooltip'),
         builder: (context, _) => const Text('Tooltip'),
         sizing: const ContentSizing(),
@@ -117,7 +129,10 @@ void main() {
         matching: find.byType(CompositedTransformFollower),
       );
       expect(followerFinder, findsOneWidget);
-      expect(tester.widget<CompositedTransformFollower>(followerFinder).link, layerLink);
+      expect(
+        tester.widget<CompositedTransformFollower>(followerFinder).link,
+        layerLink,
+      );
     });
   });
 }

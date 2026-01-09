@@ -27,7 +27,8 @@ void main() {
         builder: (context, _) => const Text('Content PanelId(center)'),
         sizing: const FlexibleSizing(1),
         mode: PanelMode.inline,
-        anchor: PanelAnchor.left, // Anchor mostly relevant for overlays/resize dir
+        anchor:
+            PanelAnchor.left, // Anchor mostly relevant for overlays/resize dir
       );
 
       await tester.pumpWidget(
@@ -73,7 +74,7 @@ void main() {
 
       expect(find.text('Content PanelId(main)'), findsOneWidget);
       expect(find.text('Content PanelId(drawer)'), findsOneWidget);
-      
+
       // Verify layout structure: Stack -> [Flex(main), Align(drawer)]
       // Drawer is right-aligned overlay
       final alignFinder = find.ancestor(
@@ -81,7 +82,10 @@ void main() {
         matching: find.byType(Align),
       );
       expect(alignFinder, findsOneWidget);
-      expect(tester.widget<Align>(alignFinder).alignment, Alignment.centerRight);
+      expect(
+        tester.widget<Align>(alignFinder).alignment,
+        Alignment.centerRight,
+      );
     });
 
     testWidgets('resizing fixed panel updates width', (tester) async {
@@ -115,7 +119,7 @@ void main() {
       );
 
       final handleFinder = find.byType(PanelResizeHandle);
-      
+
       // Drag handle right by 50px
       await tester.drag(handleFinder, const Offset(50, 0));
       await tester.pumpAndSettle();
@@ -123,7 +127,9 @@ void main() {
       expect((leftPanel.sizing as FixedSizing).size, 150.0);
     });
 
-    testWidgets('resizing flexible panels redistributes weight', (tester) async {
+    testWidgets('resizing flexible panels redistributes weight', (
+      tester,
+    ) async {
       final leftPanel = layoutController.registerPanel(
         const PanelId('left'),
         builder: (context, _) => const Text('PanelId(left)'),
@@ -155,7 +161,7 @@ void main() {
       );
 
       final handleFinder = find.byType(PanelResizeHandle);
-      
+
       // Drag handle right by 100px.
       // Left becomes 500, Right becomes 300.
       // Weights should shift: Left 1.25, Right 0.75?
@@ -163,12 +169,15 @@ void main() {
       // delta = 100. available = 800. totalWeight = 2.
       // weightDelta = (100 / 800) * 2 = 0.25.
       // Left = 1 + 0.25 = 1.25. Right = 1 - 0.25 = 0.75.
-      
+
       await tester.drag(handleFinder, const Offset(100, 0));
       await tester.pumpAndSettle();
 
       expect((leftPanel.sizing as FlexibleSizing).weight, closeTo(1.25, 0.001));
-      expect((rightPanel.sizing as FlexibleSizing).weight, closeTo(0.75, 0.001));
+      expect(
+        (rightPanel.sizing as FlexibleSizing).weight,
+        closeTo(0.75, 0.001),
+      );
     });
 
     testWidgets('hiding panel updates layout', (tester) async {
@@ -178,7 +187,9 @@ void main() {
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
-        visuals: const PanelVisuals(animationDuration: Duration.zero), // Instant
+        visuals: const PanelVisuals(
+          animationDuration: Duration.zero,
+        ), // Instant
       );
       layoutController.registerPanel(
         const PanelId('center'),
@@ -203,19 +214,19 @@ void main() {
       leftPanel.setVisible(visible: false);
       await tester.pumpAndSettle();
 
-      // Text should still be present because fixed sizing panels animate to 0 size 
-      // but are not removed from tree (as per my LayoutPanel logic), 
+      // Text should still be present because fixed sizing panels animate to 0 size
+      // but are not removed from tree (as per my LayoutPanel logic),
       // BUT PanelArea logic says:
       // if (panel.isVisible || panel.sizing is! FlexibleSizing)
       // So FixedSizing IS added to list even if hidden.
-      
+
       // Verify size is 0?
       // Actually, if it's hidden, effectiveSize is 0.
       // LayoutPanel builds AnimatedContainer(width: 0).
       // So text might be clipped but present in tree.
-      
+
       expect(find.text('Content PanelId(left)'), findsOneWidget);
-      // But verify it takes no space? 
+      // But verify it takes no space?
       // Hard to verify specific render details here easily, but we verified LayoutPanel logic in unit test.
     });
 

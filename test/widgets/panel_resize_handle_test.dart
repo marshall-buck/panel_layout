@@ -35,10 +35,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelResizeHandle(
-            axis: Axis.horizontal,
-            onDragUpdate: (_) {},
-          ),
+          child: PanelResizeHandle(axis: Axis.horizontal, onDragUpdate: (_) {}),
         ),
       );
       expect(
@@ -52,9 +49,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelResizeHandle(
-            onDragUpdate: (delta) => lastDelta = delta,
-          ),
+          child: PanelResizeHandle(onDragUpdate: (delta) => lastDelta = delta),
         ),
       );
 
@@ -70,7 +65,7 @@ void main() {
     testWidgets('calls onDragStart/End', (tester) async {
       bool started = false;
       bool ended = false;
-      
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -82,18 +77,20 @@ void main() {
         ),
       );
 
-      final gesture = await tester.startGesture(tester.getCenter(find.byType(PanelResizeHandle)));
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PanelResizeHandle)),
+      );
       expect(started, true);
-      
+
       await gesture.moveBy(const Offset(10, 0));
       await gesture.up();
       expect(ended, true);
     });
 
     testWidgets('responds to hover state visually', (tester) async {
-      // We can verify that state changes, though testing exact color rendering via widget test 
+      // We can verify that state changes, though testing exact color rendering via widget test
       // usually involves checking the Container decoration.
-      
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -109,7 +106,9 @@ void main() {
 
       // Initial state: not hovered
       final handleFinder = find.byType(AnimatedContainer);
-      BoxDecoration decoration = tester.widget<AnimatedContainer>(handleFinder).decoration as BoxDecoration;
+      BoxDecoration decoration =
+          tester.widget<AnimatedContainer>(handleFinder).decoration
+              as BoxDecoration;
       expect(decoration.color, const Color(0xFF000000));
 
       // Simulate hover
@@ -119,7 +118,9 @@ void main() {
       await gesture.moveTo(tester.getCenter(find.byType(PanelResizeHandle)));
       await tester.pumpAndSettle();
 
-      decoration = tester.widget<AnimatedContainer>(handleFinder).decoration as BoxDecoration;
+      decoration =
+          tester.widget<AnimatedContainer>(handleFinder).decoration
+              as BoxDecoration;
       expect(decoration.color, const Color(0xFF00FF00));
     });
   });

@@ -50,10 +50,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelScope(
-            controller: controller1,
-            child: child,
-          ),
+          child: PanelScope(controller: controller1, child: child),
         ),
       );
 
@@ -63,10 +60,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelScope(
-            controller: controller1,
-            child: child,
-          ),
+          child: PanelScope(controller: controller1, child: child),
         ),
       );
 
@@ -76,26 +70,20 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelScope(
-            controller: controller2,
-            child: child,
-          ),
+          child: PanelScope(controller: controller2, child: child),
         ),
       );
 
       expect(buildCount, 2);
     });
-    
+
     testWidgets('throws if not found', (tester) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Builder(
             builder: (context) {
-              expect(
-                () => PanelScope.of(context),
-                throwsA(isA<Exception>()),
-              );
+              expect(() => PanelScope.of(context), throwsA(isA<Exception>()));
               return const SizedBox();
             },
           ),

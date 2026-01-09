@@ -20,15 +20,15 @@ void main() {
       );
 
       expect(capturedController, isNotNull);
-      
+
       // Verify it's in scope
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: PanelLayout(
             builder: (context, controller) {
-               expect(PanelLayout.of(context), controller);
-               return const SizedBox();
+              expect(PanelLayout.of(context), controller);
+              return const SizedBox();
             },
           ),
         ),
@@ -36,11 +36,11 @@ void main() {
     });
 
     testWidgets('disposes controller on unmount', (tester) async {
-      // It's hard to verify dispose directly since we can't access the private _controller state 
-      // after the widget is gone, and standard ChangeNotifier.dispose() doesn't have side effects we can observe easily 
+      // It's hard to verify dispose directly since we can't access the private _controller state
+      // after the widget is gone, and standard ChangeNotifier.dispose() doesn't have side effects we can observe easily
       // without mocking.
       // But we can verify that the widget tree builds correctly and cleans up without error.
-      
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -49,17 +49,17 @@ void main() {
           ),
         ),
       );
-      
+
       // Remove it
       await tester.pumpWidget(const SizedBox());
-      
+
       // Expect no errors.
     });
 
     testWidgets('PanelLayout.of returns controller', (tester) async {
-       late PanelLayoutController controller;
-       
-       await tester.pumpWidget(
+      late PanelLayoutController controller;
+
+      await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: PanelLayout(
@@ -76,17 +76,14 @@ void main() {
         ),
       );
     });
-    
+
     testWidgets('PanelLayout.of throws if missing', (tester) async {
-       await tester.pumpWidget(
+      await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Builder(
             builder: (context) {
-              expect(
-                () => PanelLayout.of(context),
-                throwsA(isA<Exception>()),
-              );
+              expect(() => PanelLayout.of(context), throwsA(isA<Exception>()));
               return const SizedBox();
             },
           ),

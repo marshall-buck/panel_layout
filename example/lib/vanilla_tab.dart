@@ -17,9 +17,7 @@ class VanillaTab extends StatelessWidget {
           constraints: const PanelConstraints(minSize: 100, maxSize: 400),
           builder: (context, _) => Container(
             decoration: const BoxDecoration(
-              border: Border(
-                right: BorderSide(color: Color(0xFFCCCCCC)),
-              ),
+              border: Border(right: BorderSide(color: Color(0xFFCCCCCC))),
             ),
             child: const Center(
               child: Text(
@@ -63,9 +61,7 @@ class VanillaTab extends StatelessWidget {
           constraints: const PanelConstraints(minSize: 200, maxSize: 500),
           builder: (context, _) => Container(
             decoration: const BoxDecoration(
-              border: Border(
-                left: BorderSide(color: Color(0xFFCCCCCC)),
-              ),
+              border: Border(left: BorderSide(color: Color(0xFFCCCCCC))),
             ),
             child: const Center(
               child: Text(

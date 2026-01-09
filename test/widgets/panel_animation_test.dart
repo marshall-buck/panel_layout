@@ -23,12 +23,8 @@ void main() {
     // Panel 2: Content, Invisible initially
     controller.registerPanel(
       panelId2,
-      builder:
-          (context, _) => Container(
-            width: 200,
-            height: 200,
-            color: const Color(0xFFFF0000),
-          ),
+      builder: (context, _) =>
+          Container(width: 200, height: 200, color: const Color(0xFFFF0000)),
       sizing: const ContentSizing(),
       mode: PanelMode.inline,
       anchor: PanelAnchor.right,
@@ -118,11 +114,10 @@ void main() {
 
       controller.registerPanel(
         panelId,
-        builder:
-            (context, _) => Container(
-              key: const ValueKey('content'),
-              color: const Color(0xFF00FF00),
-            ),
+        builder: (context, _) => Container(
+          key: const ValueKey('content'),
+          color: const Color(0xFF00FF00),
+        ),
         sizing: const FixedSizing(fixedWidth),
         mode: PanelMode.inline,
         anchor: PanelAnchor.right,
@@ -183,8 +178,7 @@ void main() {
       expect(
         contentSizeMid.width,
         fixedWidth,
-        reason:
-            'Content should remain full width during close animation',
+        reason: 'Content should remain full width during close animation',
       );
 
       await tester.pumpAndSettle();
@@ -200,13 +194,12 @@ void main() {
 
       controller.registerPanel(
         panelId,
-        builder:
-            (context, _) => Container(
-              key: const ValueKey('content'),
-              width: 200, // Explicit width for content
-              height: 200,
-              color: const Color(0xFF00FF00),
-            ),
+        builder: (context, _) => Container(
+          key: const ValueKey('content'),
+          width: 200, // Explicit width for content
+          height: 200,
+          color: const Color(0xFF00FF00),
+        ),
         sizing: const ContentSizing(),
         mode: PanelMode.inline,
         anchor: PanelAnchor.right,

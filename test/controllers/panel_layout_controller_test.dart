@@ -82,10 +82,10 @@ void main() {
     });
 
     test('dispose clears all panels', () {
-      // Create a local controller to test dispose specifically, 
+      // Create a local controller to test dispose specifically,
       // ensuring we don't conflict with setUp/tearDown lifecycle.
       final localController = PanelLayoutController();
-      
+
       localController.registerPanel(
         panelId,
         builder: (c, _) => const SizedBox(),
@@ -95,7 +95,7 @@ void main() {
       );
 
       localController.dispose();
-      
+
       // Verification: implicitly passed if no error is thrown.
       // We can't access state after dispose.
     });

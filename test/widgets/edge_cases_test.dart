@@ -71,7 +71,9 @@ void main() {
         sizing: const FixedSizing(100),
         mode: PanelMode.inline,
         anchor: PanelAnchor.left,
-        visuals: const PanelVisuals(animationDuration: Duration(milliseconds: 200)),
+        visuals: const PanelVisuals(
+          animationDuration: Duration(milliseconds: 200),
+        ),
       );
 
       await tester.pumpWidget(
@@ -106,9 +108,7 @@ void main() {
     testWidgets('Theme switching updates visuals', (tester) async {
       final themeData = ValueNotifier<PanelThemeData>(
         const PanelThemeData(
-          resizeHandleDecoration: BoxDecoration(
-            color: Colors.red,
-          ),
+          resizeHandleDecoration: BoxDecoration(color: Colors.red),
         ),
       );
 
@@ -149,23 +149,28 @@ void main() {
 
       // Find resize handle's internal AnimatedContainer
       final handleFinder = find.descendant(
-        of: find.byType(PanelResizeHandle), 
-        matching: find.byType(AnimatedContainer)
+        of: find.byType(PanelResizeHandle),
+        matching: find.byType(AnimatedContainer),
       );
-      
-      final animatedContainer = tester.widget<AnimatedContainer>(handleFinder.first);
+
+      final animatedContainer = tester.widget<AnimatedContainer>(
+        handleFinder.first,
+      );
       expect((animatedContainer.decoration as BoxDecoration).color, Colors.red);
 
       // Update theme
       themeData.value = const PanelThemeData(
-        resizeHandleDecoration: BoxDecoration(
-          color: Colors.blue,
-        ),
+        resizeHandleDecoration: BoxDecoration(color: Colors.blue),
       );
       await tester.pumpAndSettle();
 
-      final animatedContainer2 = tester.widget<AnimatedContainer>(handleFinder.first);
-      expect((animatedContainer2.decoration as BoxDecoration).color, Colors.blue);
+      final animatedContainer2 = tester.widget<AnimatedContainer>(
+        handleFinder.first,
+      );
+      expect(
+        (animatedContainer2.decoration as BoxDecoration).color,
+        Colors.blue,
+      );
     });
   });
 }

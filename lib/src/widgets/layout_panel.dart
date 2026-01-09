@@ -130,16 +130,28 @@ class LayoutPanel extends StatelessWidget {
             switchInCurve: visuals.animationCurve,
             switchOutCurve: visuals.animationCurve,
             transitionBuilder: (child, animation) {
+              final isRelative =
+                  panelController.anchorPanel != null ||
+                  panelController.anchorLink != null;
               Offset begin;
+
               switch (panelController.anchor) {
                 case PanelAnchor.right:
-                  begin = const Offset(1, 0);
+                  // Global: Slide in from Right (1 -> 0)
+                  // Relative: Slide out from Left/Target (-1 -> 0)
+                  begin = isRelative ? const Offset(-1, 0) : const Offset(1, 0);
                 case PanelAnchor.left:
-                  begin = const Offset(-1, 0);
+                  // Global: Slide in from Left (-1 -> 0)
+                  // Relative: Slide out from Right/Target (1 -> 0)
+                  begin = isRelative ? const Offset(1, 0) : const Offset(-1, 0);
                 case PanelAnchor.top:
-                  begin = const Offset(0, -1);
+                  // Global: Slide in from Top (0, -1 -> 0, 0)
+                  // Relative: Slide out from Bottom/Target (0, 1 -> 0, 0)
+                  begin = isRelative ? const Offset(0, 1) : const Offset(0, -1);
                 case PanelAnchor.bottom:
-                  begin = const Offset(0, 1);
+                  // Global: Slide in from Bottom (0, 1 -> 0, 0)
+                  // Relative: Slide out from Top/Target (0, -1 -> 0, 0)
+                  begin = isRelative ? const Offset(0, -1) : const Offset(0, 1);
               }
 
               return SlideTransition(
