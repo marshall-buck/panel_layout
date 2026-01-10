@@ -40,25 +40,27 @@ void main() {
               panelIds: const [
                 panelA,
                 panelB,
-              ], // Order in list doesn't matter for anchored
+              ], 
             ),
           ),
         ),
       );
 
-      // Verify order in the Row/Column
-      // We expect: [Panel B] [Panel A]
-      final flexFinder = find.byType(Flex);
-      tester.widget<Flex>(flexFinder.first);
-
-      // We can't easily inspect children order directly from Flex widget without keys or deeper inspection.
-      // But we can check the Finder order.
+      // Flex check is implementation detail (MultiChildLayout used now)
+      // But verify text order in Finder might still work if children are painted in order?
+      // CustomMultiChildLayout paints children in order of layout/paint.
+      // We rely on layout positions.
+      
       final textFinder = find.byType(Text);
       expect(textFinder, findsNWidgets(2));
 
       final firstText = tester.widget<Text>(textFinder.at(0));
       final secondText = tester.widget<Text>(textFinder.at(1));
 
+      // With CustomMultiChildLayout, paint order depends on `children` list passed to it.
+      // In PanelArea, we add inline widgets in order.
+      // The order should be [Panel B, Panel A] because B is anchored Left of A.
+      
       expect(firstText.data, 'panelB');
       expect(secondText.data, 'panelA');
     });
@@ -105,7 +107,7 @@ void main() {
 
   group('Anchored Overlay Panels', () {
     testWidgets(
-      'Overlay Panel anchored to another uses CompositedTransformFollower',
+      'Overlay Panel anchored to another is positioned correctly (Custom Layout)',
       (tester) async {
         final controller = PanelLayoutController();
 
@@ -138,15 +140,16 @@ void main() {
           ),
         );
 
-        // Verify that CompositedTransformFollower exists
-        expect(find.byType(CompositedTransformFollower), findsOneWidget);
-
-        // Verify that CompositedTransformTarget exists (for Panel A)
-        expect(find.byType(CompositedTransformTarget), findsWidgets);
+        // Verify Positions
+        final rectA = tester.getRect(find.text('panelA'));
+        final rectB = tester.getRect(find.text('panelB'));
+        
+        // Panel B (Right anchor) should be to the right of Panel A
+        expect(rectB.left, equals(rectA.right));
       },
     );
 
-    testWidgets('Overlay Panel without anchor uses Align (Global)', (
+    testWidgets('Overlay Panel without anchor uses Global Positioning', (
       tester,
     ) async {
       final controller = PanelLayoutController();
@@ -180,19 +183,11 @@ void main() {
         ),
       );
 
-      // Should verify we are using Align logic, not Follower logic for B
-      // Note: Panel A is wrapped in Target, so Target exists.
-      // But B should be in a Stack -> Align -> Flex.
-      // We can check that we have an Align with Alignment.centerRight containing Panel B
-
-      final alignFinder = find.ancestor(
-        of: find.text('panelB'),
-        matching: find.byType(Align),
-      );
-
-      expect(alignFinder, findsOneWidget);
-      final align = tester.widget<Align>(alignFinder.first);
-      expect(align.alignment, Alignment.centerRight);
+      // Verify Global Positioning (Right Aligned)
+      final rectB = tester.getRect(find.text('panelB'));
+      final screenRect = tester.getRect(find.byType(MaterialApp));
+      
+      expect(rectB.right, equals(screenRect.right));
     });
   });
 }

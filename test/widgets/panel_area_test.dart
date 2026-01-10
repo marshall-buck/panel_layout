@@ -65,9 +65,13 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelArea(
-            panelLayoutController: layoutController,
-            panelIds: const [PanelId('main'), PanelId('drawer')],
+          child: SizedBox(
+            width: 800,
+            height: 600,
+            child: PanelArea(
+              panelLayoutController: layoutController,
+              panelIds: const [PanelId('main'), PanelId('drawer')],
+            ),
           ),
         ),
       );
@@ -75,17 +79,10 @@ void main() {
       expect(find.text('Content PanelId(main)'), findsOneWidget);
       expect(find.text('Content PanelId(drawer)'), findsOneWidget);
 
-      // Verify layout structure: Stack -> [Flex(main), Align(drawer)]
-      // Drawer is right-aligned overlay
-      final alignFinder = find.ancestor(
-        of: find.text('Content PanelId(drawer)'),
-        matching: find.byType(Align),
-      );
-      expect(alignFinder, findsOneWidget);
-      expect(
-        tester.widget<Align>(alignFinder).alignment,
-        Alignment.centerRight,
-      );
+      // Verify Global Overlay Positioning (Right Aligned)
+      // Screen 800. Drawer 200. Left should be 600.
+      final drawerRect = tester.getRect(find.text('Content PanelId(drawer)'));
+      expect(drawerRect.left, equals(600.0));
     });
 
     testWidgets('resizing fixed panel updates width', (tester) async {
@@ -214,20 +211,7 @@ void main() {
       leftPanel.setVisible(visible: false);
       await tester.pumpAndSettle();
 
-      // Text should still be present because fixed sizing panels animate to 0 size
-      // but are not removed from tree (as per my LayoutPanel logic),
-      // BUT PanelArea logic says:
-      // if (panel.isVisible || panel.sizing is! FlexibleSizing)
-      // So FixedSizing IS added to list even if hidden.
-
-      // Verify size is 0?
-      // Actually, if it's hidden, effectiveSize is 0.
-      // LayoutPanel builds AnimatedContainer(width: 0).
-      // So text might be clipped but present in tree.
-
       expect(find.text('Content PanelId(left)'), findsOneWidget);
-      // But verify it takes no space?
-      // Hard to verify specific render details here easily, but we verified LayoutPanel logic in unit test.
     });
 
     testWidgets('hiding flexible panel removes it from layout', (tester) async {
@@ -261,8 +245,6 @@ void main() {
       leftPanel.setVisible(visible: false);
       await tester.pumpAndSettle();
 
-      // Flexible panels are excluded from the children list if not visible.
-      // So it should be removed from tree.
       expect(find.text('Content PanelId(left)'), findsNothing);
     });
 

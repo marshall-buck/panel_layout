@@ -15,7 +15,7 @@ void main() {
     });
 
     testWidgets(
-      'Global Overlay respects custom alignment and crossAxisAlignment',
+      'Global Overlay respects custom alignment',
       (tester) async {
         layoutController.registerPanel(
           const PanelId('main'),
@@ -37,8 +37,7 @@ void main() {
           mode: PanelMode.overlay,
           anchor: PanelAnchor.top,
           alignment: Alignment.topCenter,
-          crossAxisAlignment:
-              CrossAxisAlignment.center, // Don't stretch to full width
+          // crossAxisAlignment is handled by the Delegate logic if not stretching
         );
 
         await tester.pumpWidget(
@@ -58,27 +57,13 @@ void main() {
           ),
         );
 
-        // Verify alignment
-        final alignFinder = find.ancestor(
-          of: find.text('Dropdown'),
-          matching: find.byType(Align),
-        );
-        expect(alignFinder, findsOneWidget);
-        expect(
-          tester.widget<Align>(alignFinder).alignment,
-          Alignment.topCenter,
-        );
-
-        // Verify it is NOT stretched
-        // We find the Flex that is the parent of the panel
-        final flexFinder = find
-            .ancestor(of: find.text('Dropdown'), matching: find.byType(Flex))
-            .first;
-
-        expect(
-          tester.widget<Flex>(flexFinder).crossAxisAlignment,
-          CrossAxisAlignment.center,
-        );
+        // Verify position: Should be Top Center of 800x600.
+        // X = (800 - 200) / 2 = 300.
+        // Y = 0.
+        
+        final dropdownRect = tester.getRect(find.text('Dropdown'));
+        expect(dropdownRect.left, 300.0);
+        expect(dropdownRect.top, 0.0);
       },
     );
 

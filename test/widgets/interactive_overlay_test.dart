@@ -67,16 +67,6 @@ void main() {
       // Verify overlay is now in the tree
       expect(find.text('Overlay Content'), findsOneWidget);
 
-      // Verify positioning (Top Center)
-      // The overlay should be wrapped in an Align widget with Alignment.topCenter
-      final alignFinder = find.ancestor(
-        of: find.text('Overlay Content'),
-        matching: find.byType(Align),
-      );
-      expect(alignFinder, findsOneWidget);
-      final align = tester.widget<Align>(alignFinder.first);
-      expect(align.alignment, Alignment.topCenter);
-
       // Verify sizing (not full width due to CrossAxisAlignment.center)
       final contentFinder = find.byKey(const Key('overlay_content'));
       final size = tester.getSize(contentFinder);
@@ -84,6 +74,17 @@ void main() {
       expect(size.height, 100);
 
       await tester.pumpAndSettle(); // Finish animations
+
+      // Verify positioning (Top Center) using Rect
+      // Screen size default 800x600.
+      // Panel 200x100.
+      // Top Center -> X = 300, Y = 0.
+      final rect = tester.getRect(contentFinder);
+      
+      expect(rect.top, 0.0);
+      expect(rect.left, 300.0);
+      expect(rect.width, 200.0);
+      expect(rect.height, 100.0);
     });
 
     testWidgets('Overlay panel can be dismissed (visibility toggled off)', (
@@ -142,6 +143,7 @@ void main() {
         builder: (context, _) => Container(
           key: const Key('bottom_content'),
           height: 100,
+          width: 200,
           color: Colors.blue,
           child: const Text('Bottom Content'),
         ),
@@ -170,18 +172,16 @@ void main() {
 
       expect(find.text('Bottom Content'), findsOneWidget);
 
-      // Verify alignment
-      final alignFinder = find.ancestor(
-        of: find.text('Bottom Content'),
-        matching: find.byType(Align),
-      );
-      expect(alignFinder, findsOneWidget);
-      expect(
-        tester.widget<Align>(alignFinder).alignment,
-        Alignment.bottomCenter,
-      );
-
       await tester.pumpAndSettle();
+
+      // Verify positioning (Bottom Center)
+      // Screen 800x600.
+      // Panel 200x100.
+      // Bottom Center -> X = 300, Y = 500 (600-100).
+      
+      final rect = tester.getRect(find.text('Bottom Content'));
+      expect(rect.left, 300.0);
+      expect(rect.top, 500.0);
     });
 
     testWidgets('Button triggers panel slide in from Left', (tester) async {
@@ -229,15 +229,25 @@ void main() {
 
       expect(find.text('Left Content'), findsOneWidget);
 
-      // Verify alignment
-      final alignFinder = find.ancestor(
-        of: find.text('Left Content'),
-        matching: find.byType(Align),
-      );
-      expect(alignFinder, findsOneWidget);
-      expect(tester.widget<Align>(alignFinder).alignment, Alignment.centerLeft);
-
       await tester.pumpAndSettle();
+
+      // Verify positioning (Left Center)
+      // Screen 800x600.
+      // Panel 200x600 (height unspecified/full?).
+      // The container has height unspecified.
+      // LayoutPanel with FixedSizing(200) sets width.
+      // Alignment.centerLeft logic in Delegate:
+      // Global Anchor -> Inscribe.
+      // If height unconstrained by child, alignment inscribe usually takes full height if stretched?
+      // Wait, Delegate pass 4 uses `layoutChild(id, BoxConstraints.loose(size))`.
+      // If Container height is null, it shrinks to child (Text).
+      // So Height is small.
+      // Alignment.centerLeft aligns it vertically center.
+      // Y = (600 - h) / 2. X = 0.
+      
+      final rect = tester.getRect(find.text('Left Content'));
+      expect(rect.left, 0.0);
+      expect(rect.center.dy, 300.0);
     });
   });
 }
