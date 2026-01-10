@@ -55,22 +55,39 @@ class LayoutPanel extends StatelessWidget {
         // Apply sizing and animations
         if (panelController.sizing is FixedSizing || isCollapsed) {
           double contentSize = effectiveSize;
+          
           // Fix for content disappearing during close animation:
-          // If not visible, effectiveSize is 0, but we want the inner content
-          // to remain at its target size so it gets clipped by the AnimatedContainer.
+          // If not visible, effectiveSize is 0.
+          // For Inline panels, we WANT 0 so it animates closed.
+          // For Overlay panels, we WANT full size so it slides out (AnimatedSwitcher handles visibility).
           if (!panelController.isVisible) {
-            if (isCollapsed) {
-              contentSize = panelController.constraints.collapsedSize;
-            } else if (panelController.sizing is FixedSizing) {
-              contentSize = (panelController.sizing as FixedSizing).size;
+            if (panelController.mode == PanelMode.overlay) {
+               // Force full size for overlay exit animation
+               if (isCollapsed) {
+                 contentSize = panelController.constraints.collapsedSize;
+               } else if (panelController.sizing is FixedSizing) {
+                 contentSize = (panelController.sizing as FixedSizing).size;
+               }
+            } else {
+               // Inline panel closing logic
+               if (isCollapsed) {
+                 contentSize = panelController.constraints.collapsedSize;
+               } else if (panelController.sizing is FixedSizing) {
+                 contentSize = (panelController.sizing as FixedSizing).size;
+               }
             }
           }
+          
+          // Override effectiveSize for the container if it's an overlay
+          final containerSize = (panelController.mode == PanelMode.overlay && !panelController.isVisible) 
+              ? contentSize 
+              : effectiveSize;
 
           animatedPanel = AnimatedContainer(
             duration: visuals.animationDuration,
             curve: visuals.animationCurve,
-            width: isVertical ? effectiveSize : null,
-            height: isVertical ? null : effectiveSize,
+            width: isVertical ? containerSize : null,
+            height: isVertical ? null : containerSize,
             child: SingleChildScrollView(
               scrollDirection: isVertical ? Axis.horizontal : Axis.vertical,
               physics:
