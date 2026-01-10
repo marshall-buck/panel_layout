@@ -37,10 +37,9 @@ class LayoutPanel extends StatelessWidget {
         final visuals = panelController.visuals;
         final isCollapsed = panelController.isCollapsed;
 
-        // Apply theme decoration and padding
-        final decoratedChild = Container(
-          decoration: theme.panelDecoration,
-          padding: theme.panelPadding,
+        // Apply theme padding (decoration moved to AnimatedContainer for stability)
+        final paddedChild = Padding(
+          padding: theme.panelPadding ?? EdgeInsets.zero,
           child: child,
         );
 
@@ -88,13 +87,14 @@ class LayoutPanel extends StatelessWidget {
             curve: visuals.animationCurve,
             width: isVertical ? containerSize : null,
             height: isVertical ? null : containerSize,
+            decoration: theme.panelDecoration,
             child: SingleChildScrollView(
               scrollDirection: isVertical ? Axis.horizontal : Axis.vertical,
               physics:
                   const NeverScrollableScrollPhysics(), // Disable scrolling by user, it's just for clipping/layout
               child: isVertical
-                  ? SizedBox(width: contentSize, child: decoratedChild)
-                  : SizedBox(height: contentSize, child: decoratedChild),
+                  ? SizedBox(width: contentSize, child: paddedChild)
+                  : SizedBox(height: contentSize, child: paddedChild),
             ),
           );
         } else if (panelController.sizing is ContentSizing) {
@@ -130,13 +130,13 @@ class LayoutPanel extends StatelessWidget {
               );
             },
             child: panelController.isVisible
-                ? decoratedChild
+                ? Container(decoration: theme.panelDecoration, child: paddedChild)
                 : const Opacity(opacity: 0.01, child: SizedBox(width: 0.1, height: 0.1)),
           );
         } else {
           // For FlexibleSizing, we return the content directly.
           animatedPanel = panelController.isVisible
-              ? decoratedChild
+              ? Container(decoration: theme.panelDecoration, child: paddedChild)
               : const Opacity(opacity: 0.01, child: SizedBox(width: 0.1, height: 0.1));
         }
 

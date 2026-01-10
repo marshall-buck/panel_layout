@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
+import 'package:panel_layout/src/theme/panel_theme.dart';
 
 void main() {
   const panelA = PanelId('panelA');
@@ -111,15 +112,19 @@ void main() {
       expect(offset.dx, lessThanOrEqualTo(1.0));
     });
 
-    testWidgets('Overlay maintains size during exit animation', (tester) async {
+    testWidgets('Overlay maintains visual size when content clears during exit', (tester) async {
       final controller = PanelLayoutController();
+      final contentNotifier = ValueNotifier<bool>(true); // Simulates Bloc State
+
       controller.registerPanel(
         panelA,
-        builder: (context, _) => Container(
-          key: const Key('content'), 
-          width: 300, 
-          height: 300,
-          color: Colors.red,
+        builder: (context, _) => ValueListenableBuilder<bool>(
+          valueListenable: contentNotifier,
+          builder: (context, hasContent, _) {
+            return hasContent 
+                ? Container(key: const Key('content'), width: 300, height: 300, color: Colors.red)
+                : const SizedBox.shrink(key: Key('empty'));
+          },
         ),
         sizing: const FixedSizing(300),
         mode: PanelMode.overlay,
@@ -132,32 +137,54 @@ void main() {
         MaterialApp(
           home: PanelScope(
             controller: controller,
-            child: PanelArea(
-              panelLayoutController: controller,
-              panelIds: const [panelA],
+            child: PanelTheme(
+              data: PanelThemeData(
+                panelDecoration: BoxDecoration(color: Colors.blue), // Theme background
+              ),
+              child: PanelArea(
+                panelLayoutController: controller,
+                panelIds: const [panelA],
+              ),
             ),
           ),
         ),
       );
 
-      // Verify initial visibility and size
+      // Verify initial state
       expect(find.byKey(const Key('content')), findsOneWidget);
-      expect(tester.getSize(find.byKey(const Key('content'))).width, 300.0);
 
-      // Close panel
-      controller.getPanel(panelA)!.setVisible(visible: false);
-      await tester.pump(); // Start exit animation (t=0)
-      await tester.pump(const Duration(milliseconds: 500)); // Halfway
-
-      // Verify it is STILL in tree and STILL has size
-      expect(find.byKey(const Key('content')), findsOneWidget);
-      expect(tester.getSize(find.byKey(const Key('content'))).width, 300.0, 
-        reason: 'Panel should NOT shrink to 0 during exit animation');
+      // Trigger Close AND Clear Content simultaneously
+      contentNotifier.value = false; // Internal content clears
+      controller.getPanel(panelA)!.setVisible(visible: false); // Panel starts closing
+      
+      await tester.pump(); // Frame 1: Animation starts, Internal builder updates
+      
+      // Verify content is gone (simulating Bloc behavior)
+      // The outgoing panel still exists, but its internal ValueListenableBuilder rebuilt to Empty.
+      expect(find.byKey(const Key('content')), findsNothing);
+      expect(find.byKey(const Key('empty')), findsOneWidget);
+      
+      // Verify LayoutPanel (AnimatedContainer) still has size and decoration
+      final containerFinder = find.ancestor(
+        of: find.byType(SingleChildScrollView),
+        matching: find.byType(AnimatedContainer),
+      );
+      
+      expect(containerFinder, findsOneWidget);
+      final container = tester.widget<AnimatedContainer>(containerFinder);
+      final decoration = container.decoration as BoxDecoration;
+      
+      expect(decoration.color, Colors.blue, reason: 'Decoration should be on the container, not content');
+      
+      // Check size
+      await tester.pump(const Duration(milliseconds: 500)); // Halfway through animation
+      final size = tester.getSize(containerFinder);
+      
+      expect(size.width, 300.0, reason: 'Panel container should maintain width even if content is empty');
 
       await tester.pumpAndSettle();
       
-      // Now it should be gone
-      expect(find.byKey(const Key('content')), findsNothing);
+      contentNotifier.dispose();
     });
 
     testWidgets(
