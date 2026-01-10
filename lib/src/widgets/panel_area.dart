@@ -251,13 +251,13 @@ class PanelArea extends StatelessWidget {
     // 2. Determine Logic Strategy (Global vs Relative)
     if (panel.anchorLink != null) {
       return _buildRelativeOverlay(context, panel, content, panel.anchorLink!);
-    } else if (panel.anchorPanel != null) {
-      final target = panelLayoutController.getPanel(panel.anchorPanel!);
-      if (target != null) {
-        return _buildRelativeOverlay(context, panel, content, target.layerLink);
-      }
-    }
-
+            } else if (panel.anchorPanel != null) {
+              final target = panelLayoutController.getPanel(panel.anchorPanel!);
+              if (target != null) {
+                return _buildRelativeOverlay(
+                    context, panel, content, target.layerLink);
+              }
+            }
     // Fallback or explicit global
     return _buildGlobalOverlay(context, panel, content);
   }

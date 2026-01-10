@@ -114,13 +114,13 @@ class LayoutPanel extends StatelessWidget {
             },
             child: panelController.isVisible
                 ? decoratedChild
-                : const SizedBox.shrink(),
+                : const Opacity(opacity: 0.01, child: SizedBox(width: 0.1, height: 0.1)),
           );
         } else {
           // For FlexibleSizing, we return the content directly.
           animatedPanel = panelController.isVisible
               ? decoratedChild
-              : const SizedBox.shrink();
+              : const Opacity(opacity: 0.01, child: SizedBox(width: 0.1, height: 0.1));
         }
 
         // For Overlay panels, we add a Slide transition
@@ -130,8 +130,7 @@ class LayoutPanel extends StatelessWidget {
             switchInCurve: visuals.animationCurve,
             switchOutCurve: visuals.animationCurve,
             transitionBuilder: (child, animation) {
-              final isRelative =
-                  panelController.anchorPanel != null ||
+              final isRelative = panelController.anchorPanel != null ||
                   panelController.anchorLink != null;
               Offset begin;
 

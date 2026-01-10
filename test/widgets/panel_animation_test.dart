@@ -63,8 +63,8 @@ void main() {
 
     final panel2Finder = layoutPanels.at(1);
 
-    // Initial size should be 0
-    expect(tester.getSize(panel2Finder).width, 0.0);
+    // Initial size should be 0.1 (min size for paint)
+    expect(tester.getSize(panel2Finder).width, 0.1);
 
     // Set visible = true
     controller.getPanel(panelId2)!.setVisible(visible: true);
@@ -77,32 +77,24 @@ void main() {
     final panel2FinderNew = find.byType(LayoutPanel).last;
 
     // Check size at 0ms.
-
-    // If state is preserved, it should be 0 (start of animation).
-
-    // If state is lost (recreated widget), it would jump to 200.
-
+    // If state is preserved, it should be 0.1 (start of animation).
     final size0ms = tester.getSize(panel2FinderNew);
 
     // Pump 150ms (halfway of 300ms linear)
-
     await tester.pump(const Duration(milliseconds: 150));
 
     final Size sizeMid = tester.getSize(panel2FinderNew);
 
     // Pump until done
-
     await tester.pumpAndSettle();
 
     final Size sizeFinal = tester.getSize(panel2FinderNew);
 
     expect(sizeFinal.width, 200.0);
 
-    // Regression check: Ensure animation starts from 0 and progresses.
-
-    expect(size0ms.width, 0.0, reason: 'Should start at 0');
-
-    expect(sizeMid.width, 100.0, reason: 'Should be 100 at 50%');
+    // Regression check: Ensure animation starts from 0.1 and progresses.
+    expect(size0ms.width, 0.1, reason: 'Should start at 0.1');
+    expect(sizeMid.width, closeTo(100.0, 1.0), reason: 'Should be 100 at 50%');
   });
 
   testWidgets(
@@ -270,7 +262,7 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      expect(tester.getSize(layoutPanelFinder).width, 0.0);
+      expect(tester.getSize(layoutPanelFinder).width, 0.1);
     },
   );
 }
