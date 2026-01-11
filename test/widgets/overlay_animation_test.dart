@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/theme/panel_theme.dart';
 
 void main() {
   const panelA = PanelId('panelA');
@@ -112,7 +111,9 @@ void main() {
       expect(offset.dx, lessThanOrEqualTo(1.0));
     });
 
-    testWidgets('Overlay maintains visual size when content clears during exit', (tester) async {
+    testWidgets('Overlay maintains visual size when content clears during exit', (
+      tester,
+    ) async {
       final controller = PanelLayoutController();
       final contentNotifier = ValueNotifier<bool>(true); // Simulates Bloc State
 
@@ -121,8 +122,13 @@ void main() {
         builder: (context, _) => ValueListenableBuilder<bool>(
           valueListenable: contentNotifier,
           builder: (context, hasContent, _) {
-            return hasContent 
-                ? Container(key: const Key('content'), width: 300, height: 300, color: Colors.red)
+            return hasContent
+                ? Container(
+                    key: const Key('content'),
+                    width: 300,
+                    height: 300,
+                    color: Colors.red,
+                  )
                 : const SizedBox.shrink(key: Key('empty'));
           },
         ),
@@ -139,7 +145,9 @@ void main() {
             controller: controller,
             child: PanelTheme(
               data: PanelThemeData(
-                panelDecoration: BoxDecoration(color: Colors.blue), // Theme background
+                panelDecoration: BoxDecoration(
+                  color: Colors.blue,
+                ), // Theme background
               ),
               child: PanelArea(
                 panelLayoutController: controller,
@@ -155,119 +163,142 @@ void main() {
 
       // Trigger Close AND Clear Content simultaneously
       contentNotifier.value = false; // Internal content clears
-      controller.getPanel(panelA)!.setVisible(visible: false); // Panel starts closing
-      
-      await tester.pump(); // Frame 1: Animation starts, Internal builder updates
-      
+      controller
+          .getPanel(panelA)!
+          .setVisible(visible: false); // Panel starts closing
+
+      await tester
+          .pump(); // Frame 1: Animation starts, Internal builder updates
+
       // Verify content is gone (simulating Bloc behavior)
       // The outgoing panel still exists, but its internal ValueListenableBuilder rebuilt to Empty.
       expect(find.byKey(const Key('content')), findsNothing);
       expect(find.byKey(const Key('empty')), findsOneWidget);
-      
+
       // Verify LayoutPanel (AnimatedContainer) still has size and decoration
       final containerFinder = find.ancestor(
         of: find.byType(SingleChildScrollView),
         matching: find.byType(AnimatedContainer),
       );
-      
+
       expect(containerFinder, findsOneWidget);
       final container = tester.widget<AnimatedContainer>(containerFinder);
       final decoration = container.decoration as BoxDecoration;
-      
-      expect(decoration.color, Colors.blue, reason: 'Decoration should be on the container, not content');
-      
+
+      expect(
+        decoration.color,
+        Colors.blue,
+        reason: 'Decoration should be on the container, not content',
+      );
+
       // Check size
-      await tester.pump(const Duration(milliseconds: 500)); // Halfway through animation
+      await tester.pump(
+        const Duration(milliseconds: 500),
+      ); // Halfway through animation
       final size = tester.getSize(containerFinder);
-      
-      expect(size.width, 300.0, reason: 'Panel container should maintain width even if content is empty');
+
+      expect(
+        size.width,
+        300.0,
+        reason:
+            'Panel container should maintain width even if content is empty',
+      );
 
       await tester.pumpAndSettle();
-      
+
       contentNotifier.dispose();
     });
 
-    testWidgets(
-      'Overlay anchored to HIDDEN inline panel is positioned correctly',
-      (tester) async {
-        // Reproducing OilNet scenario:
-        // SettingsPanel (Inline, Right, Hidden -> 0 width at Right Edge)
-        // SettingsChangePanel (Overlay, Left of SettingsPanel)
-        // Should appear at Right Edge (Left of 0-width Target), NOT at Left Edge of screen.
+    testWidgets('Overlay anchored to HIDDEN inline panel is positioned correctly', (
+      tester,
+    ) async {
+      // Reproducing OilNet scenario:
+      // SettingsPanel (Inline, Right, Hidden -> 0 width at Right Edge)
+      // SettingsChangePanel (Overlay, Left of SettingsPanel)
+      // Should appear at Right Edge (Left of 0-width Target), NOT at Left Edge of screen.
 
-        final controller = PanelLayoutController();
-        const spacerPanel = PanelId('spacer');
-        const settingsPanel = PanelId('settings_panel');
-        const changePanel = PanelId('settings_change_panel');
+      final controller = PanelLayoutController();
+      const spacerPanel = PanelId('spacer');
+      const settingsPanel = PanelId('settings_panel');
+      const changePanel = PanelId('settings_change_panel');
 
-        // 0. Spacer Panel (Flexible) - Pushes settings to right
-        controller.registerPanel(
-          spacerPanel,
-          builder: (context, _) => Container(color: Colors.green),
-          sizing: const FlexibleSizing(1),
-          mode: PanelMode.inline,
-          anchor: PanelAnchor.top,
-        );
+      // 0. Spacer Panel (Flexible) - Pushes settings to right
+      controller.registerPanel(
+        spacerPanel,
+        builder: (context, _) => Container(color: Colors.green),
+        sizing: const FlexibleSizing(1),
+        mode: PanelMode.inline,
+        anchor: PanelAnchor.top,
+      );
 
-        // 1. Register Hidden Target (Inline, Right)
-        controller.registerPanel(
-          settingsPanel,
-          builder: (context, _) => Container(width: 100, height: 100, color: Colors.red),
-          sizing: const ContentSizing(),
-          mode: PanelMode.inline,
-          anchor: PanelAnchor.right,
-          isVisible: false, // Hidden!
-        );
+      // 1. Register Hidden Target (Inline, Right)
+      controller.registerPanel(
+        settingsPanel,
+        builder: (context, _) =>
+            Container(width: 100, height: 100, color: Colors.red),
+        sizing: const ContentSizing(),
+        mode: PanelMode.inline,
+        anchor: PanelAnchor.right,
+        isVisible: false, // Hidden!
+      );
 
-        // 2. Register Overlay (Anchored Left of Target)
-        controller.registerPanel(
-          changePanel,
-          builder: (context, _) => Container(width: 200, height: 200, color: Colors.blue),
-          sizing: const FixedSizing(200),
-          mode: PanelMode.overlay,
-          anchor: PanelAnchor.left,
-          anchorPanel: settingsPanel,
-          isVisible: true,
-        );
+      // 2. Register Overlay (Anchored Left of Target)
+      controller.registerPanel(
+        changePanel,
+        builder: (context, _) =>
+            Container(width: 200, height: 200, color: Colors.blue),
+        sizing: const FixedSizing(200),
+        mode: PanelMode.overlay,
+        anchor: PanelAnchor.left,
+        anchorPanel: settingsPanel,
+        isVisible: true,
+      );
 
-        // Fixed screen size
-        tester.view.physicalSize = const Size(800, 600);
-        tester.view.devicePixelRatio = 1.0;
+      // Fixed screen size
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
 
-        await tester.pumpWidget(
-          MaterialApp(
-            home: PanelScope(
-              controller: controller,
-              child: PanelArea(
-                panelLayoutController: controller,
-                panelIds: const [spacerPanel, settingsPanel, changePanel],
-              ),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PanelScope(
+            controller: controller,
+            child: PanelArea(
+              panelLayoutController: controller,
+              panelIds: const [spacerPanel, settingsPanel, changePanel],
             ),
           ),
-        );
+        ),
+      );
 
-        await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-        // Verify position of ChangePanel
-        // Screen Width: 800.
-        // SettingsPanel: Width 0 (Hidden). Positioned at 800 (Right Edge).
-        // ChangePanel: Anchored Left of SettingsPanel.
-        // Expected Right Edge = 800. Width = 200. Left Edge = 600.
-        
-        final changeFinder = find.byKey(
-          ValueKey(changePanel), // Correct key logic from PanelArea
-        );
-        
-        // Ensure Key matches what PanelArea uses.
-        // PanelArea uses LayoutId(id: panel.id, child: LayoutPanel(key: ValueKey(panel.id)))
-        // So find.byKey(ValueKey(PanelId('...'))) should work.
-        expect(changeFinder, findsOneWidget);
-        
-        final rect = tester.getRect(changeFinder);
+      // Verify position of ChangePanel
+      // Screen Width: 800.
+      // SettingsPanel: Width 0 (Hidden). Positioned at 800 (Right Edge).
+      // ChangePanel: Anchored Left of SettingsPanel.
+      // Expected Right Edge = 800. Width = 200. Left Edge = 600.
 
-        expect(rect.right, closeTo(800.0, 0.2), reason: 'Overlay Right should match Screen Right (Target)');
-        expect(rect.left, closeTo(600.0, 0.2), reason: 'Overlay Left should be Screen Width - Overlay Width');
-      },
-    );
+      final changeFinder = find.byKey(
+        ValueKey(changePanel), // Correct key logic from PanelArea
+      );
+
+      // Ensure Key matches what PanelArea uses.
+      // PanelArea uses LayoutId(id: panel.id, child: LayoutPanel(key: ValueKey(panel.id)))
+      // So find.byKey(ValueKey(PanelId('...'))) should work.
+      expect(changeFinder, findsOneWidget);
+
+      final rect = tester.getRect(changeFinder);
+
+      expect(
+        rect.right,
+        closeTo(800.0, 0.2),
+        reason: 'Overlay Right should match Screen Right (Target)',
+      );
+      expect(
+        rect.left,
+        closeTo(600.0, 0.2),
+        reason: 'Overlay Left should be Screen Width - Overlay Width',
+      );
+    });
   });
 }
