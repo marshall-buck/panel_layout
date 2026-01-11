@@ -1,17 +1,116 @@
 # Panel Layout
 
-A pure Flutter, dependency-free, state-management-agnostic panel system.
+A modern, declarative, widget-centric panel layout system for Flutter.
 
-`panel_layout` provides a robust layout engine for Flutter applications. It handles resizable panels, flexible content areas, and overlay panels (drawers) without imposing any specific state management solution (like BLoC or Provider) on your application.
+`panel_layout` provides a robust engine for building complex user interfaces with resizable panels, flexible content areas, and intelligently anchored overlays.
 
-## Features
+## The Declarative Shift (v0.4.0+)
 
--   **State Agnostic**: Works with `setState`, `Bloc`, `Riverpod`, `Provider`, or raw `ValueNotifier`.
--   **Resizable Panels**: Built-in drag handles for resizing fixed and flexible panels.
--   **Flexible Layouts**: Supports `Fixed` (pixels), `Flexible` (weight/height), and `Content` (intrinsic) sizing.
--   **Modes**:
-    -   `Inline`: Panels flow in a Row/Column (pushing content).
-    -   `Overlay`: Panels float on top (like drawers/modals).
--   **Granular Rebuilds**: Layout structure rebuilds only when necessary, keeping performance high.
+Starting with version 0.4.0, the package has moved to a **"Widget-First"** declarative API. Instead of manually registering controllers, you define your layout structure directly in the widget tree. The engine automatically handles state preservation, resizing interactions, and frame-perfect animations.
 
+## Key Features
 
+-   **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
+-   **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
+-   **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
+-   **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
+-   **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels by extending `BasePanel`.
+-   **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds and ensure smooth 60/120fps interactions.
+
+## Getting Started
+
+### 1. Define your Panels
+
+Create your panels by extending the `BasePanel` class. This encapsulates your panel's configuration and its content.
+
+```dart
+class MySidebar extends BasePanel {
+  MySidebar() : super(
+    id: const PanelId('sidebar'),
+    width: 250,
+    minSize: 100,
+    maxSize: 400,
+    anchor: PanelAnchor.left,
+    child: SidebarContent(),
+  );
+}
+```
+
+### 2. Assemble the Layout
+
+Place your panels inside a `PanelLayout`.
+
+```dart
+PanelLayout(
+  children: [
+    MySidebar(),
+    MyMainContent(), // Another class extending BasePanel with flex: 1
+  ],
+)
+```
+
+## Programmatic Control
+
+To manipulate the layout from elsewhere in your app (e.g., a button in the AppBar), use the `PanelLayoutController`.
+
+```dart
+final controller = PanelLayoutController();
+
+// ... in build ...
+PanelLayout(
+  controller: controller,
+  children: [...],
+)
+
+// ... elsewhere ...
+IconButton(
+  icon: Icon(Icons.menu),
+  onPressed: () => controller.toggleVisible(const PanelId('sidebar')),
+)
+```
+
+## Accessing Panel State
+
+Descendants of a panel can access its real-time runtime state (like whether it is collapsed) using `PanelDataScope`.
+
+```dart
+class SidebarContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final state = PanelDataScope.of(context);
+    
+    return Column(
+      children: [
+        if (!state.collapsed) Text("I am expanded!"),
+        Text("My current width is ${state.size}"),
+      ],
+    );
+  }
+}
+```
+
+## Customizing Resize Handles
+
+Use `ResizeHandleTheme` to customize the appearance and behavior of the draggable dividers.
+
+```dart
+ResizeHandleTheme(
+  data: ResizeHandleThemeData(
+    width: 2.0,
+    color: Colors.blue,
+    hitTestWidth: 12.0,
+  ),
+  child: PanelLayout(...),
+)
+```
+
+## Installation
+
+Add `panel_layout` to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  panel_layout:
+    git:
+      url: https://github.com/marshall-buck/panel_layout.git
+```
