@@ -57,6 +57,11 @@ class PanelLayoutController extends ChangeNotifier {
   ///   - **Note**: Flexible panels are removed from the layout immediately when hidden.
   ///
   /// [isResizable]  Whether the user can drag the edge of this panel to resize it.
+  ///
+  /// [zIndex] Controls the painting order of the panel.
+  ///   - Panels with higher [zIndex] are painted on top of panels with lower [zIndex].
+  ///   - Defaults to 0.
+  ///   - Useful for controlling the stacking of overlay panels relative to each other or to inline panels.
   PanelController registerPanel(
     PanelId id, {
     required Widget Function(BuildContext, PanelController) builder,
