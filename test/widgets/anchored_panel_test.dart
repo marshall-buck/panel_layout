@@ -51,18 +51,18 @@ void main() {
       // CustomMultiChildLayout paints children in order of layout/paint.
       // We rely on layout positions.
       
-      final textFinder = find.byType(Text);
-      expect(textFinder, findsNWidgets(2));
-
-      final firstText = tester.widget<Text>(textFinder.at(0));
-      final secondText = tester.widget<Text>(textFinder.at(1));
-
-      // With CustomMultiChildLayout, paint order depends on `children` list passed to it.
-      // In PanelArea, we add inline widgets in order.
-      // The order should be [Panel B, Panel A] because B is anchored Left of A.
+      // Verify order in the Row/Column
+      // We expect: [Panel B] [Panel A]
+      // Since PanelArea uses CustomMultiChildLayout, tree order might follow panelIds (A, B).
+      // But VISUALLY, B should be to the Left of A.
       
-      expect(firstText.data, 'panelB');
-      expect(secondText.data, 'panelA');
+      final rectA = tester.getRect(find.text('panelA'));
+      final rectB = tester.getRect(find.text('panelB'));
+      
+      // B (Left anchor) should be to the Left of A
+      // Note: A resize handle (width ~12) is inserted between them.
+      expect(rectB.right, lessThanOrEqualTo(rectA.left), reason: 'Panel B should be to the left of Panel A');
+      expect(rectB.left, lessThan(rectA.left));
     });
 
     testWidgets('Panel B anchored RIGHT of Panel A should appear AFTER A', (

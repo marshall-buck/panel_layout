@@ -38,97 +38,125 @@ class PanelArea extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge(panels),
       builder: (context, _) {
-        // --- 1. Separate Inline and Overlay Panels ---
-        final allInlinePanels = <PanelController>[];
+        // --- 1. Identify Panel Types ---
+        final inlinePanels = <PanelController>[];
         final overlayPanels = <PanelController>[];
 
         for (final panel in panels) {
           if (panel.mode == PanelMode.detached) continue;
-
           if (panel.mode == PanelMode.overlay) {
             overlayPanels.add(panel);
           } else {
-            allInlinePanels.add(panel);
+            inlinePanels.add(panel);
           }
         }
 
-        // --- 2. Reorder Inline Panels based on anchors ---
-        final visibleInlinePanels = _orderInlinePanels(allInlinePanels)
+        // --- 2. Calculate Layout Order (Inline) ---
+        // This determines geometry (who is next to whom), but NOT paint order.
+        final orderedInlinePanels = _orderInlinePanels(inlinePanels)
             .where((panel) {
-              // Include invisible panels if they are NOT flexible,
-              // to allow LayoutPanel to animate their size to 0.
               if (panel.isVisible) return true;
               return panel.sizing is! FlexibleSizing;
             })
             .toList();
 
-        // --- 3. Build Layout Children (Inline + Handles) ---
+        // --- 3. Prepare Widgets ---
         final layoutChildren = <Widget>[];
-        final inlineLayoutIds = <Object>[];
+        final inlineLayoutIds = <Object>[]; // Will contain PanelId and _HandleId
+        final overlayIds = <PanelId>[];
+        
+        // Track which IDs are actually active/rendered to filter the children list
+        final activeIds = <Object>{}; 
 
-        for (var i = 0; i < visibleInlinePanels.length; i++) {
-          final panel = visibleInlinePanels[i];
-          final isLast = i == visibleInlinePanels.length - 1;
-
-          // Panel
+        // Populate inlineLayoutIds from the ORDERED and FILTERED list
+        // This ensures hidden flexible panels are excluded from the Delegate.
+        for (var i = 0; i < orderedInlinePanels.length; i++) {
+          final panel = orderedInlinePanels[i];
+          
+          // Add Panel ID
           inlineLayoutIds.add(panel.id);
-          layoutChildren.add(
-            LayoutId(
-              id: panel.id,
-              child: LayoutPanel(
-                key: ValueKey(panel.id),
-                panelController: panel,
-                child: panel.builder(context, panel),
-              ),
-            ),
-          );
+          activeIds.add(panel.id);
 
-          // Handle
-          if (!isLast) {
-            final nextPanel = visibleInlinePanels[i + 1];
+          // Check for Handle
+          if (i < orderedInlinePanels.length - 1) {
+            final nextPanel = orderedInlinePanels[i + 1];
             if (_shouldAddHandle(panel, nextPanel) &&
                 panel.isVisible &&
                 nextPanel.isVisible) {
               final handleId = _HandleId(panel.id, nextPanel.id);
               inlineLayoutIds.add(handleId);
-
-              layoutChildren.add(
-                LayoutId(
-                  id: handleId,
-                  child: PanelResizeHandle(
-                    key: ValueKey('${panel.id.value}_handle'),
-                    axis: axis == Axis.horizontal
-                        ? Axis.vertical
-                        : Axis.horizontal,
-                    onDragUpdate: (delta) => _handleResize(
-                      delta,
-                      panel,
-                      nextPanel,
-                      axis == Axis.horizontal
-                          ? context.size?.width ?? 0
-                          : context.size?.height ?? 0,
-                      visibleInlinePanels,
-                    ),
-                  ),
-                ),
-              );
+              activeIds.add(handleId);
             }
           }
         }
 
-        // --- 4. Sort and Build Overlay Panels ---
-        final sortedOverlays = _sortOverlays(overlayPanels);
-        final overlayIds = <PanelId>[];
+        // Map to store widgets before ordering
+        final widgetMap = <Object, Widget>{};
 
-        for (final panel in sortedOverlays) {
-          overlayIds.add(panel.id);
-          layoutChildren.add(
-            LayoutId(
-              id: panel.id,
-              child: _buildOverlayChild(context, panel),
-            ),
+        // Create Panel Widgets (for ALL panels initially, filtered later)
+        for (final panel in panels) {
+          if (panel.mode == PanelMode.detached) continue;
+          
+          Widget child = LayoutPanel(
+            key: ValueKey(panel.id),
+            panelController: panel,
+            child: panel.builder(context, panel),
           );
+
+          if (panel.mode == PanelMode.overlay) {
+            overlayIds.add(panel.id);
+            activeIds.add(panel.id);
+            
+            if (panel.anchorLink != null) {
+              child = CompositedTransformFollower(
+                link: panel.anchorLink!,
+                showWhenUnlinked: false,
+                child: child,
+              );
+            }
+          } 
+          
+          widgetMap[panel.id] = LayoutId(id: panel.id, child: child);
         }
+
+        // Create Handle Widgets
+        final handleWidgets = <Widget>[];
+        for (final id in inlineLayoutIds) {
+          if (id is _HandleId) {
+             final prev = panelLayoutController.getPanel(id.prev)!;
+             final next = panelLayoutController.getPanel(id.next)!;
+             
+             final handleWidget = LayoutId(
+              id: id,
+              child: PanelResizeHandle(
+                key: ValueKey('${id.prev.value}_handle'),
+                axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
+                onDragUpdate: (delta) => _handleResize(
+                  delta,
+                  prev,
+                  next,
+                  axis == Axis.horizontal
+                      ? context.size?.width ?? 0
+                      : context.size?.height ?? 0,
+                  orderedInlinePanels, // Pass the filtered list!
+                ),
+              ),
+            );
+            handleWidgets.add(handleWidget);
+          }
+        }
+
+        // --- 4. Construct Render Order ---
+        // Paint Panels in user-provided order (panelIds) to allow Z-index control.
+        for (final id in panelIds) {
+          // Only add if it is active (i.e. not a hidden flexible panel)
+          if (activeIds.contains(id) && widgetMap.containsKey(id)) {
+            layoutChildren.add(widgetMap[id]!);
+          }
+        }
+        
+        // Paint Handles on top
+        layoutChildren.addAll(handleWidgets);
 
         return CustomMultiChildLayout(
           delegate: _PanelLayoutDelegate(
@@ -144,49 +172,9 @@ class PanelArea extends StatelessWidget {
     );
   }
 
-  Widget _buildOverlayChild(BuildContext context, PanelController panel) {
-    final child = LayoutPanel(
-      key: ValueKey(panel.id),
-      panelController: panel,
-      child: panel.builder(context, panel),
-    );
+  // _buildOverlayChild removed as it is now integrated into loop
+  // _sortOverlays removed as we respect user order
 
-    // If externally anchored, wrap in Follower.
-    // The Delegate will position this at (0,0) and let Follower handle the rest.
-    if (panel.anchorLink != null) {
-      return CompositedTransformFollower(
-        link: panel.anchorLink!,
-        showWhenUnlinked: false,
-        child: child,
-      );
-    }
-    return child;
-  }
-
-  List<PanelController> _sortOverlays(List<PanelController> overlays) {
-    // Simple topological sort to ensure anchors appear before dependents
-    final sorted = <PanelController>[];
-    final visited = <PanelId>{};
-
-    void visit(PanelController p) {
-      if (visited.contains(p.id)) return;
-      
-      // If anchored to another overlay, visit that first
-      if (p.anchorPanel != null) {
-        final anchor = overlays.where((o) => o.id == p.anchorPanel).firstOrNull;
-        if (anchor != null) {
-          visit(anchor);
-        }
-      }
-      visited.add(p.id);
-      sorted.add(p);
-    }
-
-    for (final p in overlays) {
-      visit(p);
-    }
-    return sorted;
-  }
 
   List<PanelController> _orderInlinePanels(List<PanelController> source) {
     final ordered = <PanelController>[];
@@ -426,11 +414,40 @@ class _PanelLayoutDelegate extends MultiChildLayoutDelegate {
       }
 
       // Measure Overlay Child
-      // Overlays usually auto-size (ContentSizing) or FixedSizing.
-      // PanelController properties should constrain this?
-      // LayoutPanel handles the internal sizing (SizedBox/AnimatedContainer).
-      // So we just give loose constraints.
-      final childSize = layoutChild(id, BoxConstraints.loose(size));
+      final crossAlign = panel.crossAxisAlignment ?? CrossAxisAlignment.stretch;
+      BoxConstraints childConstraints = BoxConstraints.loose(size);
+
+      // If anchored and stretching, enforce tight constraints on the cross axis
+      if (panel.anchorPanel != null && panelRects.containsKey(panel.anchorPanel)) {
+        final anchorRect = panelRects[panel.anchorPanel]!;
+        
+        if (crossAlign == CrossAxisAlignment.stretch) {
+          switch (panel.anchor) {
+            case PanelAnchor.left:
+            case PanelAnchor.right:
+              // Match Height
+              childConstraints = BoxConstraints(
+                minHeight: anchorRect.height,
+                maxHeight: anchorRect.height,
+                minWidth: 0,
+                maxWidth: size.width, 
+              );
+              break;
+            case PanelAnchor.top:
+            case PanelAnchor.bottom:
+              // Match Width
+              childConstraints = BoxConstraints(
+                minWidth: anchorRect.width,
+                maxWidth: anchorRect.width,
+                minHeight: 0,
+                maxHeight: size.height,
+              );
+              break;
+          }
+        }
+      }
+
+      final childSize = layoutChild(id, childConstraints);
       
       // Calculate Position
       Offset position = Offset.zero;
