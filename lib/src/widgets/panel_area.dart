@@ -8,6 +8,7 @@ import '../models/panel_id.dart';
 import '../models/panel_sizing.dart';
 import '../models/panel_enums.dart';
 import 'panel_resize_handle.dart';
+import 'panel_area_helper.dart';
 
 /// A smart container that orchestrates the layout of a group of panels.
 class PanelArea extends StatelessWidget {
@@ -147,16 +148,58 @@ class PanelArea extends StatelessWidget {
         }
 
         // --- 4. Construct Render Order ---
-        // Paint Panels in user-provided order (panelIds) to allow Z-index control.
-        for (final id in panelIds) {
-          // Only add if it is active (i.e. not a hidden flexible panel)
+        // We create a unified list of paintable items (Panels and Handles) and sort them.
+        // This decouples paint order (Z-index) from layout order.
+        
+        final paintItems = <PaintItem>[];
+
+        // 4a. Add Panels
+        for (var i = 0; i < panelIds.length; i++) {
+          final id = panelIds[i];
           if (activeIds.contains(id) && widgetMap.containsKey(id)) {
-            layoutChildren.add(widgetMap[id]!);
+            final panel = panelLayoutController.getPanel(id);
+            if (panel != null) {
+              paintItems.add(PaintItem(
+                id: id,
+                widget: widgetMap[id]!,
+                zIndex: panel.zIndex,
+                isHandle: false,
+                originalIndex: i,
+              ));
+            }
           }
         }
-        
-        // Paint Handles on top
-        layoutChildren.addAll(handleWidgets);
+
+        // 4b. Add Handles
+        // Handles are part of the inline layer, so we default them to zIndex 0.
+        // They should typically render ABOVE inline panels of the same z-index.
+        for (var i = 0; i < handleWidgets.length; i++) {
+          paintItems.add(PaintItem(
+            id: const Object(), // Handle ID not strictly needed for sorting distinct from widget
+            widget: handleWidgets[i],
+            zIndex: 0, 
+            isHandle: true,
+            originalIndex: panelIds.length + i, // Arbitrary order after panels
+          ));
+        }
+
+        // 4c. Sort
+        paintItems.sort((a, b) {
+          // 1. Z-Index
+          final zComp = a.zIndex.compareTo(b.zIndex);
+          if (zComp != 0) return zComp;
+
+          // 2. Handles on top of Panels (for same Z-index)
+          if (a.isHandle != b.isHandle) {
+            return a.isHandle ? 1 : -1;
+          }
+
+          // 3. Stable Sort (Original Index)
+          return a.originalIndex.compareTo(b.originalIndex);
+        });
+
+        // 4d. Populate Children
+        layoutChildren.addAll(paintItems.map((item) => item.widget));
 
         return CustomMultiChildLayout(
           delegate: _PanelLayoutDelegate(

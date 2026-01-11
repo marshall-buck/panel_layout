@@ -32,6 +32,7 @@ class PanelController extends ChangeNotifier {
     bool isCollapsed = false,
     bool isVisible = true,
     this.isResizable = true,
+    int zIndex = 0,
   }) : _sizing = sizing,
        _mode = mode,
        _anchor = anchor,
@@ -42,7 +43,8 @@ class PanelController extends ChangeNotifier {
        _constraints = constraints,
        _visuals = visuals,
        _isCollapsed = isCollapsed,
-       _isVisible = isVisible;
+       _isVisible = isVisible,
+       _zIndex = zIndex;
 
   /// The unique identifier for this panel.
   final PanelId id;
@@ -70,6 +72,7 @@ class PanelController extends ChangeNotifier {
 
   bool _isCollapsed;
   bool _isVisible;
+  int _zIndex;
 
   /// The current sizing strategy of the panel.
   PanelSizing get sizing => _sizing;
@@ -106,6 +109,9 @@ class PanelController extends ChangeNotifier {
 
   /// Whether the panel is currently visible in the layout.
   bool get isVisible => _isVisible;
+
+  /// The painting order of the panel. Higher values are painted on top.
+  int get zIndex => _zIndex;
 
   /// Calculates the effective logical pixel size or flex weight for rendering.
   double get effectiveSize {
@@ -166,6 +172,14 @@ class PanelController extends ChangeNotifier {
   void setMode(PanelMode mode) {
     if (_mode != mode) {
       _mode = mode;
+      notifyListeners();
+    }
+  }
+
+  /// Updates the z-index of the panel.
+  void setZIndex(int zIndex) {
+    if (_zIndex != zIndex) {
+      _zIndex = zIndex;
       notifyListeners();
     }
   }

@@ -1,3 +1,8 @@
+## 0.3.2
+
+*   **Feat**: Added `zIndex` support to `PanelController` and `PanelLayoutController`.
+*   **Fix**: Decoupled panel rendering order (Z-index) from the registration order in `PanelArea`. Panels are now sorted by `zIndex` before painting, allowing for explicit control over overlapping behavior (e.g., sliding from behind vs. sliding over).
+
 ## 0.3.1
 
 *   **Fix**: Corrected the slide animation direction for anchored overlay panels. Relative overlays now correctly slide out from their anchor target instead of the screen edge.

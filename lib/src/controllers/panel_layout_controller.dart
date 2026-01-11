@@ -72,6 +72,7 @@ class PanelLayoutController extends ChangeNotifier {
     bool isCollapsed = false,
     bool isVisible = true,
     bool isResizable = true,
+    int zIndex = 0,
   }) {
     if (_panels.containsKey(id)) {
       return _panels[id]!;
@@ -92,6 +93,7 @@ class PanelLayoutController extends ChangeNotifier {
       isCollapsed: isCollapsed,
       isVisible: isVisible,
       isResizable: isResizable,
+      zIndex: zIndex,
     );
 
     _panels[id] = controller;
