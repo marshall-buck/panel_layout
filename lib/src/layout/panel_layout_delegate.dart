@@ -56,9 +56,24 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
           totalWeight += p.config.flex!;
         }
       } else {
-        final constraints = isHorizontal 
-            ? BoxConstraints(maxHeight: crossSpace)
-            : BoxConstraints(maxWidth: crossSpace);
+        // Fixed or Content?
+        // If config.width/height is set, it's Fixed.
+        // We use state.size which should match the config/user-drag value.
+        final isFixed = isHorizontal ? p.config.width != null : p.config.height != null;
+        
+        final BoxConstraints constraints;
+        
+        if (isFixed) {
+           // Enforce the size from state
+           constraints = isHorizontal
+               ? BoxConstraints.tightFor(width: p.state.size, height: crossSpace)
+               : BoxConstraints.tightFor(height: p.state.size, width: crossSpace);
+        } else {
+           // Content Sizing (Intrinsic)
+           constraints = isHorizontal 
+              ? BoxConstraints(maxHeight: crossSpace)
+              : BoxConstraints(maxWidth: crossSpace);
+        }
         
         final s = layoutChild(p.config.id, constraints);
         usedMainSpace += isHorizontal ? s.width : s.height;

@@ -6,8 +6,8 @@ const kDefaultHoverDuration = Duration(milliseconds: 150);
 
 // --- Handle Dimensions ---
 const kDefaultHandleWidth = 4.0;
-const kDefaultHandleHitTestWidth = 12.0;
-const kDefaultHandleIconSize = 16.0;
+const kDefaultHandleHitTestWidth = 8.0;
+const kDefaultHandleIconSize = 4.0;
 
 // --- Colors (Neutral Defaults) ---
 const kDefaultHandleColor = Color(0x33000000); // Transparent black

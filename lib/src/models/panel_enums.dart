@@ -8,10 +8,6 @@ enum PanelMode {
   /// It does not affect the size/position of inline panels.
   /// Useful for temporary drawers, dialogs, or floating tools.
   overlay,
-
-  /// The panel is tracked by the controller but not rendered by the [PanelArea].
-  /// Useful for headless state management or custom rendering integration.
-  detached,
 }
 
 /// Defines which edge a panel is logically attached to.
