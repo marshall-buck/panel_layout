@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import '../debug_flag.dart';
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
 import 'layout_data.dart';
@@ -42,14 +43,14 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
       }
     }
 
-    debugPrint(
+    panelLayoutLog(
       'Delegate has ${inlinePanels.length} inline and ${overlayPanels.length} overlays',
     );
     for (var p in inlinePanels) {
-      debugPrint('  Inline: ${p.config.id.value}');
+      panelLayoutLog('  Inline: ${p.config.id.value}');
     }
     for (var p in overlayPanels) {
-      debugPrint('  Overlay: ${p.config.id.value}');
+      panelLayoutLog('  Overlay: ${p.config.id.value}');
     }
 
     // --- 1. Inline Layout ---
@@ -120,7 +121,7 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
         final s = layoutChild(p.config.id, constraints);
         usedMainSpace += isHorizontal ? s.width : s.height;
         panelRects[p.config.id] = Offset.zero & s;
-        debugPrint(
+        panelLayoutLog(
           'Delegate Pass 1 measured inline ${p.config.id.value} as $s',
         );
       }
@@ -198,7 +199,8 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
     for (final p in overlayPanels) {
       if (!hasChild(p.config.id)) continue;
 
-      if (!p.state.visible) {
+      // Ensure we layout if it's visible OR if it's still animating out (visualFactor > 0)
+      if (!p.state.visible && p.visualFactor <= 0) {
         layoutChild(
           p.config.id,
           const BoxConstraints.tightFor(width: 0, height: 0),
