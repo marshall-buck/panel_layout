@@ -1,1 +1,1 @@
-export 'panel_theme.dart';
+export 'resize_handle_theme.dart';

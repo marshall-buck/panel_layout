@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 
-import '../theme/panel_theme.dart';
+import '../constants.dart';
+import '../theme/resize_handle_theme.dart';
 
 /// A draggable handle widget used to resize adjacent panels.
 ///
 /// This widget renders a transparent hit target that becomes visible (or highlights)
 /// when hovered or dragged. It captures drag gestures and reports the delta
-/// back to the parent [PanelArea].
+/// back to the parent [PanelLayout].
 class PanelResizeHandle extends StatefulWidget {
   /// Creates a [PanelResizeHandle].
   const PanelResizeHandle({
@@ -39,7 +40,8 @@ class _PanelResizeHandleState extends State<PanelResizeHandle> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = PanelTheme.of(context);
+    // Resolve Theme (New Theme only)
+    final theme = ResizeHandleTheme.of(context);
     final isVertical = widget.axis == Axis.vertical;
 
     return MouseRegion(
@@ -63,40 +65,70 @@ class _PanelResizeHandleState extends State<PanelResizeHandle> {
         behavior: HitTestBehavior.translucent,
         child: Container(
           // Hit target size (larger than visible line)
-          width: isVertical ? theme.resizeHandleHitTestWidth : double.infinity,
-          height: isVertical ? double.infinity : theme.resizeHandleHitTestWidth,
+          width: isVertical ? theme.hitTestWidth : double.infinity,
+          height: isVertical ? double.infinity : theme.hitTestWidth,
           color: const Color(0x00000000), // Colors.transparent
-          child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              // Visible line size
-              width: isVertical
-                  ? (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0)
-                  : double.infinity,
-              height: isVertical
-                  ? double.infinity
-                  : (_isHovered || _isDragging ? theme.resizeHandleWidth : 1.0),
-              decoration: _isDragging
-                  ? (theme.resizeHandleActiveDecoration ??
-                        BoxDecoration(
-                          color: theme.resizeHandleActiveColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ))
-                  : (_isHovered
-                        ? (theme.resizeHandleHoverDecoration ??
-                              BoxDecoration(
-                                color: theme.resizeHandleHoverColor,
-                                borderRadius: BorderRadius.circular(2),
-                              ))
-                        : (theme.resizeHandleDecoration ??
-                              BoxDecoration(
-                                color: theme.resizeHandleColor,
-                                borderRadius: BorderRadius.circular(2),
-                              ))),
-            ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Visible line
+              AnimatedContainer(
+                duration: kDefaultHoverDuration,
+                width: isVertical
+                    ? (_isHovered || _isDragging ? theme.width : 1.0)
+                    : double.infinity,
+                height: isVertical
+                    ? double.infinity
+                    : (_isHovered || _isDragging ? theme.width : 1.0),
+                decoration: _getDecoration(theme),
+              ),
+              // Icon/Grip
+              if (theme.icon != null)
+                Align(
+                  alignment: theme.iconAlignment,
+                  child: Icon(
+                    theme.icon,
+                    size: theme.iconSize,
+                    color: theme.iconColor,
+                  ),
+                ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  Decoration _getDecoration(ResizeHandleThemeData theme) {
+    if (_isDragging) {
+      return theme.activeDecoration ??
+          BoxDecoration(
+            color: theme.activeColor,
+            border: theme.borderColor != null
+                ? Border.all(color: theme.borderColor!, width: theme.borderWidth ?? 1.0)
+                : null,
+            borderRadius: BorderRadius.circular(theme.borderRadius ?? 2.0),
+          );
+    }
+
+    if (_isHovered) {
+      return theme.hoverDecoration ??
+          BoxDecoration(
+            color: theme.hoverColor,
+            border: theme.borderColor != null
+                ? Border.all(color: theme.borderColor!, width: theme.borderWidth ?? 1.0)
+                : null,
+            borderRadius: BorderRadius.circular(theme.borderRadius ?? 2.0),
+          );
+    }
+
+    return theme.decoration ??
+        BoxDecoration(
+          color: theme.color,
+          border: theme.borderColor != null
+              ? Border.all(color: theme.borderColor!, width: theme.borderWidth ?? 1.0)
+              : null,
+          borderRadius: BorderRadius.circular(theme.borderRadius ?? 2.0),
+        );
   }
 }
