@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 import '../widgets/base_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
@@ -7,10 +8,12 @@ import '../models/panel_id.dart';
 ///
 /// It combines the static configuration from [BasePanel] with the
 /// dynamic runtime state from [PanelRuntimeState].
+@internal
 class PanelLayoutData {
   PanelLayoutData({
     required this.config,
     required this.state,
+    this.visualFactor = 1.0,
   });
 
   /// The static configuration (ID, Anchor, Mode, etc.)
@@ -19,15 +22,26 @@ class PanelLayoutData {
   /// The dynamic state (current size, visibility, collapse).
   final PanelRuntimeState state;
 
+  /// The current animation factor (0.0 to 1.0) for transitions.
+  final double visualFactor;
+
   /// Calculated effective size for layout.
   double get effectiveSize {
-    if (!state.visible) return 0.0;
-    if (state.collapsed) return config.collapsedSize ?? 0.0;
-    return state.size;
+    // If factor is 0, we take 0 space. 
+    // If factor is 1, we take full size.
+    double baseSize = state.size;
+    if (state.collapsed) {
+      baseSize = config.collapsedSize ?? 0.0;
+    }
+    return baseSize * visualFactor;
   }
+
+  double? get animatedWidth => config.width != null ? (state.collapsed ? (config.collapsedSize ?? 0.0) : config.width!) * visualFactor : null;
+  double? get animatedHeight => config.height != null ? (state.collapsed ? (config.collapsedSize ?? 0.0) : config.height!) * visualFactor : null;
 }
 
 /// A unique identifier for a resize handle between two panels.
+@internal
 class HandleLayoutId extends Equatable {
   const HandleLayoutId(this.previousPanelId, this.nextPanelId);
 

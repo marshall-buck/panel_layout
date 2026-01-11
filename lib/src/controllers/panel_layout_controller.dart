@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 
 /// A controller for the [PanelLayout] widget.
@@ -8,11 +9,13 @@ class PanelLayoutController extends ChangeNotifier {
   PanelLayoutStateInterface? _state;
 
   /// Attaches the controller to a [PanelLayout] state.
+  @internal
   void attach(PanelLayoutStateInterface state) {
     _state = state;
   }
 
   /// Detaches the controller.
+  @internal
   void detach() {
     _state = null;
   }
@@ -39,6 +42,7 @@ class PanelLayoutController extends ChangeNotifier {
 }
 
 /// Interface that [PanelLayoutState] implements to receive commands.
+@internal
 abstract class PanelLayoutStateInterface {
   void toggleVisible(PanelId id);
   void toggleCollapsed(PanelId id);

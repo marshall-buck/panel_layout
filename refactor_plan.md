@@ -8,37 +8,6 @@
 3.  **State in Layout:** Dynamic properties (`currentSize`, `isCollapsed`) are managed by `PanelLayoutState`.
 4.  **Controllers are Optional:** Used only for remote commands (e.g., "Open Sidebar"), not for defining structure.
 
-## Architecture Overview
-
-### 1. `BasePanel` Widget (Configuration)
-A stateless configuration object that users extend.
-```dart
-class SidebarPanel extends BasePanel {
-  SidebarPanel() : super(
-    id: 'sidebar',
-    width: 250,
-    minSize: 100,
-    anchor: PanelAnchor.left,
-    child: SidebarContent(),
-  );
-}
-```
-
-### 2. `PanelLayout` Widget (The Engine)
-A stateful orchestrator.
-*   **Input:** `children` (List of `BasePanel`).
-*   **State:** `Map<PanelId, PanelState>`.
-    *   `PanelState` holds: `size` (user-resized), `visible`, `collapsed`.
-*   **Logic:**
-    *   Reconciles `children` with `PanelState` (e.g., preserves `size` if `BasePanel` re-appears).
-    *   Handles resize gestures directly.
-    *   Computes layout using `CustomMultiChildLayout`.
-
-### 3. `PanelController` (The Remote)
-A simplified interface for commanding the layout.
-*   `controller.toggle(id)`
-*   `controller.resize(id, size)`
-
 ## Refactor Steps
 
 ### Phase 0: Infrastructure (Complete)
@@ -46,29 +15,16 @@ A simplified interface for commanding the layout.
 *   [x] `ResizeHandleTheme` for clean styling.
 *   [x] `PanelResizeHandle` updated to support legacy and new themes.
 
-### Phase 1: The New Core
-1.  **Define `BasePanel` Widget:** The public API surface for inheritance.
-2.  **Define `PanelRuntimeState` Model:** Internal class for tracking ephemeral state.
-3.  **Create `PanelLayout` Widget:**
-    *   Implement state reconciliation (Widget Config + Internal State = Render Props).
-    *   Implement `MultiChildLayoutDelegate` (ported/refactored from `PanelArea` logic).
-    *   Implement resize logic (modifying `PanelState`).
+### Phase 1: The New Core (Complete)
+*   [x] **Define `BasePanel` Widget:** The public API surface for inheritance.
+*   [x] **Define `PanelRuntimeState` Model:** Internal class for tracking ephemeral state.
+*   [x] **Create `PanelLayout` Widget:** The engine implementing `MultiChildLayoutDelegate` and state reconciliation.
+*   [x] **Implement `PanelLayoutDelegate`:** Handles layout logic and handle injection.
 
-### Phase 2: The Bridge (Compatibility)
-To support `oilnet_app` and existing users:
-1.  **Reimplement `PanelArea` (Legacy):**
-    *   Make it a wrapper around `PanelLayout`.
-    *   Convert `PanelController` list -> `List<BasePanel>` widgets.
-    *   Sync `PanelLayout` state changes back to `PanelController` (two-way binding).
-2.  **Deprecate Imperative API:** Mark controllers as legacy.
+### Phase 2: Cleanup & Verification (Complete)
+*   [x] **Remove Legacy Code:** Deleted `PanelArea`, `PanelController` (legacy), and associated shims.
+*   [x] **Verify Engine:** Implemented comprehensive tests (`panel_layout_test`, `panel_interaction_test`, `panel_anchoring_test`).
+*   [x] **Migrate Consumer:** Updated `oilnet_app` to use the new declarative API via `app_panels.dart`.
 
-### Phase 3: Migration & Cleanup
-1.  Migrate `oilnet_app` to use `PanelLayout` directly.
-2.  Remove the Legacy Bridge (`PanelArea`, old `PanelController`).
-3.  Final cleanup.
-
-## Detailed Tasks (Phase 1)
-1.  Create `lib/src/widgets/base_panel.dart` (The Config Widget).
-2.  Create `lib/src/state/panel_runtime_state.dart` (The Runtime State).
-3.  Create `lib/src/widgets/panel_layout.dart` (The Engine).
-4.  Refactor layout logic: Extract the pure math from `PanelArea` into a shared `LayoutAlgorithm` or pure Delegate that consumes abstract data, so it can be used by both New and Legacy widgets.
+## Status: COMPLETE
+The package has been successfully refactored to a modern, declarative architecture.

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../constants.dart';
 import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
@@ -10,6 +11,7 @@ import '../layout/panel_layout_delegate.dart';
 import '../controllers/panel_layout_controller.dart';
 import 'base_panel.dart';
 import 'panel_resize_handle.dart';
+import 'animated_panel.dart';
 
 /// The declarative orchestrator for the panel layout system.
 ///
@@ -22,6 +24,8 @@ class PanelLayout extends StatefulWidget {
     required this.children,
     this.controller,
     this.axis = Axis.horizontal,
+    this.onResizeStart,
+    this.onResizeEnd,
     super.key,
   });
 
@@ -36,6 +40,12 @@ class PanelLayout extends StatefulWidget {
   /// The main axis of the layout.
   final Axis axis;
 
+  /// Optional callback called when a user begins dragging a resize handle.
+  final VoidCallback? onResizeStart;
+
+  /// Optional callback called when a user finishes dragging a resize handle.
+  final VoidCallback? onResizeEnd;
+
   /// Retrieves the [PanelLayoutController] from the closest [PanelScope] ancestor.
   static PanelLayoutController of(BuildContext context) {
     return PanelScope.of(context);
@@ -45,9 +55,12 @@ class PanelLayout extends StatefulWidget {
   State<PanelLayout> createState() => _PanelLayoutState();
 }
 
-class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateInterface {
+class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin implements PanelLayoutStateInterface {
   /// Internal state for each panel, keyed by ID.
   final Map<PanelId, PanelRuntimeState> _panelStates = {};
+  
+  /// Animation controllers for each panel.
+  final Map<PanelId, AnimationController> _animationControllers = {};
 
   PanelLayoutController? _internalController;
   PanelLayoutController get _effectiveController => widget.controller ?? _internalController!;
@@ -85,6 +98,9 @@ class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateIn
   void dispose() {
     _effectiveController.detach();
     _internalController?.dispose(); 
+    for (final controller in _animationControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -93,54 +109,79 @@ class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateIn
   @override
   void toggleVisible(PanelId id) {
     if (_panelStates.containsKey(id)) {
-      setState(() {
-        _panelStates[id]!.visible = !_panelStates[id]!.visible;
-      });
+      setVisible(id, !_panelStates[id]!.visible);
     }
   }
 
   @override
   void toggleCollapsed(PanelId id) {
     if (_panelStates.containsKey(id)) {
-      setState(() {
-        _panelStates[id]!.collapsed = !_panelStates[id]!.collapsed;
-      });
+      setCollapsed(id, !_panelStates[id]!.collapsed);
     }
   }
 
   @override
   void setVisible(PanelId id, bool visible) {
-    if (_panelStates.containsKey(id)) {
+    final state = _panelStates[id];
+    if (state != null && state.visible != visible) {
       setState(() {
-        _panelStates[id]!.visible = visible;
+        _panelStates[id] = state.copyWith(visible: visible);
       });
+      _animatePanel(id, visible);
     }
   }
 
   @override
   void setCollapsed(PanelId id, bool collapsed) {
-    if (_panelStates.containsKey(id)) {
+    final state = _panelStates[id];
+    if (state != null && state.collapsed != collapsed) {
       setState(() {
-        _panelStates[id]!.collapsed = collapsed;
+        _panelStates[id] = state.copyWith(collapsed: collapsed);
       });
+      // Collapse also triggers a re-layout animation
+      _animatePanel(id, _panelStates[id]!.visible); 
+    }
+  }
+
+  void _animatePanel(PanelId id, bool visible) {
+    final controller = _animationControllers[id];
+    if (controller != null) {
+      if (visible) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
     }
   }
 
   void _reconcileState() {
     final currentIds = widget.children.map((p) => p.id).toSet();
     
-    // 1. Remove state for panels that are gone
     _panelStates.removeWhere((id, _) => !currentIds.contains(id));
+    
+    for (final id in _animationControllers.keys.toList()) {
+      if (!currentIds.contains(id)) {
+        _animationControllers[id]!.dispose();
+        _animationControllers.remove(id);
+      }
+    }
 
-    // 2. Initialize or Update state for active panels
     for (final panel in widget.children) {
       if (!_panelStates.containsKey(panel.id)) {
-        // Initialize new panel state
         _panelStates[panel.id] = PanelRuntimeState(
           size: _getInitialSize(panel),
           visible: panel.initialVisible,
           collapsed: panel.initialCollapsed,
         );
+        
+        final controller = AnimationController(
+          vsync: this,
+          duration: panel.animationDuration ?? kDefaultAnimationDuration,
+          value: panel.initialVisible ? 1.0 : 0.0,
+        );
+        
+        controller.addListener(() => setState(() {}));
+        _animationControllers[panel.id] = controller;
       }
     }
   }
@@ -154,15 +195,22 @@ class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateIn
 
   @override
   Widget build(BuildContext context) {
-    // Combine Config + State into LayoutData
-    final layoutData = widget.children.map((config) {
+    final uniquePanelConfigs = <PanelId, BasePanel>{};
+    for (final panel in widget.children) {
+      uniquePanelConfigs[panel.id] = panel;
+    }
+
+    final layoutData = uniquePanelConfigs.values.map((config) {
+      final state = _panelStates[config.id]!;
+      final anim = _animationControllers[config.id]!;
+      
       return PanelLayoutData(
         config: config,
-        state: _panelStates[config.id]!,
+        state: state,
+        visualFactor: anim.value, 
       );
     }).toList();
 
-    // Identify needed handles
     final dockedPanels = layoutData
         .where((d) => d.config.mode == PanelMode.inline)
         .toList(); 
@@ -170,25 +218,44 @@ class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateIn
     final children = <Widget>[];
 
     // Add Panels
-    for (final panel in widget.children) {
+    for (final panel in uniquePanelConfigs.values) {
+      final state = _panelStates[panel.id]!;
+      final factor = _animationControllers[panel.id]!.value;
+      
+      Widget panelWidget = AnimatedPanel(
+        config: panel,
+        state: state,
+        factor: factor,
+      );
+
+      // If anchored to external link, wrap in Follower
+      if (panel.anchorLink != null) {
+        panelWidget = CompositedTransformFollower(
+          link: panel.anchorLink!,
+          showWhenUnlinked: false,
+          child: panelWidget,
+        );
+      }
+
       children.add(
         LayoutId(
           id: panel.id,
           child: PanelDataScope(
-            state: _panelStates[panel.id]!,
-            child: panel,
+            state: state,
+            child: panelWidget,
           ),
         ),
       );
     }
 
-    // Add Handles
     for (var i = 0; i < dockedPanels.length - 1; i++) {
       final prev = dockedPanels[i];
       final next = dockedPanels[i+1];
       
-      if (!prev.state.visible || !next.state.visible) continue;
-      if (prev.state.collapsed && next.state.collapsed) continue;
+      // Handle visibility based on static state, but only remove if animation finished
+      if (!prev.state.visible || !next.state.visible) {
+         if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
+      }
       
       final handleId = HandleLayoutId(prev.config.id, next.config.id);
       
@@ -198,10 +265,14 @@ class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateIn
           child: PanelResizeHandle(
             axis: widget.axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
             onDragUpdate: (delta) => _handleResize(delta, prev, next),
+            onDragStart: widget.onResizeStart,
+            onDragEnd: widget.onResizeEnd,
           ),
         ),
       );
     }
+
+    final sortedChildren = _sortChildren(children, uniquePanelConfigs);
 
     return PanelScope(
       controller: _effectiveController,
@@ -211,38 +282,64 @@ class _PanelLayoutState extends State<PanelLayout> implements PanelLayoutStateIn
           axis: widget.axis,
           textDirection: Directionality.of(context),
         ),
-        children: children,
+        children: sortedChildren,
       ),
     );
   }
 
-  void _handleResize(double delta, PanelLayoutData prev, PanelLayoutData next) {
-    // Update State
+  List<Widget> _sortChildren(List<Widget> unsorted, Map<PanelId, BasePanel> configs) {
+    final List<Widget> sorted = List.from(unsorted);
+    sorted.sort((a, b) {
+      final idA = (a as LayoutId).id;
+      final idB = (b as LayoutId).id;
+      
+      int zA = 0;
+      if (idA is PanelId) zA = configs[idA]?.zIndex ?? 0;
+      
+      int zB = 0;
+      if (idB is PanelId) zB = configs[idB]?.zIndex ?? 0;
+      
+      if (zA != zB) return zA.compareTo(zB);
+      
+      return unsorted.indexOf(a).compareTo(unsorted.indexOf(b));
+    });
+    
+    return sorted;
+  }
+
+  void _handleResize(double delta, PanelLayoutData prevData, PanelLayoutData nextData) {
     setState(() {
-      // 1. Resize Prev (if Fixed)
-      if (prev.config.flex == null && prev.config.resizable) {
-        final newSize = (prev.state.size + delta).clamp(
-          prev.config.minSize ?? 0.0,
-          prev.config.maxSize ?? double.infinity,
+      final prev = _panelStates[prevData.config.id]!;
+      final next = _panelStates[nextData.config.id]!;
+
+      if (prevData.config.flex == null && prevData.config.resizable) {
+        final newSize = (prev.size + delta).clamp(
+          prevData.config.minSize ?? 0.0,
+          prevData.config.maxSize ?? double.infinity,
         );
-        prev.state.size = newSize;
+        _panelStates[prevData.config.id] = prev.copyWith(size: newSize);
         return;
       }
       
-      // 2. Resize Next (if Fixed) - Moving handle right shrinks next?
-      // No, moving handle right increases Prev.
-      // If Prev is Flexible, and Next is Fixed:
-      if (next.config.flex == null && next.config.resizable) {
-         final newSize = (next.state.size - delta).clamp(
-          next.config.minSize ?? 0.0,
-          next.config.maxSize ?? double.infinity,
+      if (nextData.config.flex == null && nextData.config.resizable) {
+         final newSize = (next.size - delta).clamp(
+          nextData.config.minSize ?? 0.0,
+          nextData.config.maxSize ?? double.infinity,
         );
-        next.state.size = newSize;
+        _panelStates[nextData.config.id] = next.copyWith(size: newSize);
         return;
       }
       
-      // 3. Flex/Flex
-      // Distribute weights
+      if (prevData.config.flex != null && nextData.config.flex != null &&
+          prevData.config.resizable && nextData.config.resizable) {
+        final w1 = prev.size;
+        final w2 = next.size;
+        
+        const sensitivity = 0.01; 
+        _panelStates[prevData.config.id] = prev.copyWith(size: (w1 + delta * sensitivity).clamp(0.0, double.infinity));
+        _panelStates[nextData.config.id] = next.copyWith(size: (w2 - delta * sensitivity).clamp(0.0, double.infinity));
+        return;
+      }
     });
   }
 }
