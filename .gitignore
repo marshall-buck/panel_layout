@@ -29,3 +29,9 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# Example Project (ignore generated files)
+example/*
+!example/lib/
+!example/lib/main.dart
+!example/pubspec.yaml

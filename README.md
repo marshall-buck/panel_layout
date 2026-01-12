@@ -114,3 +114,20 @@ dependencies:
     git:
       url: https://github.com/marshall-buck/panel_layout.git
 ```
+
+## Running the Example
+
+The `example/` directory contains a minimal setup to demonstrate the package. To run it:
+
+1.  Navigate to the `example` directory:
+    ```bash
+    cd example
+    ```
+2.  Initialize the Flutter project structure (this creates the `ios`, `android`, `web`, `macos`, etc., directories):
+    ```bash
+    flutter create .
+    ```
+3.  Run the app:
+    ```bash
+    flutter run -d macos  # or windows, linux, etc.
+    ```
