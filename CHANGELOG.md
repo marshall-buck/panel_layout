@@ -1,3 +1,12 @@
+## 0.4.1
+
+*   **Feat**: Added support for "Mini Variants" (Collapsed Strips). Panels can now collapse to a small strip instead of disappearing completely.
+*   **Feat**: Added `toggleIcon` property to `BasePanel`. Providing an icon automatically generates a clickable, rotating toggle button in the collapsed strip.
+*   **Feat**: Added `collapsedChild` property to `BasePanel` for custom collapsed strip content.
+*   **Feat**: Added `PanelToggleButton` widget. Automatically detects panel anchor and state to rotate its icon (e.g., a chevron) correctly.
+*   **Fix**: Resolved layout overflow issues when collapsing panels with wide content by using an internal `Stack` and `OverflowBox` strategy.
+*   **Fix**: Updated `PanelDataScope` to expose the panel's configuration (`BasePanel`) to descendants.
+
 ## 0.4.0
 
 **MAJOR REFACTOR: Declarative "Widget-First" API**

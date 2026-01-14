@@ -261,6 +261,7 @@ class _PanelLayoutState extends State<PanelLayout>
         config: panel,
         state: state,
         factor: factor,
+        collapseFactor: _collapseControllers[panel.id]!.value,
       );
 
       // If anchored to external link, wrap in Follower

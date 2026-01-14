@@ -234,10 +234,28 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
           anchor: PanelAnchor.bottom,
           height: 200,
           minSize: 100,
+          collapsedSize: 32,
+          collapsedChild: Container(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: const Row(
+              children: [
+                SizedBox(width: 8),
+                PanelToggleButton(child: Icon(Icons.chevron_left, size: 16)),
+                SizedBox(width: 8),
+                Text(
+                  'TERMINAL (Collapsed)',
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
           child: Column(
             children: [
               _PanelHeader(
                 title: 'TERMINAL',
+                actions: const [
+                  PanelToggleButton(child: Icon(Icons.chevron_left)),
+                ],
                 onClose: () =>
                     _controller.setVisible(const PanelId('terminal'), false),
               ),
