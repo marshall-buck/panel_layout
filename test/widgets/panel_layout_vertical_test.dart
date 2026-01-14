@@ -4,11 +4,14 @@ import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
 class TestFixedPanel extends BasePanel {
-  TestFixedPanel({
-    super.key,
-    required String id,
-    required double height,
-  }) : super(id: PanelId(id), height: height, mode: PanelMode.inline, anchor: PanelAnchor.top, child: Container());
+  TestFixedPanel({super.key, required String id, required double height})
+    : super(
+        id: PanelId(id),
+        height: height,
+        mode: PanelMode.inline,
+        anchor: PanelAnchor.top,
+        child: Container(),
+      );
 }
 
 void main() {

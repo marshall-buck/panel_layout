@@ -4,13 +4,22 @@ import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
 class SimplePanel extends BasePanel {
-  SimplePanel({super.key, required String id, super.width, required super.child}) : super(id: PanelId(id));
+  SimplePanel({
+    super.key,
+    required String id,
+    super.width,
+    required super.child,
+  }) : super(id: PanelId(id));
 }
 
-Finder findPanel(String id) => find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == PanelId(id));
+Finder findPanel(String id) => find.byWidgetPredicate(
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
-  testWidgets('ResizeHandleTheme affects handle size and layout', (tester) async {
+  testWidgets('ResizeHandleTheme affects handle size and layout', (
+    tester,
+  ) async {
     const handleWidth = 20.0;
     const hitTestWidth = 30.0;
 
@@ -44,7 +53,7 @@ void main() {
     // Space between panels should be equal to hitTestWidth (not visible width)
     // because PanelResizeHandle uses hitTestWidth for its layout size.
     expect(p2.left - p1.right, hitTestWidth);
-    
+
     // Verify handle size
     final handle = tester.getSize(find.byType(PanelResizeHandle));
     expect(handle.width, hitTestWidth);

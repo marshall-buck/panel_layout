@@ -17,7 +17,9 @@ class SimplePanel extends BasePanel {
   }) : super(id: PanelId(id));
 }
 
-Finder findPanel(String id) => find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == PanelId(id));
+Finder findPanel(String id) => find.byWidgetPredicate(
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
   group('PanelLayoutDelegate Extended', () {
@@ -121,7 +123,7 @@ void main() {
       );
 
       final overlayRect = tester.getRect(findPanel('overlay'));
-      
+
       // Right anchor + Cross Start -> (200, centered)
       expect(overlayRect.left, 200.0);
       expect(overlayRect.top, 275.0); // (600 - 50) / 2

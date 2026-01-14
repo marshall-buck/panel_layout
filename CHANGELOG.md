@@ -15,7 +15,7 @@ This version introduces a complete overhaul of the package architecture, moving 
 
 ### New APIs & Features
 *   **`BasePanel`**: An abstract base class that users extend to create custom panels. It encapsulates both configuration (sizing, anchors) and content.
-*   **`PanelLayout`**: The new declarative engine. It automatically manages panel lifecycles, state persistence (across rebuilds), and frame-perfect animations.
+*   **`PanelLayout`**: The new declarative engine. It automatically manages panel life-cycles, state persistence (across rebuilds), and frame-perfect animations.
 *   **`PanelLayoutController`**: A simplified remote control for programmatic actions like `toggleVisible(id)` or `setCollapsed(id, bool)`.
 *   **`ResizeHandleTheme`**: A simplified, stateless styling API for customizing the appearance and hit-test area of resize handles.
 *   **`PanelDataScope`**: An `InheritedWidget` that allows any descendant of a panel to access its runtime state (e.g., checking if it's currently collapsed or its animated size).

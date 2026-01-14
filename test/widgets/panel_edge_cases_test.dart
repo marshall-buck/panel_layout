@@ -3,7 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 
 class SimplePanel extends BasePanel {
-  SimplePanel({super.key, required String id, super.width, super.flex, required super.child}) : super(id: PanelId(id));
+  SimplePanel({
+    super.key,
+    required String id,
+    super.width,
+    super.flex,
+    required super.child,
+  }) : super(id: PanelId(id));
 }
 
 void main() {

@@ -4,12 +4,13 @@ import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
 class InlinePanel extends BasePanel {
-  InlinePanel({super.key, required String id}) : super(
-    id: PanelId(id),
-    width: 200,
-    mode: PanelMode.inline,
-    child: Container(color: const Color(0xFF000000)),
-  );
+  InlinePanel({super.key, required String id})
+    : super(
+        id: PanelId(id),
+        width: 200,
+        mode: PanelMode.inline,
+        child: Container(color: const Color(0xFF000000)),
+      );
 }
 
 class OverlayPanel extends BasePanel {
@@ -19,15 +20,17 @@ class OverlayPanel extends BasePanel {
     required PanelId anchorTo,
     super.anchor = PanelAnchor.right,
   }) : super(
-    id: PanelId(id),
-    mode: PanelMode.overlay,
-    anchorTo: anchorTo,
-    width: 100, 
-    child: Container(color: const Color(0xFFFF0000)),
-  );
+         id: PanelId(id),
+         mode: PanelMode.overlay,
+         anchorTo: anchorTo,
+         width: 100,
+         child: Container(color: const Color(0xFFFF0000)),
+       );
 }
 
-Finder findPanel(String id) => find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == PanelId(id));
+Finder findPanel(String id) => find.byWidgetPredicate(
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
   testWidgets('Overlay panel anchors to inline panel', (tester) async {

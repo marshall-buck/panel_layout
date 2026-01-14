@@ -65,6 +65,8 @@ class SimplePanel extends BasePanel {
     super.flex,
     super.minSize,
     super.maxSize,
+    super.collapsedSize,
+    super.collapsedChild,
     super.resizable = true,
     super.initialVisible = true,
     super.initialCollapsed = false,
@@ -85,25 +87,58 @@ class SimplePanel extends BasePanel {
   }
 }
 
-class ClassicIDELayout extends StatelessWidget {
+class ClassicIDELayout extends StatefulWidget {
   const ClassicIDELayout({super.key});
+
+  @override
+  State<ClassicIDELayout> createState() => _ClassicIDELayoutState();
+}
+
+class _ClassicIDELayoutState extends State<ClassicIDELayout> {
+  final _controller = PanelLayoutController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return PanelLayout(
+      controller: _controller,
       children: [
         SimplePanel(
           id: const PanelId('explorer'),
           width: 250,
           minSize: 150,
           maxSize: 400,
+          collapsedSize: 48,
+          collapsedChild: Container(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                const PanelToggleButton(child: Icon(Icons.chevron_left)),
+                const SizedBox(height: 16),
+                IconButton(
+                  icon: const Icon(Icons.folder_open),
+                  tooltip: 'Expand',
+                  onPressed: () => _controller.setCollapsed(
+                    const PanelId('explorer'),
+                    false,
+                  ),
+                ),
+              ],
+            ),
+          ),
           child: Column(
             children: [
               _PanelHeader(
                 title: 'EXPLORER',
-                onClose: () => PanelLayout.of(
-                  context,
-                ).setVisible(const PanelId('explorer'), false),
+                actions: const [
+                  PanelToggleButton(child: Icon(Icons.chevron_left)),
+                ],
               ),
               const Expanded(child: Center(child: Text('File Tree'))),
             ],
@@ -119,15 +154,13 @@ class ClassicIDELayout extends StatelessWidget {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.menu),
-                    onPressed: () => PanelLayout.of(
-                      context,
-                    ).toggleVisible(const PanelId('explorer')),
+                    onPressed: () =>
+                        _controller.toggleVisible(const PanelId('explorer')),
                   ),
                   IconButton(
                     icon: const Icon(Icons.settings),
-                    onPressed: () => PanelLayout.of(
-                      context,
-                    ).toggleVisible(const PanelId('properties')),
+                    onPressed: () =>
+                        _controller.toggleVisible(const PanelId('properties')),
                   ),
                 ],
               ),
@@ -151,9 +184,8 @@ class ClassicIDELayout extends StatelessWidget {
             children: [
               _PanelHeader(
                 title: 'PROPERTIES',
-                onClose: () => PanelLayout.of(
-                  context,
-                ).setVisible(const PanelId('properties'), false),
+                onClose: () =>
+                    _controller.setVisible(const PanelId('properties'), false),
               ),
               const Expanded(child: Center(child: Text('Settings'))),
             ],
@@ -164,12 +196,26 @@ class ClassicIDELayout extends StatelessWidget {
   }
 }
 
-class VerticalSplitLayout extends StatelessWidget {
+class VerticalSplitLayout extends StatefulWidget {
   const VerticalSplitLayout({super.key});
+
+  @override
+  State<VerticalSplitLayout> createState() => _VerticalSplitLayoutState();
+}
+
+class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
+  final _controller = PanelLayoutController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return PanelLayout(
+      controller: _controller,
       axis: Axis.vertical,
       children: [
         SimplePanel(
@@ -192,9 +238,8 @@ class VerticalSplitLayout extends StatelessWidget {
             children: [
               _PanelHeader(
                 title: 'TERMINAL',
-                onClose: () => PanelLayout.of(
-                  context,
-                ).setVisible(const PanelId('terminal'), false),
+                onClose: () =>
+                    _controller.setVisible(const PanelId('terminal'), false),
               ),
               const Expanded(child: Center(child: Text('Console Output'))),
             ],
@@ -214,6 +259,12 @@ class AnchoredOverlayLayout extends StatefulWidget {
 
 class _AnchoredOverlayLayoutState extends State<AnchoredOverlayLayout> {
   final _controller = PanelLayoutController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

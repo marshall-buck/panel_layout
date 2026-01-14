@@ -29,8 +29,8 @@ class PanelLayout extends StatefulWidget {
     super.key,
   });
 
-  /// The list of declarative panel configurations. 
-  /// 
+  /// The list of declarative panel configurations.
+  ///
   /// These widgets should extend [BasePanel].
   final List<BasePanel> children;
 
@@ -55,15 +55,21 @@ class PanelLayout extends StatefulWidget {
   State<PanelLayout> createState() => _PanelLayoutState();
 }
 
-class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin implements PanelLayoutStateInterface {
+class _PanelLayoutState extends State<PanelLayout>
+    with TickerProviderStateMixin
+    implements PanelLayoutStateInterface {
   /// Internal state for each panel, keyed by ID.
   final Map<PanelId, PanelRuntimeState> _panelStates = {};
-  
-  /// Animation controllers for each panel.
+
+  /// Animation controllers for each panel's visibility.
   final Map<PanelId, AnimationController> _animationControllers = {};
 
+  /// Animation controllers for each panel's collapse state.
+  final Map<PanelId, AnimationController> _collapseControllers = {};
+
   PanelLayoutController? _internalController;
-  PanelLayoutController get _effectiveController => widget.controller ?? _internalController!;
+  PanelLayoutController get _effectiveController =>
+      widget.controller ?? _internalController!;
 
   @override
   void initState() {
@@ -97,8 +103,11 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
   @override
   void dispose() {
     _effectiveController.detach();
-    _internalController?.dispose(); 
+    _internalController?.dispose();
     for (final controller in _animationControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _collapseControllers.values) {
       controller.dispose();
     }
     super.dispose();
@@ -138,8 +147,8 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
       setState(() {
         _panelStates[id] = state.copyWith(collapsed: collapsed);
       });
-      // Collapse also triggers a re-layout animation
-      _animatePanel(id, _panelStates[id]!.visible); 
+      // Trigger collapse animation
+      _animateCollapse(id, collapsed);
     }
   }
 
@@ -154,15 +163,32 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
     }
   }
 
+  void _animateCollapse(PanelId id, bool collapsed) {
+    final controller = _collapseControllers[id];
+    if (controller != null) {
+      if (collapsed) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
+    }
+  }
+
   void _reconcileState() {
     final currentIds = widget.children.map((p) => p.id).toSet();
-    
+
     _panelStates.removeWhere((id, _) => !currentIds.contains(id));
-    
+
     for (final id in _animationControllers.keys.toList()) {
       if (!currentIds.contains(id)) {
         _animationControllers[id]!.dispose();
         _animationControllers.remove(id);
+      }
+    }
+    for (final id in _collapseControllers.keys.toList()) {
+      if (!currentIds.contains(id)) {
+        _collapseControllers[id]!.dispose();
+        _collapseControllers.remove(id);
       }
     }
 
@@ -173,15 +199,22 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
           visible: panel.initialVisible,
           collapsed: panel.initialCollapsed,
         );
-        
+
         final controller = AnimationController(
           vsync: this,
           duration: panel.animationDuration ?? kDefaultAnimationDuration,
           value: panel.initialVisible ? 1.0 : 0.0,
         );
-        
         controller.addListener(() => setState(() {}));
         _animationControllers[panel.id] = controller;
+
+        final collapseController = AnimationController(
+          vsync: this,
+          duration: panel.animationDuration ?? kDefaultAnimationDuration,
+          value: panel.initialCollapsed ? 1.0 : 0.0,
+        );
+        collapseController.addListener(() => setState(() {}));
+        _collapseControllers[panel.id] = collapseController;
       }
     }
   }
@@ -203,25 +236,27 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
     final layoutData = uniquePanelConfigs.values.map((config) {
       final state = _panelStates[config.id]!;
       final anim = _animationControllers[config.id]!;
-      
+      final collapseAnim = _collapseControllers[config.id]!;
+
       return PanelLayoutData(
         config: config,
         state: state,
-        visualFactor: anim.value, 
+        visualFactor: anim.value,
+        collapseFactor: collapseAnim.value,
       );
     }).toList();
 
     final dockedPanels = layoutData
         .where((d) => d.config.mode == PanelMode.inline)
-        .toList(); 
-        
+        .toList();
+
     final children = <Widget>[];
 
     // Add Panels
     for (final panel in uniquePanelConfigs.values) {
       final state = _panelStates[panel.id]!;
       final factor = _animationControllers[panel.id]!.value;
-      
+
       Widget panelWidget = AnimatedPanel(
         config: panel,
         state: state,
@@ -242,6 +277,7 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
           id: panel.id,
           child: PanelDataScope(
             state: state,
+            config: panel,
             child: panelWidget,
           ),
         ),
@@ -250,20 +286,22 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
 
     for (var i = 0; i < dockedPanels.length - 1; i++) {
       final prev = dockedPanels[i];
-      final next = dockedPanels[i+1];
-      
+      final next = dockedPanels[i + 1];
+
       // Handle visibility based on static state, but only remove if animation finished
       if (!prev.state.visible || !next.state.visible) {
-         if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
+        if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
       }
-      
+
       final handleId = HandleLayoutId(prev.config.id, next.config.id);
-      
+
       children.add(
         LayoutId(
           id: handleId,
           child: PanelResizeHandle(
-            axis: widget.axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
+            axis: widget.axis == Axis.horizontal
+                ? Axis.vertical
+                : Axis.horizontal,
             onDragUpdate: (delta) => _handleResize(delta, prev, next),
             onDragStart: widget.onResizeStart,
             onDragEnd: widget.onResizeEnd,
@@ -287,27 +325,34 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
     );
   }
 
-  List<Widget> _sortChildren(List<Widget> unsorted, Map<PanelId, BasePanel> configs) {
+  List<Widget> _sortChildren(
+    List<Widget> unsorted,
+    Map<PanelId, BasePanel> configs,
+  ) {
     final List<Widget> sorted = List.from(unsorted);
     sorted.sort((a, b) {
       final idA = (a as LayoutId).id;
       final idB = (b as LayoutId).id;
-      
+
       int zA = 0;
       if (idA is PanelId) zA = configs[idA]?.zIndex ?? 0;
-      
+
       int zB = 0;
       if (idB is PanelId) zB = configs[idB]?.zIndex ?? 0;
-      
+
       if (zA != zB) return zA.compareTo(zB);
-      
+
       return unsorted.indexOf(a).compareTo(unsorted.indexOf(b));
     });
-    
+
     return sorted;
   }
 
-  void _handleResize(double delta, PanelLayoutData prevData, PanelLayoutData nextData) {
+  void _handleResize(
+    double delta,
+    PanelLayoutData prevData,
+    PanelLayoutData nextData,
+  ) {
     setState(() {
       final prev = _panelStates[prevData.config.id]!;
       final next = _panelStates[nextData.config.id]!;
@@ -320,24 +365,30 @@ class _PanelLayoutState extends State<PanelLayout> with TickerProviderStateMixin
         _panelStates[prevData.config.id] = prev.copyWith(size: newSize);
         return;
       }
-      
+
       if (nextData.config.flex == null && nextData.config.resizable) {
-         final newSize = (next.size - delta).clamp(
+        final newSize = (next.size - delta).clamp(
           nextData.config.minSize ?? 0.0,
           nextData.config.maxSize ?? double.infinity,
         );
         _panelStates[nextData.config.id] = next.copyWith(size: newSize);
         return;
       }
-      
-      if (prevData.config.flex != null && nextData.config.flex != null &&
-          prevData.config.resizable && nextData.config.resizable) {
+
+      if (prevData.config.flex != null &&
+          nextData.config.flex != null &&
+          prevData.config.resizable &&
+          nextData.config.resizable) {
         final w1 = prev.size;
         final w2 = next.size;
-        
-        const sensitivity = 0.01; 
-        _panelStates[prevData.config.id] = prev.copyWith(size: (w1 + delta * sensitivity).clamp(0.0, double.infinity));
-        _panelStates[nextData.config.id] = next.copyWith(size: (w2 - delta * sensitivity).clamp(0.0, double.infinity));
+
+        const sensitivity = 0.01;
+        _panelStates[prevData.config.id] = prev.copyWith(
+          size: (w1 + delta * sensitivity).clamp(0.0, double.infinity),
+        );
+        _panelStates[nextData.config.id] = next.copyWith(
+          size: (w2 - delta * sensitivity).clamp(0.0, double.infinity),
+        );
         return;
       }
     });

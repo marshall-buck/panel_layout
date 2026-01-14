@@ -4,25 +4,33 @@ import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
 class TestFixedPanel extends BasePanel {
-  TestFixedPanel({
-    super.key,
-    required String id,
-    required double width,
-  }) : super(id: PanelId(id), width: width, mode: PanelMode.inline, child: Container());
+  TestFixedPanel({super.key, required String id, required double width})
+    : super(
+        id: PanelId(id),
+        width: width,
+        mode: PanelMode.inline,
+        child: Container(),
+      );
 }
 
 class TestFlexPanel extends BasePanel {
-  TestFlexPanel({
-    super.key,
-    required String id,
-    double flex = 1.0,
-  }) : super(id: PanelId(id), flex: flex, mode: PanelMode.inline, child: Container());
+  TestFlexPanel({super.key, required String id, double flex = 1.0})
+    : super(
+        id: PanelId(id),
+        flex: flex,
+        mode: PanelMode.inline,
+        child: Container(),
+      );
 }
 
-Finder findPanel(String id) => find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == PanelId(id));
+Finder findPanel(String id) => find.byWidgetPredicate(
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
-  testWidgets('Dragging handle resizes Fixed panel and triggers callbacks', (tester) async {
+  testWidgets('Dragging handle resizes Fixed panel and triggers callbacks', (
+    tester,
+  ) async {
     bool started = false;
     bool ended = false;
 
@@ -47,7 +55,7 @@ void main() {
     );
 
     final handle = find.byType(PanelResizeHandle);
-    
+
     await tester.drag(handle, const Offset(50, 0));
     await tester.pump();
 

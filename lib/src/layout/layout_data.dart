@@ -14,6 +14,7 @@ class PanelLayoutData {
     required this.config,
     required this.state,
     this.visualFactor = 1.0,
+    this.collapseFactor = 0.0,
   });
 
   /// The static configuration (ID, Anchor, Mode, etc.)
@@ -22,22 +23,41 @@ class PanelLayoutData {
   /// The dynamic state (current size, visibility, collapse).
   final PanelRuntimeState state;
 
-  /// The current animation factor (0.0 to 1.0) for transitions.
+  /// The current animation factor (0.0 to 1.0) for visibility.
   final double visualFactor;
+
+  /// The current animation factor (0.0 to 1.0) for collapse.
+  /// 0.0 = Expanded, 1.0 = Collapsed.
+  final double collapseFactor;
 
   /// Calculated effective size for layout.
   double get effectiveSize {
-    // If factor is 0, we take 0 space. 
+    // If factor is 0, we take 0 space.
     // If factor is 1, we take full size.
-    double baseSize = state.size;
-    if (state.collapsed) {
-      baseSize = config.collapsedSize ?? 0.0;
-    }
-    return baseSize * visualFactor;
+    final baseSize = state.size;
+    final collapsedSize = config.collapsedSize ?? 0.0;
+
+    // Interpolate between full size and collapsed size based on collapseFactor
+    final currentSize = baseSize + (collapsedSize - baseSize) * collapseFactor;
+
+    return currentSize * visualFactor;
   }
 
-  double? get animatedWidth => config.width != null ? (state.collapsed ? (config.collapsedSize ?? 0.0) : config.width!) * visualFactor : null;
-  double? get animatedHeight => config.height != null ? (state.collapsed ? (config.collapsedSize ?? 0.0) : config.height!) * visualFactor : null;
+  double? get animatedWidth {
+    if (config.width == null) return null;
+    final base = config.width!;
+    final collapsed = config.collapsedSize ?? 0.0;
+    final current = base + (collapsed - base) * collapseFactor;
+    return current * visualFactor;
+  }
+
+  double? get animatedHeight {
+    if (config.height == null) return null;
+    final base = config.height!;
+    final collapsed = config.collapsedSize ?? 0.0;
+    final current = base + (collapsed - base) * collapseFactor;
+    return current * visualFactor;
+  }
 }
 
 /// A unique identifier for a resize handle between two panels.

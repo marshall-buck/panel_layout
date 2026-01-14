@@ -4,11 +4,18 @@ import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
 class OuterPanel extends BasePanel {
-  OuterPanel({super.key, required String id, super.width, required super.child}) : super(id: PanelId(id));
+  OuterPanel({super.key, required String id, super.width, required super.child})
+    : super(id: PanelId(id));
 }
 
 class SimplePanel extends BasePanel {
-  SimplePanel({super.key, required String id, super.height, super.flex, required super.child}) : super(id: PanelId(id));
+  SimplePanel({
+    super.key,
+    required String id,
+    super.height,
+    super.flex,
+    required super.child,
+  }) : super(id: PanelId(id));
 }
 
 void main() {
@@ -42,10 +49,39 @@ void main() {
     );
 
     // Verify outer sidebar width
-    expect(tester.getSize(find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == const PanelId('sidebar'))).width, 200.0);
+    expect(
+      tester
+          .getSize(
+            find.byWidgetPredicate(
+              (w) =>
+                  w is AnimatedPanel && w.config.id == const PanelId('sidebar'),
+            ),
+          )
+          .width,
+      200.0,
+    );
 
     // Verify inner panels
-    expect(tester.getSize(find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == const PanelId('top'))).height, 100.0);
-    expect(tester.getSize(find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == const PanelId('bottom'))).height, 492.0); // 600 - 100 - 8 (handle)
+    expect(
+      tester
+          .getSize(
+            find.byWidgetPredicate(
+              (w) => w is AnimatedPanel && w.config.id == const PanelId('top'),
+            ),
+          )
+          .height,
+      100.0,
+    );
+    expect(
+      tester
+          .getSize(
+            find.byWidgetPredicate(
+              (w) =>
+                  w is AnimatedPanel && w.config.id == const PanelId('bottom'),
+            ),
+          )
+          .height,
+      492.0,
+    ); // 600 - 100 - 8 (handle)
   });
 }

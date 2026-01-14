@@ -10,15 +10,22 @@ class TestFixedPanel extends BasePanel {
     required double width,
     super.minSize,
     super.maxSize,
-  }) : super(id: PanelId(id), width: width, mode: PanelMode.inline, child: Container());
+  }) : super(
+         id: PanelId(id),
+         width: width,
+         mode: PanelMode.inline,
+         child: Container(),
+       );
 }
 
 class TestFlexPanel extends BasePanel {
-  TestFlexPanel({
-    super.key,
-    required String id,
-    double flex = 1.0,
-  }) : super(id: PanelId(id), flex: flex, mode: PanelMode.inline, child: Container());
+  TestFlexPanel({super.key, required String id, double flex = 1.0})
+    : super(
+        id: PanelId(id),
+        flex: flex,
+        mode: PanelMode.inline,
+        child: Container(),
+      );
 }
 
 void main() {
@@ -33,7 +40,12 @@ void main() {
               height: 100,
               child: PanelLayout(
                 children: [
-                  TestFixedPanel(id: 'left', width: 100, minSize: 50, maxSize: 150),
+                  TestFixedPanel(
+                    id: 'left',
+                    width: 100,
+                    minSize: 50,
+                    maxSize: 150,
+                  ),
                   TestFlexPanel(id: 'right', flex: 1),
                 ],
               ),
@@ -78,7 +90,7 @@ void main() {
       expect(tester.getSize(find.byType(AnimatedPanel).first).width, 196.0);
 
       final handle = find.byType(PanelResizeHandle);
-      
+
       // Drag right by 50px
       await tester.drag(handle, const Offset(50, 0));
       await tester.pump();

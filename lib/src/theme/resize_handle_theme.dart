@@ -70,5 +70,6 @@ class ResizeHandleTheme extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(ResizeHandleTheme oldWidget) => data != oldWidget.data;
+  bool updateShouldNotify(ResizeHandleTheme oldWidget) =>
+      data != oldWidget.data;
 }

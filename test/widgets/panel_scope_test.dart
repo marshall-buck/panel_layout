@@ -6,14 +6,18 @@ void main() {
   group('Scope Widget Tests', () {
     testWidgets('PanelScope.of throws if missing', (tester) async {
       await tester.pumpWidget(
-        Builder(builder: (context) {
-          expect(() => PanelLayout.of(context), throwsException);
-          return Container();
-        }),
+        Builder(
+          builder: (context) {
+            expect(() => PanelLayout.of(context), throwsException);
+            return Container();
+          },
+        ),
       );
     });
 
-    testWidgets('PanelScope.of(listen: false) returns controller', (tester) async {
+    testWidgets('PanelScope.of(listen: false) returns controller', (
+      tester,
+    ) async {
       final controller = PanelLayoutController();
       late PanelLayoutController found;
 
@@ -24,11 +28,13 @@ void main() {
             controller: controller,
             children: [
               SimplePanel(
-                id: 'p1', 
-                child: Builder(builder: (context) {
-                  found = PanelScope.of(context, listen: false);
-                  return Container();
-                }),
+                id: 'p1',
+                child: Builder(
+                  builder: (context) {
+                    found = PanelScope.of(context, listen: false);
+                    return Container();
+                  },
+                ),
               ),
             ],
           ),
@@ -51,12 +57,14 @@ void main() {
             controller: controller,
             children: [
               SimplePanel(
-                id: 'p1', 
-                child: Builder(builder: (context) {
-                  builds++;
-                  PanelDataScope.of(context); // register dependency
-                  return Container();
-                }),
+                id: 'p1',
+                child: Builder(
+                  builder: (context) {
+                    builds++;
+                    PanelDataScope.of(context); // register dependency
+                    return Container();
+                  },
+                ),
               ),
             ],
           ),
@@ -73,5 +81,6 @@ void main() {
 }
 
 class SimplePanel extends BasePanel {
-  SimplePanel({super.key, required String id, required super.child}) : super(id: PanelId(id));
+  SimplePanel({super.key, required String id, required super.child})
+    : super(id: PanelId(id));
 }

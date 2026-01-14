@@ -56,9 +56,7 @@ class PanelResizeHandle extends StatelessWidget {
               Container(
                 width: isVertical ? theme.width : double.infinity,
                 height: isVertical ? double.infinity : theme.width,
-                decoration: BoxDecoration(
-                  color: theme.color,
-                ),
+                decoration: BoxDecoration(color: theme.color),
               ),
               // Icon/Grip
               if (theme.icon != null)

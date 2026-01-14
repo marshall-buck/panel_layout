@@ -11,11 +11,11 @@ class TestFixedPanel extends BasePanel {
     required double width,
     Color color = const Color(0xFFFF0000),
   }) : super(
-    id: PanelId(id),
-    width: width,
-    mode: PanelMode.inline,
-    child: Container(color: color),
-  );
+         id: PanelId(id),
+         width: width,
+         mode: PanelMode.inline,
+         child: Container(color: color),
+       );
 }
 
 class TestFlexPanel extends BasePanel {
@@ -25,24 +25,28 @@ class TestFlexPanel extends BasePanel {
     double flex = 1.0,
     Color color = const Color(0xFF00FF00),
   }) : super(
-    id: PanelId(id),
-    flex: flex,
-    mode: PanelMode.inline,
-    child: Container(color: color),
-  );
+         id: PanelId(id),
+         flex: flex,
+         mode: PanelMode.inline,
+         child: Container(color: color),
+       );
 }
 
-Finder findPanel(String id) => find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == PanelId(id));
+Finder findPanel(String id) => find.byWidgetPredicate(
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
-  testWidgets('PanelLayout renders fixed panels with correct width', (tester) async {
+  testWidgets('PanelLayout renders fixed panels with correct width', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: Center(
           child: SizedBox(
             height: 100,
-            width: 800, 
+            width: 800,
             child: PanelLayout(
               children: [
                 TestFixedPanel(id: 'p1', width: 100),
@@ -58,7 +62,9 @@ void main() {
     expect(tester.getSize(findPanel('p2')).width, 200.0);
   });
 
-  testWidgets('PanelLayout distributes flex space accounting for handle', (tester) async {
+  testWidgets('PanelLayout distributes flex space accounting for handle', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -80,7 +86,7 @@ void main() {
     expect(tester.getSize(findPanel('f1')).width, 98.0);
     expect(tester.getSize(findPanel('f2')).width, 294.0);
   });
-  
+
   testWidgets('PanelLayout mixes Fixed and Flex panels', (tester) async {
     await tester.pumpWidget(
       Directionality(

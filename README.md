@@ -4,14 +4,11 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 
 `panel_layout` provides a robust engine for building complex user interfaces with resizable panels, flexible content areas, and intelligently anchored overlays.
 
-## The Declarative Shift (v0.4.0+)
-
-Starting with version 0.4.0, the package has moved to a **"Widget-First"** declarative API. Instead of manually registering controllers, you define your layout structure directly in the widget tree. The engine automatically handles state preservation, resizing interactions, and frame-perfect animations.
-
 ## Key Features
 
 -   **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
 -   **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
+-   **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns. Panels can collapse to a small strip instead of disappearing completely.
 -   **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
 -   **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
 -   **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels by extending `BasePanel`.
@@ -31,6 +28,11 @@ class MySidebar extends BasePanel {
     minSize: 100,
     maxSize: 400,
     anchor: PanelAnchor.left,
+    
+    // Optional: Define a collapsed "mini" state
+    collapsedSize: 48,
+    collapsedChild: MySideRail(), 
+    
     child: SidebarContent(),
   );
 }
@@ -46,6 +48,19 @@ PanelLayout(
     MySidebar(),
     MyMainContent(), // Another class extending BasePanel with flex: 1
   ],
+)
+```
+
+## Mini Variants & Collapsing
+
+You can allow panels to collapse into a "Mini Variant" (like a toolbar or icon rail) by providing a `collapsedChild`.
+
+Use the built-in `PanelToggleButton` to easily toggle this state. It automatically detects the panel's anchor and rotates its icon (e.g., a chevron) to point the correct way.
+
+```dart
+// Inside your panel content
+PanelToggleButton(
+  child: Icon(Icons.chevron_left), // Will rotate to point right when collapsed!
 )
 ```
 
@@ -114,20 +129,3 @@ dependencies:
     git:
       url: https://github.com/marshall-buck/panel_layout.git
 ```
-
-## Running the Example
-
-The `example/` directory contains a minimal setup to demonstrate the package. To run it:
-
-1.  Navigate to the `example` directory:
-    ```bash
-    cd example
-    ```
-2.  Initialize the Flutter project structure (this creates the `ios`, `android`, `web`, `macos`, etc., directories):
-    ```bash
-    flutter create .
-    ```
-3.  Run the app:
-    ```bash
-    flutter run -d macos  # or windows, linux, etc.
-    ```

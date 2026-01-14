@@ -21,11 +21,7 @@ class PanelRuntimeState {
   bool collapsed;
 
   /// Creates a copy of this state.
-  PanelRuntimeState copyWith({
-    double? size,
-    bool? visible,
-    bool? collapsed,
-  }) {
+  PanelRuntimeState copyWith({double? size, bool? visible, bool? collapsed}) {
     return PanelRuntimeState(
       size: size ?? this.size,
       visible: visible ?? this.visible,

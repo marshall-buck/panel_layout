@@ -24,8 +24,10 @@ class AnimatedPanel extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final targetSize = state.collapsed ? (config.collapsedSize ?? 0.0) : state.size;
-    
+    final targetSize = state.collapsed
+        ? (config.collapsedSize ?? 0.0)
+        : state.size;
+
     final bool hasFixedWidth = config.width != null;
     final bool hasFixedHeight = config.height != null;
 
@@ -33,10 +35,7 @@ class AnimatedPanel extends StatelessWidget {
     Widget content = SizedBox(
       width: hasFixedWidth ? targetSize : null,
       height: hasFixedHeight ? targetSize : null,
-      child: Opacity(
-        opacity: factor.clamp(0.0, 1.0),
-        child: config,
-      ),
+      child: Opacity(opacity: factor.clamp(0.0, 1.0), child: config),
     );
 
     // If the axis is fixed, we use OverflowBox to prevent squashing during clipping animations.
@@ -56,18 +55,20 @@ class AnimatedPanel extends StatelessWidget {
     return SizedBox(
       width: hasFixedWidth ? (targetSize * factor) : null,
       height: hasFixedHeight ? (targetSize * factor) : null,
-      child: ClipRect(
-        child: content,
-      ),
+      child: ClipRect(child: content),
     );
   }
 
   Alignment _getAlignment() {
     switch (config.anchor) {
-      case PanelAnchor.left: return Alignment.centerLeft;
-      case PanelAnchor.right: return Alignment.centerRight;
-      case PanelAnchor.top: return Alignment.topCenter;
-      case PanelAnchor.bottom: return Alignment.bottomCenter;
+      case PanelAnchor.left:
+        return Alignment.centerLeft;
+      case PanelAnchor.right:
+        return Alignment.centerRight;
+      case PanelAnchor.top:
+        return Alignment.topCenter;
+      case PanelAnchor.bottom:
+        return Alignment.bottomCenter;
     }
   }
 }

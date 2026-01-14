@@ -10,15 +10,17 @@ class TestOverlay extends BasePanel {
     super.alignment,
     super.anchor = PanelAnchor.left,
   }) : super(
-    id: PanelId(id),
-    mode: PanelMode.overlay,
-    width: 100,
-    height: 100,
-    child: Container(),
-  );
+         id: PanelId(id),
+         mode: PanelMode.overlay,
+         width: 100,
+         height: 100,
+         child: Container(),
+       );
 }
 
-Finder findPanel(String id) => find.byWidgetPredicate((w) => w is AnimatedPanel && w.config.id == PanelId(id));
+Finder findPanel(String id) => find.byWidgetPredicate(
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
   testWidgets('Overlay respects custom alignment', (tester) async {
