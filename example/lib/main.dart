@@ -240,12 +240,13 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
             child: const Row(
               children: [
                 SizedBox(width: 8),
-                PanelToggleButton(child: Icon(Icons.chevron_left, size: 16)),
-                SizedBox(width: 8),
                 Text(
                   'TERMINAL (Collapsed)',
                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                 ),
+                Spacer(),
+                PanelToggleButton(child: Icon(Icons.chevron_left, size: 16)),
+                SizedBox(width: 8),
               ],
             ),
           ),
@@ -256,8 +257,6 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
                 actions: const [
                   PanelToggleButton(child: Icon(Icons.chevron_left)),
                 ],
-                onClose: () =>
-                    _controller.setVisible(const PanelId('terminal'), false),
               ),
               const Expanded(child: Center(child: Text('Console Output'))),
             ],
