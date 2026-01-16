@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
 import 'base_panel.dart';
+import 'panel_toggle_button.dart';
 
 /// An internal wrapper that handles animations for a panel's size and visibility.
 @internal
@@ -38,8 +39,15 @@ class AnimatedPanel extends StatelessWidget {
     final expandedSize = state.size;
     final stripSize = config.collapsedSize ?? 0.0;
 
-    // Use the strictly typed collapsedChild (PanelToggleButton)
-    Widget? stripWidget = config.collapsedChild;
+    // Use toggleIcon to build the strip widget
+    Widget? stripWidget;
+    if (config.toggleIcon != null) {
+      stripWidget = PanelToggleButton(
+        icon: config.toggleIcon!,
+        panelId: config.id,
+        closingDirection: config.closingDirection,
+      );
+    }
 
     Widget childWidget = Opacity(
       opacity: factor.clamp(0.0, 1.0),
@@ -61,7 +69,7 @@ class AnimatedPanel extends StatelessWidget {
       alignment: _getAlignment(config.anchor),
       children: [
         childWidget,
-        if (stripWidget != null)
+        if (stripWidget != null || config.collapsedDecoration != null)
           Positioned(
             left:
                 (config.anchor == PanelAnchor.left ||
@@ -99,7 +107,11 @@ class AnimatedPanel extends StatelessWidget {
               ignoring: collapseFactor == 0.0,
               child: Opacity(
                 opacity: collapseFactor.clamp(0.0, 1.0),
-                child: stripWidget,
+                child: Container(
+                  decoration: config.collapsedDecoration,
+                  alignment: Alignment.center,
+                  child: stripWidget,
+                ),
               ),
             ),
           ),

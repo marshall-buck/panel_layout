@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import '../models/panel_enums.dart';
 import 'base_panel.dart';
 
@@ -16,7 +17,9 @@ class InlinePanel extends BasePanel {
     this.minSize,
     this.maxSize,
     super.collapsedSize,
-    super.collapsedChild,
+    super.toggleIcon,
+    super.closingDirection,
+    super.collapsedDecoration,
     this.resizable = true,
     super.initialVisible = true,
     super.initialCollapsed = false,

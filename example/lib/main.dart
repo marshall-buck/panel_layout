@@ -97,19 +97,27 @@ class _ClassicIDELayoutState extends State<ClassicIDELayout> {
           minSize: 150,
           maxSize: 400,
           collapsedSize: 48,
-          collapsedChild: PanelToggleButton(
-            icon: Icon(Icons.chevron_left),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
+          toggleIcon: const Icon(Icons.chevron_left),
+          collapsedDecoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           child: PanelContainer(
             child: Column(
               children: [
                 _PanelHeader(
                   title: 'EXPLORER',
-                  actions: const [
-                    PanelToggleButton(icon: Icon(Icons.chevron_left)),
+                  actions: [
+                    Builder(
+                      builder: (context) {
+                        return IconButton(
+                          icon: const Icon(Icons.chevron_left),
+                          onPressed: () {
+                            final panelId = PanelDataScope.of(context).config.id;
+                            PanelScope.of(context).toggleCollapsed(panelId);
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
                 const Expanded(child: Center(child: Text('File Tree'))),
@@ -216,19 +224,27 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
           height: 200,
           minSize: 100,
           collapsedSize: 32,
-          collapsedChild: PanelToggleButton(
-            icon: Icon(Icons.chevron_left, size: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
+          toggleIcon: const Icon(Icons.chevron_left, size: 16),
+          collapsedDecoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           child: PanelContainer(
             child: Column(
               children: [
                 _PanelHeader(
                   title: 'TERMINAL',
-                  actions: const [
-                    PanelToggleButton(icon: Icon(Icons.chevron_left)),
+                  actions: [
+                    Builder(
+                      builder: (context) {
+                        return IconButton(
+                          icon: const Icon(Icons.chevron_left),
+                          onPressed: () {
+                            final panelId = PanelDataScope.of(context).config.id;
+                            PanelScope.of(context).toggleCollapsed(panelId);
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
                 const Expanded(child: Center(child: Text('Console Output'))),

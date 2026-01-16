@@ -5,17 +5,19 @@ import '../models/panel_enums.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
 
-/// A button that toggles the collapsed state of a panel.
+import 'package:meta/meta.dart';
+
+/// A private button that toggles the collapsed state of a panel.
 ///
 /// It strictly expects a left-pointing chevron icon and automatically rotates
-/// it based on the [direction] or the panel's anchor.
+/// it based on the [closingDirection] or the panel's anchor.
+@internal
 class PanelToggleButton extends StatelessWidget {
   const PanelToggleButton({
     required this.icon,
     this.panelId,
     this.size = 24.0,
-    this.decoration,
-    this.direction,
+    this.closingDirection,
     super.key,
   });
 
@@ -29,12 +31,9 @@ class PanelToggleButton extends StatelessWidget {
   /// The size of the button tap area.
   final double size;
 
-  /// Optional decoration (background color, border, etc.) for the button.
-  final Decoration? decoration;
-
-  /// The direction the panel opens (expands).
-  /// If provided, this overrides the automatic direction inference from the panel anchor.
-  final PanelAnimationDirection? direction;
+  /// The direction the panel closes towards.
+  /// If provided, this overrides the automatic inference from the panel anchor.
+  final PanelAnchor? closingDirection;
 
   @override
   Widget build(BuildContext context) {
@@ -56,40 +55,39 @@ class PanelToggleButton extends StatelessWidget {
       }
     }
 
-    PanelAnimationDirection effectiveDirection;
+    // Direction logic:
+    // If explicit closingDirection provided, use it.
+    // Else, anchor determines closing direction (e.g. Left panel closes to Left).
+    final PanelAnchor effectiveClosingDir = closingDirection ?? anchor;
 
-    if (direction != null) {
-      effectiveDirection = direction!;
-    } else {
-      switch (anchor) {
-        case PanelAnchor.left:
-          effectiveDirection = PanelAnimationDirection.opensRight;
-          break;
-        case PanelAnchor.right:
-          effectiveDirection = PanelAnimationDirection.opensLeft;
-          break;
-        case PanelAnchor.top:
-          effectiveDirection = PanelAnimationDirection.opensDown;
-          break;
-        case PanelAnchor.bottom:
-          effectiveDirection = PanelAnimationDirection.opensUp;
-          break;
-      }
-    }
+    // Input: Left Chevron (<)
+    // 0 deg = Pointing Left.
 
     double rotation = 0.0;
 
-    switch (effectiveDirection) {
-      case PanelAnimationDirection.opensRight:
+    switch (effectiveClosingDir) {
+      case PanelAnchor.left:
+        // Closes Left (<). Opens Right (>).
+        // Open (Visible): Point Left (<) to close. (0 deg)
+        // Collapsed: Point Right (>) to open. (180 deg)
         rotation = isCollapsed ? math.pi : 0.0;
         break;
-      case PanelAnimationDirection.opensLeft:
+      case PanelAnchor.right:
+        // Closes Right (>). Opens Left (<).
+        // Open: Point Right (>) to close. (180 deg)
+        // Collapsed: Point Left (<) to open. (0 deg)
         rotation = isCollapsed ? 0.0 : math.pi;
         break;
-      case PanelAnimationDirection.opensDown:
+      case PanelAnchor.top:
+        // Closes Up (^). Opens Down (v).
+        // Open: Point Up (^) to close. (-90 deg)
+        // Collapsed: Point Down (v) to open. (90 deg)
         rotation = isCollapsed ? math.pi / 2 : -math.pi / 2;
         break;
-      case PanelAnimationDirection.opensUp:
+      case PanelAnchor.bottom:
+        // Closes Down (v). Opens Up (^).
+        // Open: Point Down (v) to close. (90 deg)
+        // Collapsed: Point Up (^) to open. (-90 deg)
         rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
         break;
     }
@@ -102,10 +100,9 @@ class PanelToggleButton extends StatelessWidget {
         }
       },
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: SizedBox(
         width: size,
         height: size,
-        decoration: decoration,
         child: Center(
           child: TweenAnimationBuilder<double>(
             tween: Tween(end: rotation),
