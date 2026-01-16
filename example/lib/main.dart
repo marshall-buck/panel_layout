@@ -112,7 +112,8 @@ class _ClassicIDELayoutState extends State<ClassicIDELayout> {
                         return IconButton(
                           icon: const Icon(Icons.chevron_left),
                           onPressed: () {
-                            final panelId = PanelDataScope.of(context).config.id;
+                            final panelId =
+                                PanelDataScope.maybeOf(context)!.config.id;
                             PanelScope.of(context).toggleCollapsed(panelId);
                           },
                         );
@@ -239,7 +240,8 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
                         return IconButton(
                           icon: const Icon(Icons.chevron_left),
                           onPressed: () {
-                            final panelId = PanelDataScope.of(context).config.id;
+                            final panelId =
+                                PanelDataScope.maybeOf(context)!.config.id;
                             PanelScope.of(context).toggleCollapsed(panelId);
                           },
                         );
