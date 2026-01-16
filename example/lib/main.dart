@@ -97,22 +97,10 @@ class _ClassicIDELayoutState extends State<ClassicIDELayout> {
           minSize: 150,
           maxSize: 400,
           collapsedSize: 48,
-          collapsedChild: Container(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                const PanelToggleButton(child: Icon(Icons.chevron_left)),
-                const SizedBox(height: 16),
-                IconButton(
-                  icon: const Icon(Icons.folder_open),
-                  tooltip: 'Expand',
-                  onPressed: () => _controller.setCollapsed(
-                    const PanelId('explorer'),
-                    false,
-                  ),
-                ),
-              ],
+          collapsedChild: PanelToggleButton(
+            icon: Icon(Icons.chevron_left),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
           ),
           child: PanelContainer(
@@ -121,7 +109,7 @@ class _ClassicIDELayoutState extends State<ClassicIDELayout> {
                 _PanelHeader(
                   title: 'EXPLORER',
                   actions: const [
-                    PanelToggleButton(child: Icon(Icons.chevron_left)),
+                    PanelToggleButton(icon: Icon(Icons.chevron_left)),
                   ],
                 ),
                 const Expanded(child: Center(child: Text('File Tree'))),
@@ -228,19 +216,10 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
           height: 200,
           minSize: 100,
           collapsedSize: 32,
-          collapsedChild: Container(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: const Row(
-              children: [
-                SizedBox(width: 8),
-                Text(
-                  'TERMINAL (Collapsed)',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                PanelToggleButton(child: Icon(Icons.chevron_left, size: 16)),
-                SizedBox(width: 8),
-              ],
+          collapsedChild: PanelToggleButton(
+            icon: Icon(Icons.chevron_left, size: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
           ),
           child: PanelContainer(
@@ -249,7 +228,7 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
                 _PanelHeader(
                   title: 'TERMINAL',
                   actions: const [
-                    PanelToggleButton(child: Icon(Icons.chevron_left)),
+                    PanelToggleButton(icon: Icon(Icons.chevron_left)),
                   ],
                 ),
                 const Expanded(child: Center(child: Text('Console Output'))),

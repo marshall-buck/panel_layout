@@ -7,20 +7,21 @@ import '../state/panel_data_scope.dart';
 
 /// A button that toggles the collapsed state of a panel.
 ///
-/// It automatically rotates its [child] (icon) based on the panel's
-/// anchor and collapse state.
-///
-/// If [panelId] is not provided, it attempts to find the closest [PanelDataScope].
+/// It strictly expects a left-pointing chevron icon and automatically rotates
+/// it based on the [direction] or the panel's anchor.
 class PanelToggleButton extends StatelessWidget {
   const PanelToggleButton({
-    required this.child,
+    required this.icon,
     this.panelId,
     this.size = 24.0,
+    this.decoration,
+    this.direction,
     super.key,
   });
 
-  /// The icon to display (usually a chevron pointing LEFT).
-  final Widget child;
+  /// The icon to display. This should be a left-pointing chevron.
+  /// The widget will rotate it automatically.
+  final Widget icon;
 
   /// The ID of the panel to toggle. If null, uses the nearest enclosing panel.
   final PanelId? panelId;
@@ -28,28 +29,22 @@ class PanelToggleButton extends StatelessWidget {
   /// The size of the button tap area.
   final double size;
 
+  /// Optional decoration (background color, border, etc.) for the button.
+  final Decoration? decoration;
+
+  /// The direction the panel opens (expands).
+  /// If provided, this overrides the automatic direction inference from the panel anchor.
+  final PanelAnimationDirection? direction;
+
   @override
   Widget build(BuildContext context) {
     final scope = PanelDataScope.maybeOf(context);
     final controller = PanelScope.of(context);
 
-    // If panelId is explicit, we can't easily get its config (Anchor)
-    // without looking it up in the LayoutController or State.
-    // But LayoutController doesn't expose configs publicly.
-    // So this widget works best when placed INSIDE the panel (scope != null).
-
-    // If external, we assume standard behavior or no rotation if we can't find anchor.
-    // However, the requirement is "package should figure out the way...".
-
     PanelAnchor anchor = PanelAnchor.left;
     bool isCollapsed = false;
 
     if (panelId != null) {
-      // External control. We don't know the anchor easily unless we query the layout logic.
-      // But PanelLayout doesn't expose a "getPanelConfig(id)" API.
-      // We'll have to rely on the user to put it inside, or add that API.
-      // For now, if explicit ID, we just toggle. Rotation might be static.
-      // BUT, if scope matches ID, use scope.
       if (scope != null && scope.config.id == panelId) {
         anchor = scope.config.anchor;
         isCollapsed = scope.state.collapsed;
@@ -61,35 +56,41 @@ class PanelToggleButton extends StatelessWidget {
       }
     }
 
-    // Determine rotation
-    // User supplies LEFT pointing chevron.
-    // Anchor Left:
-    //   Open: Points Left (Standard). Rotation 0.
-    //   Collapsed: Points Right (to open). Rotation 180 (pi).
-    // Anchor Right:
-    //   Open: Points Right (to close). Rotation 180.
-    //   Collapsed: Points Left (to open). Rotation 0.
+    PanelAnimationDirection effectiveDirection;
+
+    if (direction != null) {
+      effectiveDirection = direction!;
+    } else {
+      switch (anchor) {
+        case PanelAnchor.left:
+          effectiveDirection = PanelAnimationDirection.opensRight;
+          break;
+        case PanelAnchor.right:
+          effectiveDirection = PanelAnimationDirection.opensLeft;
+          break;
+        case PanelAnchor.top:
+          effectiveDirection = PanelAnimationDirection.opensDown;
+          break;
+        case PanelAnchor.bottom:
+          effectiveDirection = PanelAnimationDirection.opensUp;
+          break;
+      }
+    }
 
     double rotation = 0.0;
 
-    switch (anchor) {
-      case PanelAnchor.left:
+    switch (effectiveDirection) {
+      case PanelAnimationDirection.opensRight:
         rotation = isCollapsed ? math.pi : 0.0;
         break;
-      case PanelAnchor.right:
+      case PanelAnimationDirection.opensLeft:
         rotation = isCollapsed ? 0.0 : math.pi;
         break;
-      case PanelAnchor.top:
-        // Left Chevron points Left.
-        // Top Panel Open: Point Up? (90 deg). Collapsed: Point Down?
-        // This assumes user provides LEFT chevron.
-        // Let's assume standard behavior:
-        // Open: Arrow points into panel (Up).
-        // Closed: Arrow points out (Down).
-        rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
-        break;
-      case PanelAnchor.bottom:
+      case PanelAnimationDirection.opensDown:
         rotation = isCollapsed ? math.pi / 2 : -math.pi / 2;
+        break;
+      case PanelAnimationDirection.opensUp:
+        rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
         break;
     }
 
@@ -101,9 +102,10 @@ class PanelToggleButton extends StatelessWidget {
         }
       },
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
+      child: Container(
         width: size,
         height: size,
+        decoration: decoration,
         child: Center(
           child: TweenAnimationBuilder<double>(
             tween: Tween(end: rotation),
@@ -111,7 +113,7 @@ class PanelToggleButton extends StatelessWidget {
             builder: (context, angle, child) {
               return Transform.rotate(angle: angle, child: child);
             },
-            child: child,
+            child: icon,
           ),
         ),
       ),

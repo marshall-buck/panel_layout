@@ -17,7 +17,6 @@ class InlinePanel extends BasePanel {
     this.maxSize,
     super.collapsedSize,
     super.collapsedChild,
-    super.toggleIcon,
     this.resizable = true,
     super.initialVisible = true,
     super.initialCollapsed = false,

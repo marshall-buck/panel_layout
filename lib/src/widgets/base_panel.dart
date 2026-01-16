@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
+import 'panel_toggle_button.dart';
 
 /// An abstract base class for panels in a [PanelLayout].
 ///
@@ -15,7 +16,6 @@ abstract class BasePanel extends StatelessWidget {
     this.height,
     this.collapsedSize,
     this.collapsedChild,
-    this.toggleIcon,
     this.initialVisible = true,
     required this.initialCollapsed,
     this.animationDuration,
@@ -45,11 +45,9 @@ abstract class BasePanel extends StatelessWidget {
   /// If null, defaults to a standard small size (e.g. 24.0) if a collapsed representation exists.
   final double? collapsedSize;
 
-  /// The content to display when the panel is collapsed.
-  final Widget? collapsedChild;
-
-  /// An icon to display in the default collapsed strip.
-  final Widget? toggleIcon;
+  /// The button to display when the panel is collapsed.
+  /// This must be a [PanelToggleButton] to ensure correct behavior and styling.
+  final PanelToggleButton? collapsedChild;
 
   /// Whether the panel is initially visible.
   final bool initialVisible;

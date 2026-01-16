@@ -15,7 +15,6 @@ class OverlayPanel extends BasePanel {
     super.height,
     super.collapsedSize,
     super.collapsedChild,
-    super.toggleIcon,
     super.initialVisible = true,
     super.initialCollapsed = true, // Default to true as requested
     super.animationDuration,
