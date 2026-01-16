@@ -3,21 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class TestOverlay extends BasePanel {
-  TestOverlay({
-    super.key,
-    required String id,
-    super.alignment,
-    super.anchor = PanelAnchor.left,
-  }) : super(
-         id: PanelId(id),
-         mode: PanelMode.overlay,
-         width: 100,
-         height: 100,
-         child: Container(),
-       );
-}
-
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
 );
@@ -33,8 +18,22 @@ void main() {
             height: 600,
             child: PanelLayout(
               children: [
-                TestOverlay(id: 'top-right', alignment: Alignment.topRight),
-                TestOverlay(id: 'bottom-left', alignment: Alignment.bottomLeft),
+                OverlayPanel(
+                  id: const PanelId('top-right'),
+                  alignment: Alignment.topRight,
+                  width: 100,
+                  height: 100,
+                  initialCollapsed: false,
+                  child: Container(),
+                ),
+                OverlayPanel(
+                  id: const PanelId('bottom-left'),
+                  alignment: Alignment.bottomLeft,
+                  width: 100,
+                  height: 100,
+                  initialCollapsed: false,
+                  child: Container(),
+                ),
               ],
             ),
           ),

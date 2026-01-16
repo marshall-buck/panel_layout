@@ -7,35 +7,46 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 ## Key Features
 
 -   **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
+-   **Type-Safe Panels**: Use `InlinePanel` for docked content and `OverlayPanel` for floating content.
 -   **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
 -   **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns. Panels can collapse to a small strip instead of disappearing completely.
 -   **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
 -   **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
--   **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels by extending `BasePanel`.
+-   **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels.
 -   **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds and ensure smooth 60/120fps interactions.
 
 ## Getting Started
 
 ### 1. Define your Panels
 
-Create your panels by extending the `BasePanel` class. This encapsulates your panel's configuration and its content.
+Use `InlinePanel` for panels that participate in the main layout (Row/Column flow).
 
 ```dart
-class MySidebar extends BasePanel {
-  MySidebar() : super(
-    id: const PanelId('sidebar'),
-    width: 250,
-    minSize: 100,
-    maxSize: 400,
-    anchor: PanelAnchor.left,
-    
-    // Optional: Define a collapsed "mini" state
-    collapsedSize: 48,
-    collapsedChild: MySideRail(), 
-    
-    child: SidebarContent(),
-  );
-}
+InlinePanel(
+  id: const PanelId('sidebar'),
+  width: 250,
+  minSize: 100,
+  maxSize: 400,
+  anchor: PanelAnchor.left,
+  
+  // Optional: Define a collapsed "mini" state
+  collapsedSize: 48,
+  collapsedChild: MySideRail(), 
+  
+  child: SidebarContent(),
+)
+```
+
+Use `OverlayPanel` for floating panels (Dialogs, Popovers).
+
+```dart
+OverlayPanel(
+  id: const PanelId('settings_popup'),
+  anchor: PanelAnchor.right,
+  anchorTo: const PanelId('sidebar'), // Anchor to another panel!
+  width: 300,
+  child: SettingsContent(),
+)
 ```
 
 ### 2. Assemble the Layout
@@ -45,8 +56,9 @@ Place your panels inside a `PanelLayout`.
 ```dart
 PanelLayout(
   children: [
-    MySidebar(),
-    MyMainContent(), // Another class extending BasePanel with flex: 1
+    InlinePanel(...),
+    InlinePanel(id: const PanelId('main'), flex: 1, child: MainContent()),
+    OverlayPanel(...),
   ],
 )
 ```

@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import '../debug_flag.dart';
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
+import '../widgets/widgets.dart';
 import 'layout_data.dart';
 
 /// A delegate that calculates the layout of panels based on [PanelLayoutData].
@@ -36,9 +37,9 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
     final overlayPanels = <PanelLayoutData>[];
 
     for (final p in panels) {
-      if (p.config.mode == PanelMode.overlay) {
+      if (p.config is OverlayPanel) {
         overlayPanels.add(p);
-      } else if (p.config.mode == PanelMode.inline) {
+      } else if (p.config is InlinePanel) {
         inlinePanels.add(p);
       }
     }
@@ -63,7 +64,9 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
 
     // Pass 1: Measure Fixed and Content
     for (final p in inlineIds) {
-      if (p.config.flex != null) {
+      final config = p.config as InlinePanel;
+
+      if (config.flex != null) {
         // Flexible: Sum up animated weight
         final animatedWeight = p.effectiveSize;
         if (animatedWeight > 0) {
@@ -71,35 +74,35 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
           totalWeight += animatedWeight;
         } else {
           // Effectively hidden
-          if (hasChild(p.config.id)) {
+          if (hasChild(config.id)) {
             layoutChild(
-              p.config.id,
+              config.id,
               const BoxConstraints.tightFor(width: 0, height: 0),
             );
-            positionChild(p.config.id, Offset.zero);
+            positionChild(config.id, Offset.zero);
           }
         }
       } else {
         final animatedSize = p.effectiveSize;
-        final isContent = p.config.width == null && p.config.height == null;
+        final isContent = config.width == null && config.height == null;
 
         // If not visible and not content, it takes no space but MUST be laid out
         if (animatedSize <= 0 && !isContent) {
-          if (hasChild(p.config.id)) {
+          if (hasChild(config.id)) {
             layoutChild(
-              p.config.id,
+              config.id,
               const BoxConstraints.tightFor(width: 0, height: 0),
             );
-            positionChild(p.config.id, Offset.zero);
+            positionChild(config.id, Offset.zero);
           }
-          panelRects[p.config.id] = Rect.zero;
+          panelRects[config.id] = Rect.zero;
           continue;
         }
 
         // Fixed or Content?
         final isFixed = isHorizontal
-            ? p.config.width != null
-            : p.config.height != null;
+            ? config.width != null
+            : config.height != null;
 
         final BoxConstraints constraints;
 
@@ -118,11 +121,11 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
               : BoxConstraints(maxWidth: crossSpace);
         }
 
-        final s = layoutChild(p.config.id, constraints);
+        final s = layoutChild(config.id, constraints);
         usedMainSpace += isHorizontal ? s.width : s.height;
-        panelRects[p.config.id] = Offset.zero & s;
+        panelRects[config.id] = Offset.zero & s;
         panelLayoutLog(
-          'Delegate Pass 1 measured inline ${p.config.id.value} as $s',
+          'Delegate Pass 1 measured inline ${config.id.value} as $s',
         );
       }
     }
@@ -198,39 +201,40 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
     // --- 2. Overlay Layout ---
     for (final p in overlayPanels) {
       if (!hasChild(p.config.id)) continue;
+      final config = p.config as OverlayPanel;
 
       // Ensure we layout if it's visible OR if it's still animating out (visualFactor > 0)
       if (!p.state.visible && p.visualFactor <= 0) {
         layoutChild(
-          p.config.id,
+          config.id,
           const BoxConstraints.tightFor(width: 0, height: 0),
         );
-        positionChild(p.config.id, Offset.zero);
+        positionChild(config.id, Offset.zero);
         continue;
       }
 
       // Determine Anchor Rect
       Rect anchorRect;
-      if (p.config.anchorTo != null &&
-          panelRects.containsKey(p.config.anchorTo)) {
-        anchorRect = panelRects[p.config.anchorTo]!;
+      if (config.anchorTo != null &&
+          panelRects.containsKey(config.anchorTo)) {
+        anchorRect = panelRects[config.anchorTo]!;
       } else {
         anchorRect = Offset.zero & size;
       }
 
       // External Anchor (LayerLink) special case
-      if (p.config.anchorLink != null) {
-        layoutChild(p.config.id, BoxConstraints.loose(size));
-        positionChild(p.config.id, Offset.zero);
+      if (config.anchorLink != null) {
+        layoutChild(config.id, BoxConstraints.loose(size));
+        positionChild(config.id, Offset.zero);
         continue;
       }
 
       // Measure Overlay
       final crossAlign =
-          p.config.crossAxisAlignment ?? CrossAxisAlignment.stretch;
+          config.crossAxisAlignment ?? CrossAxisAlignment.stretch;
       BoxConstraints childConstraints;
 
-      final isFixed = p.config.width != null || p.config.height != null;
+      final isFixed = config.width != null || config.height != null;
       if (isFixed) {
         childConstraints = BoxConstraints.tightFor(
           width: p.animatedWidth,
@@ -240,11 +244,11 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
         childConstraints = BoxConstraints.loose(size);
       }
 
-      if (p.config.anchorTo != null &&
-          panelRects.containsKey(p.config.anchorTo)) {
-        final anchorRect = panelRects[p.config.anchorTo]!;
+      if (config.anchorTo != null &&
+          panelRects.containsKey(config.anchorTo)) {
+        final anchorRect = panelRects[config.anchorTo]!;
         if (crossAlign == CrossAxisAlignment.stretch) {
-          switch (p.config.anchor) {
+          switch (config.anchor) {
             case PanelAnchor.left:
             case PanelAnchor.right:
               childConstraints = BoxConstraints(
@@ -268,20 +272,20 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
       }
 
       // Measure Overlay
-      final childSize = layoutChild(p.config.id, childConstraints);
+      final childSize = layoutChild(config.id, childConstraints);
 
       // Calculate Position
       Offset position;
       final alignment =
-          (p.config.alignment ?? _defaultAlignment(p.config.anchor)).resolve(
+          (config.alignment ?? _defaultAlignment(config.anchor)).resolve(
             textDirection,
           );
 
-      if (p.config.anchorTo != null) {
+      if (config.anchorTo != null) {
         // Relative Positioning
         double dx = 0;
         double dy = 0;
-        switch (p.config.anchor) {
+        switch (config.anchor) {
           case PanelAnchor.left:
             dx = anchorRect.left - childSize.width;
             dy = _alignAxis(
@@ -322,8 +326,8 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
         position = rect.topLeft;
       }
 
-      positionChild(p.config.id, position);
-      panelRects[p.config.id] = position & childSize;
+      positionChild(config.id, position);
+      panelRects[config.id] = position & childSize;
     }
   }
 

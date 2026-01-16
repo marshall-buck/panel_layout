@@ -2,16 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 
-class SimplePanel extends BasePanel {
-  SimplePanel({
-    super.key,
-    required String id,
-    super.width,
-    super.flex,
-    required super.child,
-  }) : super(id: PanelId(id));
-}
-
 void main() {
   group('Edge Cases', () {
     testWidgets('Empty PanelLayout works', (tester) async {
@@ -30,8 +20,16 @@ void main() {
           textDirection: TextDirection.ltr,
           child: PanelLayout(
             children: [
-              SimplePanel(id: 'dup', width: 100, child: const Text('First')),
-              SimplePanel(id: 'dup', width: 200, child: const Text('Second')),
+              InlinePanel(
+                id: const PanelId('dup'),
+                width: 100,
+                child: const Text('First'),
+              ),
+              InlinePanel(
+                id: const PanelId('dup'),
+                width: 200,
+                child: const Text('Second'),
+              ),
             ],
           ),
         ),
@@ -49,8 +47,16 @@ void main() {
           child: PanelLayout(
             controller: controller,
             children: [
-              SimplePanel(id: 'p1', width: 100, child: Container()),
-              SimplePanel(id: 'p2', width: 100, child: Container()),
+              InlinePanel(
+                id: const PanelId('p1'),
+                width: 100,
+                child: Container(),
+              ),
+              InlinePanel(
+                id: const PanelId('p2'),
+                width: 100,
+                child: Container(),
+              ),
             ],
           ),
         ),

@@ -3,17 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class TestFixedPanel extends BasePanel {
-  TestFixedPanel({
-    super.key,
-    required String id,
-    required double width,
-    super.mode,
-    super.anchor,
-    super.anchorTo,
-  }) : super(id: PanelId(id), width: width, child: const SizedBox.shrink());
-}
-
 void main() {
   testWidgets('Panel animates size when hidden', (tester) async {
     final controller = PanelLayoutController();
@@ -27,14 +16,20 @@ void main() {
             height: 100,
             child: PanelLayout(
               controller: controller,
-              children: [TestFixedPanel(id: 'p1', width: 100)],
+              children: [
+                InlinePanel(
+                  id: const PanelId('p1'),
+                  width: 100,
+                  child: const SizedBox.shrink(),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
 
-    expect(tester.getSize(find.byType(TestFixedPanel)).width, 100.0);
+    expect(tester.getSize(find.byType(InlinePanel)).width, 100.0);
 
     controller.setVisible(const PanelId('p1'), false);
 
@@ -63,13 +58,18 @@ void main() {
             body: PanelLayout(
               controller: controller,
               children: [
-                TestFixedPanel(id: 'main', width: 300),
-                TestFixedPanel(
-                  id: 'overlay',
-                  mode: PanelMode.overlay,
+                InlinePanel(
+                  id: const PanelId('main'),
+                  width: 300,
+                  child: const SizedBox.shrink(),
+                ),
+                OverlayPanel(
+                  id: const PanelId('overlay'),
                   anchor: PanelAnchor.right,
                   anchorTo: const PanelId('main'),
                   width: 100,
+                  initialCollapsed: false,
+                  child: const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -78,7 +78,7 @@ void main() {
       );
 
       // Initial state: Overlay is visible
-      expect(find.byType(TestFixedPanel), findsNWidgets(2));
+      expect(find.byType(OverlayPanel), findsOneWidget);
       final Size initialSize = tester.getSize(find.byType(AnimatedPanel).last);
       expect(initialSize.width, 100.0);
 

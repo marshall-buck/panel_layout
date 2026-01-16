@@ -3,20 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 
-class TestPanel extends BasePanel {
-  const TestPanel({
-    required super.id,
-    required super.child,
-    super.collapsedChild,
-    super.collapsedSize,
-    super.width,
-    super.height,
-    super.initialCollapsed,
-    super.anchor,
-    super.key,
-  });
-}
-
 void main() {
   testWidgets('Panel collapse animation respects collapsedSize', (
     tester,
@@ -28,13 +14,13 @@ void main() {
         textDirection: TextDirection.ltr,
         child: PanelLayout(
           children: [
-            TestPanel(
+            InlinePanel(
               id: id,
               width: 200,
               collapsedSize: 50,
               initialCollapsed: false,
-              collapsedChild: Container(key: Key('strip')),
-              child: Container(key: Key('content')),
+              collapsedChild: Container(key: const Key('strip')),
+              child: Container(key: const Key('content')),
             ),
           ],
         ),
@@ -43,15 +29,15 @@ void main() {
 
     // Initial state: 200px width.
     expect(tester.getSize(find.byType(LayoutId)).width, 200.0);
-    expect(find.byKey(Key('content')), findsOneWidget);
+    expect(find.byKey(const Key('content')), findsOneWidget);
     // Strip is in the stack, but might be obscured or visible depending on impl.
     // In our Stack impl, both are present.
-    expect(find.byKey(Key('strip')), findsOneWidget);
+    expect(find.byKey(const Key('strip')), findsOneWidget);
 
     // Toggle collapse
     // Toggle collapse
     final controller = PanelLayout.of(
-      tester.element(find.byKey(Key('content'))),
+      tester.element(find.byKey(const Key('content'))),
     );
     controller.setCollapsed(id, true);
     await tester.pump(); // Start animation
@@ -76,12 +62,12 @@ void main() {
         textDirection: TextDirection.ltr,
         child: PanelLayout(
           children: [
-            TestPanel(
+            InlinePanel(
               id: id,
               width: 200,
               collapsedSize: 50,
               anchor: PanelAnchor.left,
-              child: PanelToggleButton(child: Text('Icon')),
+              child: const PanelToggleButton(child: Text('Icon')),
             ),
           ],
         ),
@@ -131,7 +117,7 @@ void main() {
 
         child: PanelLayout(
           children: [
-            TestPanel(
+            InlinePanel(
               id: id,
 
               width: 200,
@@ -146,7 +132,7 @@ void main() {
               // Content requires at least 150px width, or it overflows
               child: Row(
                 children: [
-                  SizedBox(width: 150, height: 20, child: Text('Wide Content')),
+                  SizedBox(width: 150, height: 20, child: const Text('Wide Content')),
                 ],
               ),
             ),
@@ -197,7 +183,7 @@ void main() {
           axis: Axis.vertical,
 
           children: [
-            TestPanel(
+            InlinePanel(
               id: id,
 
               height: 200,
@@ -207,13 +193,13 @@ void main() {
               anchor: PanelAnchor.top,
 
               collapsedChild: Container(
-                key: Key('strip'),
+                key: const Key('strip'),
                 color: const Color(0xFFFF0000),
               ),
 
               // Content needs to be distinct
               child: Container(
-                key: Key('content'),
+                key: const Key('content'),
                 color: const Color(0xFF00FF00),
               ),
             ),
@@ -225,18 +211,18 @@ void main() {
     // Initial State: Expanded (200px)
 
     // Strip should be at top (0,0), Content also at (0,0) (Overlapping/Stacked)
-    expect(tester.getTopLeft(find.byKey(Key('strip'))).dy, 0.0);
-    expect(tester.getSize(find.byKey(Key('strip'))).height, 40.0);
+    expect(tester.getTopLeft(find.byKey(const Key('strip'))).dy, 0.0);
+    expect(tester.getSize(find.byKey(const Key('strip'))).height, 40.0);
 
-    expect(tester.getTopLeft(find.byKey(Key('content'))).dy, 0.0);
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 0.0);
 
     // Content height = Expanded (200)
-    expect(tester.getSize(find.byKey(Key('content'))).height, 200.0);
+    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0);
 
     // Toggle Collapse
 
     final controller = PanelLayout.of(
-      tester.element(find.byKey(Key('content'))),
+      tester.element(find.byKey(const Key('content'))),
     );
 
     controller.setCollapsed(id, true);
@@ -253,10 +239,10 @@ void main() {
 
     // Strip is still at 0
 
-    expect(tester.getTopLeft(find.byKey(Key('strip'))).dy, 0.0);
+    expect(tester.getTopLeft(find.byKey(const Key('strip'))).dy, 0.0);
 
     // Content is still at 0 (effectively hidden/clipped out of view)
 
-    expect(tester.getTopLeft(find.byKey(Key('content'))).dy, 0.0);
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 0.0);
   });
 }

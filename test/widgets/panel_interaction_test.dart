@@ -3,26 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class TestFixedPanel extends BasePanel {
-  TestFixedPanel({super.key, required String id, required double width})
-    : super(
-        id: PanelId(id),
-        width: width,
-        mode: PanelMode.inline,
-        child: Container(),
-      );
-}
-
-class TestFlexPanel extends BasePanel {
-  TestFlexPanel({super.key, required String id, double flex = 1.0})
-    : super(
-        id: PanelId(id),
-        flex: flex,
-        mode: PanelMode.inline,
-        child: Container(),
-      );
-}
-
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
 );
@@ -45,8 +25,16 @@ void main() {
               onResizeStart: () => started = true,
               onResizeEnd: () => ended = true,
               children: [
-                TestFixedPanel(id: 'left', width: 100),
-                TestFlexPanel(id: 'right', flex: 1),
+                InlinePanel(
+                  id: const PanelId('left'),
+                  width: 100,
+                  child: Container(),
+                ),
+                InlinePanel(
+                  id: const PanelId('right'),
+                  flex: 1,
+                  child: Container(),
+                ),
               ],
             ),
           ),

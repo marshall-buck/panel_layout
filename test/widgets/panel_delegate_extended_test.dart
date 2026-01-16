@@ -3,20 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class SimplePanel extends BasePanel {
-  SimplePanel({
-    super.key,
-    required String id,
-    super.width,
-    super.height,
-    super.mode,
-    super.anchor,
-    super.anchorTo,
-    super.crossAxisAlignment,
-    required super.child,
-  }) : super(id: PanelId(id));
-}
-
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
 );
@@ -34,13 +20,17 @@ void main() {
               child: PanelLayout(
                 axis: Axis.vertical,
                 children: [
-                  SimplePanel(id: 'base', height: 200, child: Container()),
-                  SimplePanel(
-                    id: 'overlay',
-                    mode: PanelMode.overlay,
+                  InlinePanel(
+                    id: const PanelId('base'),
+                    height: 200,
+                    child: Container(),
+                  ),
+                  OverlayPanel(
+                    id: const PanelId('overlay'),
                     anchor: PanelAnchor.top,
                     anchorTo: const PanelId('base'),
                     height: 50,
+                    initialCollapsed: false,
                     child: Container(),
                   ),
                 ],
@@ -71,13 +61,17 @@ void main() {
               child: PanelLayout(
                 axis: Axis.vertical,
                 children: [
-                  SimplePanel(id: 'base', height: 200, child: Container()),
-                  SimplePanel(
-                    id: 'overlay',
-                    mode: PanelMode.overlay,
+                  InlinePanel(
+                    id: const PanelId('base'),
+                    height: 200,
+                    child: Container(),
+                  ),
+                  OverlayPanel(
+                    id: const PanelId('overlay'),
                     anchor: PanelAnchor.bottom,
                     anchorTo: const PanelId('base'),
                     height: 50,
+                    initialCollapsed: false,
                     child: Container(),
                   ),
                 ],
@@ -104,15 +98,19 @@ void main() {
               height: 600,
               child: PanelLayout(
                 children: [
-                  SimplePanel(id: 'base', width: 200, child: Container()),
-                  SimplePanel(
-                    id: 'overlay',
-                    mode: PanelMode.overlay,
+                  InlinePanel(
+                    id: const PanelId('base'),
+                    width: 200,
+                    child: Container(),
+                  ),
+                  OverlayPanel(
+                    id: const PanelId('overlay'),
                     anchor: PanelAnchor.right,
                     anchorTo: const PanelId('base'),
                     width: 100,
                     height: 50,
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    initialCollapsed: false,
                     child: Container(),
                   ),
                 ],

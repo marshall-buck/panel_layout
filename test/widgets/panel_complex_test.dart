@@ -3,24 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class SimplePanel extends BasePanel {
-  SimplePanel({
-    super.key,
-    required String id,
-    super.width,
-    super.height,
-    super.flex,
-    super.mode,
-    super.anchor,
-    super.anchorTo,
-    super.zIndex,
-    super.initialVisible,
-    super.initialCollapsed,
-    super.collapsedSize,
-    required super.child,
-  }) : super(id: PanelId(id));
-}
-
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
 );
@@ -35,10 +17,10 @@ void main() {
           textDirection: TextDirection.ltr,
           child: PanelLayout(
             children: [
-              SimplePanel(
-                id: 'high',
+              OverlayPanel(
+                id: const PanelId('high'),
                 zIndex: 10,
-                mode: PanelMode.overlay,
+                initialCollapsed: false,
                 child: Builder(
                   builder: (context) {
                     buildOrder.add('high');
@@ -46,10 +28,10 @@ void main() {
                   },
                 ),
               ),
-              SimplePanel(
-                id: 'low',
+              OverlayPanel(
+                id: const PanelId('low'),
                 zIndex: 1,
-                mode: PanelMode.overlay,
+                initialCollapsed: false,
                 child: Builder(
                   builder: (context) {
                     buildOrder.add('low');
@@ -75,7 +57,11 @@ void main() {
           child: PanelLayout(
             controller: controller,
             children: [
-              SimplePanel(id: 'p1', width: 100, child: const Text('Panel 1')),
+              InlinePanel(
+                id: const PanelId('p1'),
+                width: 100,
+                child: const Text('Panel 1'),
+              ),
             ],
           ),
         ),
@@ -102,12 +88,16 @@ void main() {
               height: 100,
               child: PanelLayout(
                 children: [
-                  SimplePanel(
-                    id: 'left',
+                  InlinePanel(
+                    id: const PanelId('left'),
                     width: initialWidth,
                     child: Container(),
                   ),
-                  SimplePanel(id: 'right', flex: 1, child: Container()),
+                  InlinePanel(
+                    id: const PanelId('right'),
+                    flex: 1,
+                    child: Container(),
+                  ),
                 ],
               ),
             ),
@@ -140,7 +130,13 @@ void main() {
           textDirection: TextDirection.ltr,
           child: PanelLayout(
             controller: c1,
-            children: [SimplePanel(id: 'p1', width: 100, child: Container())],
+            children: [
+              InlinePanel(
+                id: const PanelId('p1'),
+                width: 100,
+                child: Container(),
+              ),
+            ],
           ),
         ),
       );
@@ -151,7 +147,13 @@ void main() {
           textDirection: TextDirection.ltr,
           child: PanelLayout(
             controller: c2,
-            children: [SimplePanel(id: 'p1', width: 100, child: Container())],
+            children: [
+              InlinePanel(
+                id: const PanelId('p1'),
+                width: 100,
+                child: Container(),
+              ),
+            ],
           ),
         ),
       );

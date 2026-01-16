@@ -1,3 +1,11 @@
+## 0.5.0
+
+*   **Breaking**: Removed `PanelMode`. Panels are now strictly typed as either `InlinePanel` or `OverlayPanel`.
+*   **Breaking**: `BasePanel` is now `abstract`. You must instantiate or extend `InlinePanel` or `OverlayPanel`.
+*   **Feat**: `InlinePanel` exposes linear layout properties (`flex`, `minSize`, `maxSize`, `resizable`) specifically for docked panels.
+*   **Feat**: `OverlayPanel` exposes stack layout properties (`alignment`, `anchorLink`, `zIndex`) specifically for floating panels.
+*   **Fix**: Fixed layout errors for content-sized panels by removing restrictive `Positioned.fill` constraints in `AnimatedPanel`.
+
 ## 0.4.1
 
 *   **Feat**: Added support for "Mini Variants" (Collapsed Strips). Panels can now collapse to a small strip instead of disappearing completely.

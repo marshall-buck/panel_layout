@@ -3,20 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class TestFixedPanel extends BasePanel {
-  TestFixedPanel({
-    super.key,
-    required String id,
-    required double width,
-    super.collapsedSize,
-  }) : super(
-         id: PanelId(id),
-         width: width,
-         mode: PanelMode.inline,
-         child: Container(),
-       );
-}
-
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
 );
@@ -35,7 +21,12 @@ void main() {
             child: PanelLayout(
               controller: controller,
               children: [
-                TestFixedPanel(id: 'p1', width: 100, collapsedSize: 20),
+                InlinePanel(
+                  id: const PanelId('p1'),
+                  width: 100,
+                  collapsedSize: 20,
+                  child: Container(),
+                ),
               ],
             ),
           ),

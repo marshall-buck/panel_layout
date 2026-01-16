@@ -3,15 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class LinkPanel extends BasePanel {
-  LinkPanel({
-    super.key,
-    required String id,
-    required super.anchorLink,
-    required super.child,
-  }) : super(id: PanelId(id), mode: PanelMode.overlay);
-}
-
 void main() {
   testWidgets('Overlay panel follows external LayerLink', (tester) async {
     final link = LayerLink();
@@ -35,9 +26,10 @@ void main() {
             Positioned.fill(
               child: PanelLayout(
                 children: [
-                  LinkPanel(
-                    id: 'follower',
+                  OverlayPanel(
+                    id: const PanelId('follower'),
                     anchorLink: link,
+                    initialCollapsed: false,
                     child: const SizedBox(width: 100, height: 100),
                   ),
                 ],

@@ -2,15 +2,13 @@ import 'package:flutter/widgets.dart';
 
 import '../constants.dart';
 import '../models/panel_id.dart';
-import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
 import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../controllers/panel_layout_controller.dart';
-import 'base_panel.dart';
-import 'panel_resize_handle.dart';
+import 'widgets.dart';
 import 'animated_panel.dart';
 
 /// The declarative orchestrator for the panel layout system.
@@ -220,7 +218,7 @@ class _PanelLayoutState extends State<PanelLayout>
   }
 
   double _getInitialSize(BasePanel panel) {
-    if (panel.flex != null) return panel.flex!;
+    if (panel is InlinePanel && panel.flex != null) return panel.flex!;
     if (panel.width != null) return panel.width!;
     if (panel.height != null) return panel.height!;
     return 0.0;
@@ -247,7 +245,7 @@ class _PanelLayoutState extends State<PanelLayout>
     }).toList();
 
     final dockedPanels = layoutData
-        .where((d) => d.config.mode == PanelMode.inline)
+        .where((d) => d.config is InlinePanel)
         .toList();
 
     final children = <Widget>[];
@@ -265,7 +263,7 @@ class _PanelLayoutState extends State<PanelLayout>
       );
 
       // If anchored to external link, wrap in Follower
-      if (panel.anchorLink != null) {
+      if (panel is OverlayPanel && panel.anchorLink != null) {
         panelWidget = CompositedTransformFollower(
           link: panel.anchorLink!,
           showWhenUnlinked: false,
@@ -336,10 +334,16 @@ class _PanelLayoutState extends State<PanelLayout>
       final idB = (b as LayoutId).id;
 
       int zA = 0;
-      if (idA is PanelId) zA = configs[idA]?.zIndex ?? 0;
+      if (idA is PanelId) {
+        final config = configs[idA];
+        if (config is OverlayPanel) zA = config.zIndex;
+      }
 
       int zB = 0;
-      if (idB is PanelId) zB = configs[idB]?.zIndex ?? 0;
+      if (idB is PanelId) {
+        final config = configs[idB];
+        if (config is OverlayPanel) zB = config.zIndex;
+      }
 
       if (zA != zB) return zA.compareTo(zB);
 
@@ -358,36 +362,40 @@ class _PanelLayoutState extends State<PanelLayout>
       final prev = _panelStates[prevData.config.id]!;
       final next = _panelStates[nextData.config.id]!;
 
-      if (prevData.config.flex == null && prevData.config.resizable) {
+      // We only resize inline panels, so safe to cast
+      final prevConfig = prevData.config as InlinePanel;
+      final nextConfig = nextData.config as InlinePanel;
+
+      if (prevConfig.flex == null && prevConfig.resizable) {
         final newSize = (prev.size + delta).clamp(
-          prevData.config.minSize ?? 0.0,
-          prevData.config.maxSize ?? double.infinity,
+          prevConfig.minSize ?? 0.0,
+          prevConfig.maxSize ?? double.infinity,
         );
-        _panelStates[prevData.config.id] = prev.copyWith(size: newSize);
+        _panelStates[prevConfig.id] = prev.copyWith(size: newSize);
         return;
       }
 
-      if (nextData.config.flex == null && nextData.config.resizable) {
+      if (nextConfig.flex == null && nextConfig.resizable) {
         final newSize = (next.size - delta).clamp(
-          nextData.config.minSize ?? 0.0,
-          nextData.config.maxSize ?? double.infinity,
+          nextConfig.minSize ?? 0.0,
+          nextConfig.maxSize ?? double.infinity,
         );
-        _panelStates[nextData.config.id] = next.copyWith(size: newSize);
+        _panelStates[nextConfig.id] = next.copyWith(size: newSize);
         return;
       }
 
-      if (prevData.config.flex != null &&
-          nextData.config.flex != null &&
-          prevData.config.resizable &&
-          nextData.config.resizable) {
+      if (prevConfig.flex != null &&
+          nextConfig.flex != null &&
+          prevConfig.resizable &&
+          nextConfig.resizable) {
         final w1 = prev.size;
         final w2 = next.size;
 
         const sensitivity = 0.01;
-        _panelStates[prevData.config.id] = prev.copyWith(
+        _panelStates[prevConfig.id] = prev.copyWith(
           size: (w1 + delta * sensitivity).clamp(0.0, double.infinity),
         );
-        _panelStates[nextData.config.id] = next.copyWith(
+        _panelStates[nextConfig.id] = next.copyWith(
           size: (w2 - delta * sensitivity).clamp(0.0, double.infinity),
         );
         return;

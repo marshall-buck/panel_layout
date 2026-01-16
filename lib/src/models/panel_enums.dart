@@ -1,15 +1,3 @@
-/// Defines how a panel interacts with the main layout flow.
-enum PanelMode {
-  /// The panel is part of the linear layout (Row/Column).
-  /// It pushes other panels aside.
-  inline,
-
-  /// The panel floats on top of the layout.
-  /// It does not affect the size/position of inline panels.
-  /// Useful for temporary drawers, dialogs, or floating tools.
-  overlay,
-}
-
 /// Defines which edge a panel is logically attached to.
 ///
 /// This determines:

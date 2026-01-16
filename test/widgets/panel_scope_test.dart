@@ -27,8 +27,8 @@ void main() {
           child: PanelLayout(
             controller: controller,
             children: [
-              SimplePanel(
-                id: 'p1',
+              InlinePanel(
+                id: const PanelId('p1'),
                 child: Builder(
                   builder: (context) {
                     found = PanelScope.of(context, listen: false);
@@ -56,8 +56,8 @@ void main() {
           child: PanelLayout(
             controller: controller,
             children: [
-              SimplePanel(
-                id: 'p1',
+              InlinePanel(
+                id: const PanelId('p1'),
                 child: Builder(
                   builder: (context) {
                     builds++;
@@ -78,9 +78,4 @@ void main() {
       expect(builds, greaterThan(1));
     });
   });
-}
-
-class SimplePanel extends BasePanel {
-  SimplePanel({super.key, required String id, required super.child})
-    : super(id: PanelId(id));
 }

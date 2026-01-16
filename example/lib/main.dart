@@ -52,28 +52,11 @@ class ExampleHome extends StatelessWidget {
   }
 }
 
-/// A simple concrete implementation of [BasePanel].
-class SimplePanel extends BasePanel {
-  const SimplePanel({
-    required super.id,
-    required super.child,
-    super.mode = PanelMode.inline,
-    super.anchor = PanelAnchor.left,
-    super.anchorTo,
-    super.width,
-    super.height,
-    super.flex,
-    super.minSize,
-    super.maxSize,
-    super.collapsedSize,
-    super.collapsedChild,
-    super.resizable = true,
-    super.initialVisible = true,
-    super.initialCollapsed = false,
-    super.zIndex = 0,
-    super.crossAxisAlignment,
-    super.key,
-  });
+/// A wrapper to add consistent styling to panel content.
+class PanelContainer extends StatelessWidget {
+  const PanelContainer({required this.child, super.key});
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +91,7 @@ class _ClassicIDELayoutState extends State<ClassicIDELayout> {
     return PanelLayout(
       controller: _controller,
       children: [
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('explorer'),
           width: 250,
           minSize: 150,
@@ -132,63 +115,69 @@ class _ClassicIDELayoutState extends State<ClassicIDELayout> {
               ],
             ),
           ),
-          child: Column(
-            children: [
-              _PanelHeader(
-                title: 'EXPLORER',
-                actions: const [
-                  PanelToggleButton(child: Icon(Icons.chevron_left)),
-                ],
-              ),
-              const Expanded(child: Center(child: Text('File Tree'))),
-            ],
+          child: PanelContainer(
+            child: Column(
+              children: [
+                _PanelHeader(
+                  title: 'EXPLORER',
+                  actions: const [
+                    PanelToggleButton(child: Icon(Icons.chevron_left)),
+                  ],
+                ),
+                const Expanded(child: Center(child: Text('File Tree'))),
+              ],
+            ),
           ),
         ),
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('editor'),
           flex: 1,
-          child: Column(
-            children: [
-              _PanelHeader(
-                title: 'main.dart',
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () =>
-                        _controller.toggleVisible(const PanelId('explorer')),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () =>
-                        _controller.toggleVisible(const PanelId('properties')),
-                  ),
-                ],
-              ),
-              const Expanded(
-                child: Center(
-                  child: Text(
-                    'Code Editor Content',
-                    style: TextStyle(fontFamily: 'monospace'),
+          child: PanelContainer(
+            child: Column(
+              children: [
+                _PanelHeader(
+                  title: 'main.dart',
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.menu),
+                      onPressed: () =>
+                          _controller.toggleVisible(const PanelId('explorer')),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () =>
+                          _controller.toggleVisible(const PanelId('properties')),
+                    ),
+                  ],
+                ),
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      'Code Editor Content',
+                      style: TextStyle(fontFamily: 'monospace'),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('properties'),
           anchor: PanelAnchor.right,
           width: 200,
           minSize: 100,
-          child: Column(
-            children: [
-              _PanelHeader(
-                title: 'PROPERTIES',
-                onClose: () =>
-                    _controller.setVisible(const PanelId('properties'), false),
-              ),
-              const Expanded(child: Center(child: Text('Settings'))),
-            ],
+          child: PanelContainer(
+            child: Column(
+              children: [
+                _PanelHeader(
+                  title: 'PROPERTIES',
+                  onClose: () =>
+                      _controller.setVisible(const PanelId('properties'), false),
+                ),
+                const Expanded(child: Center(child: Text('Settings'))),
+              ],
+            ),
           ),
         ),
       ],
@@ -218,18 +207,22 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
       controller: _controller,
       axis: Axis.vertical,
       children: [
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('top_nav'),
           height: 60,
           resizable: false,
-          child: const Center(child: Text('Toolbar / Navigation')),
+          child: const PanelContainer(
+            child: Center(child: Text('Toolbar / Navigation')),
+          ),
         ),
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('main_content'),
           flex: 1,
-          child: const Center(child: Text('Main Dashboard')),
+          child: const PanelContainer(
+            child: Center(child: Text('Main Dashboard')),
+          ),
         ),
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('terminal'),
           anchor: PanelAnchor.bottom,
           height: 200,
@@ -250,16 +243,18 @@ class _VerticalSplitLayoutState extends State<VerticalSplitLayout> {
               ],
             ),
           ),
-          child: Column(
-            children: [
-              _PanelHeader(
-                title: 'TERMINAL',
-                actions: const [
-                  PanelToggleButton(child: Icon(Icons.chevron_left)),
-                ],
-              ),
-              const Expanded(child: Center(child: Text('Console Output'))),
-            ],
+          child: PanelContainer(
+            child: Column(
+              children: [
+                _PanelHeader(
+                  title: 'TERMINAL',
+                  actions: const [
+                    PanelToggleButton(child: Icon(Icons.chevron_left)),
+                  ],
+                ),
+                const Expanded(child: Center(child: Text('Console Output'))),
+              ],
+            ),
           ),
         ),
       ],
@@ -289,89 +284,95 @@ class _AnchoredOverlayLayoutState extends State<AnchoredOverlayLayout> {
       controller: _controller,
       children: [
         // Main Content
-        SimplePanel(
+        InlinePanel(
           id: const PanelId('content'),
           flex: 1,
-          child: Center(
+          child: PanelContainer(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Layout with Anchored Overlay'),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () =>
+                        _controller.toggleVisible(const PanelId('side_panel')),
+                    child: const Text('Toggle Right Panel'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // 2. Inline widget anchored to the right of the app, with a fixed width
+        InlinePanel(
+          id: const PanelId('side_panel'),
+          anchor: PanelAnchor.right,
+          width: 300,
+          child: PanelContainer(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Layout with Anchored Overlay'),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () =>
-                      _controller.toggleVisible(const PanelId('side_panel')),
-                  child: const Text('Toggle Right Panel'),
+                _PanelHeader(
+                  title: 'INLINE RIGHT PANEL',
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.auto_awesome_motion),
+                      tooltip: 'Open Overlay',
+                      onPressed: () => _controller.toggleVisible(
+                        const PanelId('overlay_panel'),
+                      ),
+                    ),
+                  ],
+                ),
+                const Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      'This panel is inline and fixed width. '
+                      'Click the icon above to show an overlay anchored to my left side.',
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ),
 
-        // 2. Inline widget anchored to the right of the app, with a fixed width
-        SimplePanel(
-          id: const PanelId('side_panel'),
-          anchor: PanelAnchor.right,
-          width: 300,
-          child: Column(
-            children: [
-              _PanelHeader(
-                title: 'INLINE RIGHT PANEL',
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.auto_awesome_motion),
-                    tooltip: 'Open Overlay',
-                    onPressed: () => _controller.toggleVisible(
-                      const PanelId('overlay_panel'),
-                    ),
-                  ),
-                ],
-              ),
-              const Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'This panel is inline and fixed width. '
-                    'Click the icon above to show an overlay anchored to my left side.',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
         // 3. Overlay panel that animates FROM the left side of the inline panel
-        SimplePanel(
+        OverlayPanel(
           id: const PanelId('overlay_panel'),
-          mode: PanelMode.overlay,
           anchor: PanelAnchor.left, // Left of the target
           anchorTo: const PanelId('side_panel'),
           width: 250,
           initialVisible: false,
+          initialCollapsed: false,
           zIndex: 10,
-          child: Container(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: Column(
-              children: [
-                _PanelHeader(
-                  title: 'ANCHORED OVERLAY',
-                  onClose: () => _controller.setVisible(
-                    const PanelId('overlay_panel'),
-                    false,
+          child: PanelContainer(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: Column(
+                children: [
+                  _PanelHeader(
+                    title: 'ANCHORED OVERLAY',
+                    onClose: () => _controller.setVisible(
+                      const PanelId('overlay_panel'),
+                      false,
+                    ),
                   ),
-                ),
-                const Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'I am an overlay!\n\nI animate out from the left edge of the side panel.',
-                        textAlign: TextAlign.center,
+                  const Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'I am an overlay!\n\nI animate out from the left edge of the side panel.',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

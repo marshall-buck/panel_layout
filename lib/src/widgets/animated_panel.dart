@@ -62,28 +62,33 @@ class AnimatedPanel extends StatelessWidget {
       );
     }
 
+    Widget childWidget = Opacity(
+      // Fade out as we collapse?
+      // Usually content stays visible, just slides.
+      // But if we want to cross-fade to the strip...
+      // Let's keep content fully opaque for now, or fade it out if it overlaps strip?
+      // If Side-by-Side: Content opacity should be 1.0.
+      // If Strip is Overlay: Content opacity 1.0.
+      opacity: factor.clamp(0.0, 1.0),
+      child: config, // The User's Widget
+    );
+
+    if (hasFixedWidth || hasFixedHeight) {
+      childWidget = OverflowBox(
+        alignment: _getAlignment(config.anchor),
+        minWidth: hasFixedWidth ? expandedSize : null,
+        maxWidth: hasFixedWidth ? expandedSize : null,
+        minHeight: hasFixedHeight ? expandedSize : null,
+        maxHeight: hasFixedHeight ? expandedSize : null,
+        child: childWidget,
+      );
+    }
+
     Widget content = Stack(
+      alignment: _getAlignment(config.anchor),
       children: [
         // 1. The Main Content
-        Positioned.fill(
-          child: OverflowBox(
-            alignment: _getAlignment(config.anchor),
-            minWidth: hasFixedWidth ? expandedSize : null,
-            maxWidth: hasFixedWidth ? expandedSize : null,
-            minHeight: hasFixedHeight ? expandedSize : null,
-            maxHeight: hasFixedHeight ? expandedSize : null,
-            child: Opacity(
-              // Fade out as we collapse?
-              // Usually content stays visible, just slides.
-              // But if we want to cross-fade to the strip...
-              // Let's keep content fully opaque for now, or fade it out if it overlaps strip?
-              // If Side-by-Side: Content opacity should be 1.0.
-              // If Strip is Overlay: Content opacity 1.0.
-              opacity: factor.clamp(0.0, 1.0),
-              child: config, // The User's Widget
-            ),
-          ),
-        ),
+        childWidget,
 
         // 2. The Strip
         if (stripWidget != null)

@@ -3,17 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class TestFixedPanel extends BasePanel {
-  TestFixedPanel({super.key, required String id, required double height})
-    : super(
-        id: PanelId(id),
-        height: height,
-        mode: PanelMode.inline,
-        anchor: PanelAnchor.top,
-        child: Container(),
-      );
-}
-
 void main() {
   testWidgets('PanelLayout vertical axis sizes correctly', (tester) async {
     await tester.pumpWidget(
@@ -26,8 +15,18 @@ void main() {
             child: PanelLayout(
               axis: Axis.vertical,
               children: [
-                TestFixedPanel(id: 't1', height: 100),
-                TestFixedPanel(id: 't2', height: 200),
+                InlinePanel(
+                  id: const PanelId('t1'),
+                  height: 100,
+                  anchor: PanelAnchor.top,
+                  child: Container(),
+                ),
+                InlinePanel(
+                  id: const PanelId('t2'),
+                  height: 200,
+                  anchor: PanelAnchor.top,
+                  child: Container(),
+                ),
               ],
             ),
           ),

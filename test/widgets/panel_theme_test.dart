@@ -3,15 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animated_panel.dart';
 
-class SimplePanel extends BasePanel {
-  SimplePanel({
-    super.key,
-    required String id,
-    super.width,
-    required super.child,
-  }) : super(id: PanelId(id));
-}
-
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
 );
@@ -37,8 +28,16 @@ void main() {
               height: 100,
               child: PanelLayout(
                 children: [
-                  SimplePanel(id: 'p1', width: 100, child: Container()),
-                  SimplePanel(id: 'p2', width: 100, child: Container()),
+                  InlinePanel(
+                    id: const PanelId('p1'),
+                    width: 100,
+                    child: Container(),
+                  ),
+                  InlinePanel(
+                    id: const PanelId('p2'),
+                    width: 100,
+                    child: Container(),
+                  ),
                 ],
               ),
             ),
