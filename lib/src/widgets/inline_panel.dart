@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import '../models/panel_enums.dart';
 import 'base_panel.dart';
 
