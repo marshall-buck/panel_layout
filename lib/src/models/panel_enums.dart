@@ -25,3 +25,15 @@ enum PanelAnimationDirection {
   /// The panel expands downwards.
   opensDown,
 }
+
+/// Defines the action to take when the panel's header icon is pressed.
+enum PanelAction {
+  /// No action.
+  none,
+
+  /// Toggles the collapsed/expanded state of the panel.
+  collapse,
+
+  /// Closes (hides) the panel.
+  close,
+}

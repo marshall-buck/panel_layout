@@ -24,7 +24,8 @@ void main() {
                 InlinePanel(
                   id: const PanelId('p1'),
                   width: 100,
-                  collapsedSize: 20,
+                  toggleIconSize: 20,
+                  toggleIconPadding: 0,
                   child: Container(),
                 ),
               ],

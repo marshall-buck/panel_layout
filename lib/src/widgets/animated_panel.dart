@@ -29,10 +29,9 @@ class AnimatedPanel extends StatelessWidget {
     }
 
     final base = state.size;
-    final collapsed =
-        config is InlinePanel
-            ? (config as InlinePanel).collapsedSize ?? 0.0
-            : 0.0;
+    final collapsed = config is InlinePanel
+        ? (config as InlinePanel).collapsedSize
+        : 0.0;
     final currentSize = base + (collapsed - base) * collapseFactor;
 
     final animatedSize = currentSize * factor;
@@ -41,35 +40,91 @@ class AnimatedPanel extends StatelessWidget {
     final bool hasFixedHeight = config.height != null;
 
     final expandedSize = state.size;
-    final stripSize =
-        config is InlinePanel
-            ? (config as InlinePanel).collapsedSize ?? 0.0
-            : 0.0;
+    final stripSize = config is InlinePanel
+        ? (config as InlinePanel).collapsedSize
+        : 0.0;
 
-    // Use toggleIcon to build the strip widget
+    // Use toggleIcon to build the strip widget, fallback to headerIcon
     Widget? stripWidget;
-    if (config.toggleIcon != null) {
+    final effectiveIcon = config.toggleIcon ?? config.headerIcon;
+
+    if (effectiveIcon != null) {
       stripWidget = PanelToggleButton(
-        icon: config.toggleIcon!,
+        icon: effectiveIcon,
         panelId: config.id,
         closingDirection: config.closingDirection,
+        shouldRotate: config.rotateToggleIcon,
       );
     }
 
+    // Opacity for the Expanded Content
+    final contentOpacity = (factor * (1.0 - collapseFactor)).clamp(0.0, 1.0);
+
     Widget childWidget = Opacity(
-      opacity: factor.clamp(0.0, 1.0),
-      child: config,
+      opacity: contentOpacity,
+      child: IgnorePointer(ignoring: contentOpacity == 0.0, child: config),
     );
 
-    if (hasFixedWidth || hasFixedHeight) {
+    // If fixed size, we use SingleChildScrollView to allow content to maintain its
+    // intended size during animation (preventing squashing) while avoiding
+    // infinite size errors and layout overflow warnings.
+    // OverflowBox is used only when both dimensions are fixed, as it is safe then.
+    if (hasFixedWidth && hasFixedHeight) {
       childWidget = OverflowBox(
+        minWidth: expandedSize,
+        maxWidth: expandedSize,
+        minHeight: expandedSize,
+        maxHeight: expandedSize,
         alignment: _getAlignment(config.anchor),
-        minWidth: hasFixedWidth ? expandedSize : null,
-        maxWidth: hasFixedWidth ? expandedSize : null,
-        minHeight: hasFixedHeight ? expandedSize : null,
-        maxHeight: hasFixedHeight ? expandedSize : null,
         child: childWidget,
       );
+    } else if (hasFixedWidth) {
+      childWidget = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        // Align to end if anchored right
+        reverse: config.anchor == PanelAnchor.right,
+        physics: const NeverScrollableScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: expandedSize,
+            maxWidth: expandedSize,
+          ),
+          child: childWidget,
+        ),
+      );
+    } else if (hasFixedHeight) {
+      childWidget = SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        // Align to end if anchored bottom
+        reverse: config.anchor == PanelAnchor.bottom,
+        physics: const NeverScrollableScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: expandedSize,
+            maxHeight: expandedSize,
+          ),
+          child: childWidget,
+        ),
+      );
+    }
+
+    Alignment stripAlignment = Alignment.center;
+    if (config is InlinePanel) {
+      final inline = config as InlinePanel;
+      if (inline.toggleIconAlignment != null) {
+        stripAlignment = inline.toggleIconAlignment!;
+      } else {
+        switch (config.anchor) {
+          case PanelAnchor.top:
+          case PanelAnchor.bottom:
+            stripAlignment = Alignment.centerRight;
+            break;
+          case PanelAnchor.left:
+          case PanelAnchor.right:
+            stripAlignment = Alignment.topCenter;
+            break;
+        }
+      }
     }
 
     Widget content = Stack(
@@ -116,7 +171,7 @@ class AnimatedPanel extends StatelessWidget {
                 opacity: collapseFactor.clamp(0.0, 1.0),
                 child: Container(
                   decoration: config.collapsedDecoration,
-                  alignment: Alignment.center,
+                  alignment: stripAlignment,
                   child: stripWidget,
                 ),
               ),

@@ -17,7 +17,8 @@ void main() {
             InlinePanel(
               id: id,
               width: 200,
-              collapsedSize: 50,
+              toggleIconSize: 50,
+              toggleIconPadding: 0,
               initialCollapsed: false,
               toggleIcon: SizedBox(key: Key('toggle_icon')),
               child: Container(key: const Key('content')),
@@ -58,7 +59,8 @@ void main() {
             InlinePanel(
               id: id,
               width: 200,
-              collapsedSize: 50,
+              toggleIconSize: 50,
+              toggleIconPadding: 0,
               anchor: PanelAnchor.left,
               toggleIcon: const Text('Icon', key: Key('icon_text')),
               child: const SizedBox(),
@@ -107,12 +109,17 @@ void main() {
             InlinePanel(
               id: id,
               width: 200,
-              collapsedSize: 50,
+              toggleIconSize: 50,
+              toggleIconPadding: 0,
               toggleIcon: SizedBox(),
               collapsedDecoration: BoxDecoration(color: Color(0xFFFF0000)),
               child: Row(
                 children: [
-                  SizedBox(width: 150, height: 20, child: const Text('Wide Content')),
+                  SizedBox(
+                    width: 150,
+                    height: 20,
+                    child: const Text('Wide Content'),
+                  ),
                 ],
               ),
             ),
@@ -150,7 +157,8 @@ void main() {
             InlinePanel(
               id: id,
               height: 200,
-              collapsedSize: 40,
+              toggleIconSize: 40,
+              toggleIconPadding: 0,
               anchor: PanelAnchor.top,
               toggleIcon: SizedBox(key: Key('toggle_icon')),
               collapsedDecoration: BoxDecoration(color: Color(0xFFFF0000)),
@@ -179,7 +187,7 @@ void main() {
     expect(tester.getSize(find.byType(LayoutId)).height, 40.0);
     // Content should still be at top left in the stack, even if clipped/hidden
     expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 0.0);
-    
+
     // Verify icon is present
     expect(find.byKey(const Key('toggle_icon')), findsOneWidget);
   });

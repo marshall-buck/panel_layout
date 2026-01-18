@@ -215,8 +215,7 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
 
       // Determine Anchor Rect
       Rect anchorRect;
-      if (config.anchorTo != null &&
-          panelRects.containsKey(config.anchorTo)) {
+      if (config.anchorTo != null && panelRects.containsKey(config.anchorTo)) {
         anchorRect = panelRects[config.anchorTo]!;
       } else {
         anchorRect = Offset.zero & size;
@@ -244,8 +243,7 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
         childConstraints = BoxConstraints.loose(size);
       }
 
-      if (config.anchorTo != null &&
-          panelRects.containsKey(config.anchorTo)) {
+      if (config.anchorTo != null && panelRects.containsKey(config.anchorTo)) {
         final anchorRect = panelRects[config.anchorTo]!;
         if (crossAlign == CrossAxisAlignment.stretch) {
           switch (config.anchor) {
@@ -276,10 +274,8 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
 
       // Calculate Position
       Offset position;
-      final alignment =
-          (config.alignment ?? _defaultAlignment(config.anchor)).resolve(
-            textDirection,
-          );
+      final alignment = (config.alignment ?? _defaultAlignment(config.anchor))
+          .resolve(textDirection);
 
       if (config.anchorTo != null) {
         // Relative Positioning

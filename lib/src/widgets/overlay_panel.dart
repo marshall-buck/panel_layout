@@ -17,13 +17,22 @@ class OverlayPanel extends BasePanel {
     super.closingDirection,
     super.collapsedDecoration,
     super.initialVisible = true,
-    super.initialCollapsed = true, // Default to true as requested
+    super.initialCollapsed = false, // Default to false (Expanded)
     super.animationDuration,
     super.animationCurve,
     this.anchorLink,
     this.zIndex = 0,
     this.alignment,
     this.crossAxisAlignment,
+    super.title,
+    super.headerIcon,
+    super.decoration,
+    super.headerDecoration,
+    super.headerTextStyle,
+    super.headerIconColor,
+    super.headerIconSize,
+    super.headerAction,
+    super.rotateToggleIcon,
     super.key,
   });
 
@@ -38,4 +47,7 @@ class OverlayPanel extends BasePanel {
 
   /// Cross-axis behavior for layout.
   final CrossAxisAlignment? crossAxisAlignment;
+
+  @override
+  bool get isOverlay => true;
 }

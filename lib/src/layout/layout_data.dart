@@ -36,10 +36,9 @@ class PanelLayoutData {
     // If factor is 0, we take 0 space.
     // If factor is 1, we take full size.
     final baseSize = state.size;
-    final collapsedSize =
-        config is InlinePanel
-            ? (config as InlinePanel).collapsedSize ?? 0.0
-            : 0.0;
+    final collapsedSize = config is InlinePanel
+        ? (config as InlinePanel).collapsedSize
+        : 0.0;
 
     // Interpolate between full size and collapsed size based on collapseFactor
     final currentSize = baseSize + (collapsedSize - baseSize) * collapseFactor;
@@ -50,10 +49,9 @@ class PanelLayoutData {
   double? get animatedWidth {
     if (config.width == null) return null;
     final base = config.width!;
-    final collapsed =
-        config is InlinePanel
-            ? (config as InlinePanel).collapsedSize ?? 0.0
-            : 0.0;
+    final collapsed = config is InlinePanel
+        ? (config as InlinePanel).collapsedSize
+        : 0.0;
     final current = base + (collapsed - base) * collapseFactor;
     return current * visualFactor;
   }
@@ -61,10 +59,9 @@ class PanelLayoutData {
   double? get animatedHeight {
     if (config.height == null) return null;
     final base = config.height!;
-    final collapsed =
-        config is InlinePanel
-            ? (config as InlinePanel).collapsedSize ?? 0.0
-            : 0.0;
+    final collapsed = config is InlinePanel
+        ? (config as InlinePanel).collapsedSize
+        : 0.0;
     final current = base + (collapsed - base) * collapseFactor;
     return current * visualFactor;
   }

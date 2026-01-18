@@ -4,6 +4,8 @@ import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
+import '../theme/panel_theme.dart';
+import 'inline_panel.dart';
 
 import 'package:meta/meta.dart';
 
@@ -18,6 +20,7 @@ class PanelToggleButton extends StatelessWidget {
     this.panelId,
     this.size = 24.0,
     this.closingDirection,
+    this.shouldRotate = true,
     super.key,
   });
 
@@ -35,10 +38,19 @@ class PanelToggleButton extends StatelessWidget {
   /// If provided, this overrides the automatic inference from the panel anchor.
   final PanelAnchor? closingDirection;
 
+  /// Whether to automatically rotate the icon based on the panel's state.
+  final bool shouldRotate;
+
   @override
   Widget build(BuildContext context) {
     final scope = PanelDataScope.maybeOf(context);
     final controller = PanelScope.of(context);
+    final theme = PanelTheme.of(context);
+
+    double effectiveSize = size;
+    if (scope?.config is InlinePanel) {
+      effectiveSize = (scope!.config as InlinePanel).toggleIconSize;
+    }
 
     PanelAnchor anchor = PanelAnchor.left;
     bool isCollapsed = false;
@@ -65,31 +77,33 @@ class PanelToggleButton extends StatelessWidget {
 
     double rotation = 0.0;
 
-    switch (effectiveClosingDir) {
-      case PanelAnchor.left:
-        // Closes Left (<). Opens Right (>).
-        // Open (Visible): Point Left (<) to close. (0 deg)
-        // Collapsed: Point Right (>) to open. (180 deg)
-        rotation = isCollapsed ? math.pi : 0.0;
-        break;
-      case PanelAnchor.right:
-        // Closes Right (>). Opens Left (<).
-        // Open: Point Right (>) to close. (180 deg)
-        // Collapsed: Point Left (<) to open. (0 deg)
-        rotation = isCollapsed ? 0.0 : math.pi;
-        break;
-      case PanelAnchor.top:
-        // Closes Up (^). Opens Down (v).
-        // Open: Point Up (^) to close. (-90 deg)
-        // Collapsed: Point Down (v) to open. (90 deg)
-        rotation = isCollapsed ? math.pi / 2 : -math.pi / 2;
-        break;
-      case PanelAnchor.bottom:
-        // Closes Down (v). Opens Up (^).
-        // Open: Point Down (v) to close. (90 deg)
-        // Collapsed: Point Up (^) to open. (-90 deg)
-        rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
-        break;
+    if (shouldRotate) {
+      switch (effectiveClosingDir) {
+        case PanelAnchor.left:
+          // Closes Left (<). Opens Right (>).
+          // Open (Visible): Point Left (<) to close. (0 deg)
+          // Collapsed: Point Right (>) to open. (180 deg)
+          rotation = isCollapsed ? math.pi : 0.0;
+          break;
+        case PanelAnchor.right:
+          // Closes Right (>). Opens Left (<).
+          // Open: Point Right (>) to close. (180 deg)
+          // Collapsed: Point Left (<) to open. (0 deg)
+          rotation = isCollapsed ? 0.0 : math.pi;
+          break;
+        case PanelAnchor.top:
+          // Closes Up (^). Opens Down (v).
+          // Open: Point Up (^) to close. (-90 deg)
+          // Collapsed: Point Down (v) to open. (90 deg)
+          rotation = isCollapsed ? math.pi / 2 : -math.pi / 2;
+          break;
+        case PanelAnchor.bottom:
+          // Closes Down (v). Opens Up (^).
+          // Open: Point Down (v) to close. (90 deg)
+          // Collapsed: Point Up (^) to open. (-90 deg)
+          rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
+          break;
+      }
     }
 
     return GestureDetector(
@@ -101,8 +115,8 @@ class PanelToggleButton extends StatelessWidget {
       },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: size,
-        height: size,
+        width: effectiveSize,
+        height: effectiveSize,
         child: Center(
           child: TweenAnimationBuilder<double>(
             tween: Tween(end: rotation),
@@ -110,7 +124,13 @@ class PanelToggleButton extends StatelessWidget {
             builder: (context, angle, child) {
               return Transform.rotate(angle: angle, child: child);
             },
-            child: icon,
+            child: IconTheme(
+              data: IconThemeData(
+                size: theme.headerIconSize,
+                color: theme.headerIconColor,
+              ),
+              child: icon,
+            ),
           ),
         ),
       ),

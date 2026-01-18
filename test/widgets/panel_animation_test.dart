@@ -89,13 +89,8 @@ void main() {
       // Halfway through animation
       await tester.pump(duration ~/ 2);
 
-      // Measure the ClipRect to see the effective animated size
-      final Size midSize = tester.getSize(
-        find.descendant(
-          of: find.byType(AnimatedPanel).last,
-          matching: find.byType(ClipRect),
-        ),
-      );
+      // Measure the AnimatedPanel directly to see the effective animated size
+      final Size midSize = tester.getSize(find.byType(AnimatedPanel).last);
 
       expect(
         midSize.width,
