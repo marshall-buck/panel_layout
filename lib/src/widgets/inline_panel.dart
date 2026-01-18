@@ -15,7 +15,7 @@ class InlinePanel extends BasePanel {
     this.flex,
     this.minSize,
     this.maxSize,
-    super.collapsedSize,
+    this.collapsedSize,
     super.toggleIcon,
     super.closingDirection,
     super.collapsedDecoration,
@@ -38,6 +38,9 @@ class InlinePanel extends BasePanel {
 
   /// The maximum size (width or height) the panel can be resized to.
   final double? maxSize;
+
+  /// The size of the panel when collapsed.
+  final double? collapsedSize;
 
   /// Whether the panel can be resized by the user.
   final bool resizable;

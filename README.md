@@ -31,7 +31,8 @@ InlinePanel(
   
   // Optional: Define a collapsed "mini" state
   collapsedSize: 48,
-  collapsedChild: MySideRail(), 
+  toggleIcon: Icon(Icons.chevron_left), 
+  collapsedDecoration: BoxDecoration(color: Colors.grey),
   
   child: SidebarContent(),
 )
@@ -65,15 +66,13 @@ PanelLayout(
 
 ## Mini Variants & Collapsing
 
-You can allow panels to collapse into a "Mini Variant" (like a toolbar or icon rail) by providing a `collapsedChild`.
+You can allow panels to collapse into a "Mini Variant" (like a toolbar or icon rail) by providing a `collapsedSize`.
 
-Use the built-in `PanelToggleButton` to easily toggle this state. It automatically detects the panel's anchor and rotates its icon (e.g., a chevron) to point the correct way.
+The `toggleIcon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
 
 ```dart
-// Inside your panel content
-PanelToggleButton(
-  child: Icon(Icons.chevron_left), // Will rotate to point right when collapsed!
-)
+// In your InlinePanel config
+toggleIcon: Icon(Icons.chevron_left),
 ```
 
 ## Programmatic Control

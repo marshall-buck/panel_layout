@@ -13,7 +13,6 @@ abstract class BasePanel extends StatelessWidget {
     this.anchorTo,
     this.width,
     this.height,
-    this.collapsedSize,
     this.toggleIcon,
     this.closingDirection,
     this.collapsedDecoration,
@@ -41,9 +40,6 @@ abstract class BasePanel extends StatelessWidget {
 
   /// The initial fixed height of the panel.
   final double? height;
-
-  /// The size of the panel when collapsed.
-  final double? collapsedSize;
 
   /// The icon to display when collapsed.
   /// If provided, a toggle button will be rendered in the collapsed strip.

@@ -13,7 +13,6 @@ class OverlayPanel extends BasePanel {
     super.anchorTo,
     super.width,
     super.height,
-    super.collapsedSize,
     super.toggleIcon,
     super.closingDirection,
     super.collapsedDecoration,

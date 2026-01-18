@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
 import 'base_panel.dart';
+import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
 
 /// An internal wrapper that handles animations for a panel's size and visibility.
@@ -28,7 +29,10 @@ class AnimatedPanel extends StatelessWidget {
     }
 
     final base = state.size;
-    final collapsed = config.collapsedSize ?? 0.0;
+    final collapsed =
+        config is InlinePanel
+            ? (config as InlinePanel).collapsedSize ?? 0.0
+            : 0.0;
     final currentSize = base + (collapsed - base) * collapseFactor;
 
     final animatedSize = currentSize * factor;
@@ -37,7 +41,10 @@ class AnimatedPanel extends StatelessWidget {
     final bool hasFixedHeight = config.height != null;
 
     final expandedSize = state.size;
-    final stripSize = config.collapsedSize ?? 0.0;
+    final stripSize =
+        config is InlinePanel
+            ? (config as InlinePanel).collapsedSize ?? 0.0
+            : 0.0;
 
     // Use toggleIcon to build the strip widget
     Widget? stripWidget;
