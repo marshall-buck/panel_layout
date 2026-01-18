@@ -1,3 +1,12 @@
+## 0.5.1
+
+*   **Breaking**: `PanelToggleButton` is now internal. It is automatically rendered by `InlinePanel` when `toggleIcon` is provided.
+*   **Breaking**: Removed `collapsedChild` from `BasePanel`. If you need fully custom collapsed content, we recommend swapping your `child` widget based on the state from `PanelScope`.
+*   **Feat**: Added built-in Header support to `BasePanel` (and subclasses). You can now easily add a `title`, `headerIcon`, and `headerAction` (like Close or Collapse).
+*   **Feat**: Added `rotateToggleIcon` to `BasePanel` to optionally disable the automatic rotation of the toggle icon.
+*   **Feat**: Added advanced toggle icon customization to `InlinePanel`, including `toggleIconSize`, `toggleIconPadding`, and `toggleIconAlignment`.
+*   **Feat**: Added `PanelTheme` support for standard headers (`headerHeight`, `headerDecoration`, `headerTextStyle`, etc.).
+
 ## 0.5.0
 
 *   **Breaking**: Removed `PanelMode`. Panels are now strictly typed as either `InlinePanel` or `OverlayPanel`.

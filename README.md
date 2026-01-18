@@ -64,6 +64,26 @@ PanelLayout(
 )
 ```
 
+## Built-in Headers
+
+Panels often need a title bar with actions. `BasePanel` (and its subclasses) now includes built-in support for a standard header.
+
+```dart
+InlinePanel(
+  id: const PanelId('inspector'),
+  // Header configuration
+  title: "Inspector",
+  headerIcon: Icon(Icons.close), 
+  headerAction: PanelAction.close, // Defaults to 'collapse' for Inline, 'close' for Overlay
+  
+  // Custom styling (optional, defaults to PanelTheme)
+  headerDecoration: BoxDecoration(color: Colors.grey[200]),
+  headerTextStyle: TextStyle(fontWeight: FontWeight.bold),
+  
+  child: InspectorContent(),
+)
+```
+
 ## Mini Variants & Collapsing
 
 You can allow panels to collapse into a "Mini Variant" (like a toolbar or icon rail) by providing a `collapsedSize`.
@@ -71,8 +91,22 @@ You can allow panels to collapse into a "Mini Variant" (like a toolbar or icon r
 The `toggleIcon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
 
 ```dart
-// In your InlinePanel config
-toggleIcon: Icon(Icons.chevron_left),
+InlinePanel(
+  id: const PanelId('nav'),
+  width: 200,
+  
+  // Mini Variant Config
+  collapsedSize: 48,
+  toggleIcon: Icon(Icons.chevron_left),
+  
+  // Advanced Customization
+  toggleIconSize: 24,
+  toggleIconPadding: 2.0,
+  toggleIconAlignment: Alignment.topCenter, // Control where the icon sits
+  rotateToggleIcon: true, // Default
+  
+  child: NavContent(),
+)
 ```
 
 ## Programmatic Control
