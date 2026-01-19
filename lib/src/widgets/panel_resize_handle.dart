@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import '../theme/resize_handle_theme.dart';
 
@@ -8,6 +9,7 @@ import '../theme/resize_handle_theme.dart';
 /// and reports the delta back to the parent [PanelLayout].
 ///
 /// It does not manage size state itself; it only invokes callbacks.
+@internal
 class PanelResizeHandle extends StatelessWidget {
   /// Creates a [PanelResizeHandle].
   const PanelResizeHandle({

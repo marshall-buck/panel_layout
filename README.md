@@ -32,9 +32,8 @@ InlinePanel(
   anchor: PanelAnchor.left,
   
   // Optional: Define a collapsed "mini" state
-  // The collapsed size is derived from toggleIconSize + toggleIconPadding
+  // The collapsed size is derived from iconSize + standard padding
   icon: Icon(Icons.chevron_left), 
-  toggleIconSize: 24.0,
   railDecoration: BoxDecoration(color: Colors.grey),
   
   child: SidebarContent(),
@@ -85,7 +84,7 @@ InlinePanel(
   // Tap action defaults to 'collapse' for Inline, 'close' for Overlay
   
   // Custom styling
-  headerColor: Colors.grey[200],
+  headerDecoration: BoxDecoration(color: Colors.grey[200]),
   titleStyle: TextStyle(fontWeight: FontWeight.bold),
   
   child: InspectorContent(),
@@ -94,7 +93,7 @@ InlinePanel(
 
 ## Mini Variants & Collapsing (InlinePanel)
 
-You can allow `InlinePanel`s to collapse into a "Mini Variant" (like a toolbar or icon rail). The collapsed size is automatically calculated based on the `toggleIconSize`.
+You can allow `InlinePanel`s to collapse into a "Mini Variant" (like a toolbar or icon rail). The collapsed size is automatically calculated based on the `iconSize`.
 
 The `icon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
 
@@ -105,8 +104,7 @@ InlinePanel(
   
   // Mini Variant Config
   icon: Icon(Icons.chevron_left),
-  toggleIconSize: 24.0,
-  toggleIconPadding: 12.0, // Adds padding around the icon
+  iconSize: 24.0,
   
   // Advanced Customization
   railIconAlignment: Alignment.topCenter, // Control where the icon sits
@@ -184,8 +182,8 @@ PanelTheme(
       color: Colors.grey[900],
       border: Border(bottom: BorderSide(color: Colors.black)),
     ),
-    headerTextStyle: TextStyle(fontSize: 12, color: Colors.white),
-    panelDecoration: BoxDecoration(
+    titleStyle: TextStyle(fontSize: 12, color: Colors.white),
+    panelBoxDecoration: BoxDecoration(
       color: Colors.grey[800],
     ),
   ),

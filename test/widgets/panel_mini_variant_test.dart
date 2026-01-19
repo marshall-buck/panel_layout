@@ -3,12 +3,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/panel_toggle_button.dart';
+import 'package:panel_layout/src/constants.dart';
 
 void main() {
   testWidgets('Panel collapse animation respects collapsedSize', (
     tester,
   ) async {
     final id = PanelId('test');
+    const testIconSize = 34.0;
+    const expectedCollapsedSize = testIconSize + kDefaultRailPadding; // 34 + 16 = 50
 
     await tester.pumpWidget(
       Directionality(
@@ -18,8 +21,7 @@ void main() {
             InlinePanel(
               id: id,
               width: 200,
-              toggleIconSize: 50,
-              toggleIconPadding: 0,
+              iconSize: testIconSize,
               initialCollapsed: false,
               icon: SizedBox(key: Key('toggle_icon')),
               child: Container(key: const Key('content')),
@@ -43,11 +45,11 @@ void main() {
 
     final midWidth = tester.getSize(find.byType(LayoutId)).width;
     expect(midWidth, lessThan(200.0));
-    expect(midWidth, greaterThan(50.0));
+    expect(midWidth, greaterThan(expectedCollapsedSize));
 
     await tester.pumpAndSettle();
 
-    expect(tester.getSize(find.byType(LayoutId)).width, 50.0);
+    expect(tester.getSize(find.byType(LayoutId)).width, expectedCollapsedSize);
   });
 
   testWidgets('PanelToggleButton rotates based on anchor', (tester) async {
@@ -61,8 +63,7 @@ void main() {
             InlinePanel(
               id: id,
               width: 200,
-              toggleIconSize: 50,
-              toggleIconPadding: 0,
+              iconSize: 50,
               anchor: PanelAnchor.left,
               icon: const Text('Icon', key: Key('icon_text')),
               child: const SizedBox(),
@@ -88,13 +89,6 @@ void main() {
       of: railIconFinder,
       matching: find.byType(Transform),
     ).first;
-
-    // Initial state: Not collapsed, rail might be hidden or opacity 0.
-    // Wait, if not collapsed, the rail is not rendered?
-    // AnimatedPanel logic:
-    // child: Stack(children: [childWidget, if (stripWidget != null) Positioned(...)])
-    // Positioned child: IgnorePointer(ignoring: collapseFactor == 0.0, child: Opacity(...))
-    // So it IS in the tree.
 
     expect(transformFinder, findsOneWidget);
 
@@ -129,8 +123,7 @@ void main() {
             InlinePanel(
               id: id,
               width: 200,
-              toggleIconSize: 50,
-              toggleIconPadding: 0,
+              iconSize: 50,
               icon: SizedBox(),
               railDecoration: BoxDecoration(color: Color(0xFFFF0000)),
               child: Row(
@@ -172,6 +165,8 @@ void main() {
     tester,
   ) async {
     final id = PanelId('vertical_test');
+    const testIconSize = 24.0;
+    const expectedCollapsedSize = testIconSize + kDefaultRailPadding; // 24 + 16 = 40
 
     await tester.pumpWidget(
       Directionality(
@@ -182,8 +177,7 @@ void main() {
             InlinePanel(
               id: id,
               height: 200,
-              toggleIconSize: 40,
-              toggleIconPadding: 0,
+              iconSize: testIconSize,
               anchor: PanelAnchor.top,
               icon: SizedBox(key: Key('toggle_icon')),
               railDecoration: BoxDecoration(color: Color(0xFFFF0000)),
@@ -197,12 +191,12 @@ void main() {
       ),
     );
 
-    // Header (32.0) pushes content down.
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 32.0);
-    // Height is panel height (200) - header height (32) ?
+    // Header (kDefaultHeaderHeight) pushes content down.
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, kDefaultHeaderHeight);
+    // Height is panel height (200) - header height (kDefaultHeaderHeight) ?
     // No, BasePanel is a Column [Header, Expanded(child)].
-    // So child height = 200 - 32 = 168.
-    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0 - 32.0);
+    // So child height = 200 - kDefaultHeaderHeight.
+    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0 - kDefaultHeaderHeight);
 
     final controller = PanelLayout.of(
       tester.element(find.byKey(const Key('content'))),
@@ -211,9 +205,9 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(tester.getSize(find.byType(LayoutId)).height, 40.0);
+    expect(tester.getSize(find.byType(LayoutId)).height, expectedCollapsedSize);
     // Content should still be at top (offset by header)
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 32.0);
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, kDefaultHeaderHeight);
 
     // Verify icon is present (2 of them)
     expect(find.byKey(const Key('toggle_icon')), findsNWidgets(2));

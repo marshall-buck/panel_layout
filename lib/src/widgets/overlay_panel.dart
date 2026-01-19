@@ -29,9 +29,8 @@ class OverlayPanel extends BasePanel {
     super.icon,
     super.iconSize,
     super.iconColor,
-    super.decoration,
-    super.headerColor,
-    super.headerBorder,
+    super.panelBoxDecoration,
+    super.headerDecoration,
     super.key,
   }) : super(initialCollapsed: false);
 

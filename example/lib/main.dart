@@ -35,9 +35,8 @@ class ExampleHome extends StatelessWidget {
     return PanelTheme(
       data: PanelThemeData(
         headerHeight: 36.0,
-        headerIconSize: 18.0,
-        headerIconColor: Colors.black87,
-        headerTextStyle: const TextStyle(
+
+        titleStyle: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: Colors.black87,
@@ -49,7 +48,7 @@ class ExampleHome extends StatelessWidget {
             bottom: BorderSide(color: Colors.grey[300]!, width: 1),
           ),
         ),
-        panelDecoration: BoxDecoration(
+        panelBoxDecoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.grey[300]!, width: 1),
         ),
@@ -150,19 +149,19 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           anchor: PanelAnchor.right,
           width: 280,
           title: 'PROPERTIES',
-          
+
           // Icon for toggle (collapse/expand)
           icon: const Icon(Icons.chevron_right),
 
           // Overriding visual properties for this specific panel
-          headerColor: const Color(0xFF2D2D2D),
+          headerDecoration: const BoxDecoration(color: Color(0xFF2D2D2D)),
           titleStyle: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 12,
           ),
           iconColor: Colors.white70,
-          decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
+          panelBoxDecoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
 
           child: const Center(
             child: Text(
@@ -303,7 +302,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
           icon: const Icon(Icons.close),
 
           // Distinct decoration to make it pop over the content
-          decoration: BoxDecoration(
+          panelBoxDecoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
               BoxShadow(

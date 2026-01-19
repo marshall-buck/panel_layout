@@ -5,11 +5,13 @@ import '../models/panel_id.dart';
 import '../state/panel_runtime_state.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
+import '../theme/panel_theme.dart';
 import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../controllers/panel_layout_controller.dart';
 import 'widgets.dart';
 import 'animated_panel.dart';
+import 'panel_resize_handle.dart';
 
 /// The root widget of the panel layout system.
 ///
@@ -261,6 +263,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
   @override
   Widget build(BuildContext context) {
+    final theme = PanelTheme.of(context);
     final uniquePanelConfigs = <PanelId, BasePanel>{};
     for (final panel in widget.children) {
       uniquePanelConfigs[panel.id] = panel;
@@ -272,11 +275,18 @@ class _PanelLayoutState extends State<PanelLayout>
       final anim = _animationControllers[config.id]!;
       final collapseAnim = _collapseControllers[config.id]!;
 
+      double collapsedSize = 0.0;
+      if (config is InlinePanel) {
+        final iconSize = config.iconSize ?? theme.iconSize;
+        collapsedSize = iconSize + kDefaultRailPadding;
+      }
+
       return PanelLayoutData(
         config: config,
         state: state,
         visualFactor: anim.value,
         collapseFactor: collapseAnim.value,
+        collapsedSize: collapsedSize,
       );
     }).toList();
 

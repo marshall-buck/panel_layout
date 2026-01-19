@@ -22,8 +22,6 @@ class InlinePanel extends BasePanel {
     this.flex,
     this.minSize,
     this.maxSize,
-    this.toggleIconSize = 24.0,
-    this.toggleIconPadding = 1.0,
     this.railIconAlignment,
     this.closingDirection,
     this.railDecoration,
@@ -39,9 +37,8 @@ class InlinePanel extends BasePanel {
     super.icon,
     super.iconSize,
     super.iconColor,
-    super.decoration,
-    super.headerColor,
-    super.headerBorder,
+    super.panelBoxDecoration,
+    super.headerDecoration,
     this.rotateIcon = true,
     super.key,
   }) : assert(
@@ -61,24 +58,12 @@ class InlinePanel extends BasePanel {
   /// The maximum size (width or height) the panel can be resized to by the user.
   final double? maxSize;
 
-  /// The size of the icon in the collapsed rail. Defaults to 24.0.
-  final double toggleIconSize;
-
-  /// The padding to add to the toggle icon size when calculating the collapsed rail size.
-  /// Defaults to 1.0.
-  final double toggleIconPadding;
-
-  /// The alignment of the toggle icon within the collapsed strip.
+  /// The alignment of the icon within the collapsed strip.
   ///
   /// If null, it is automatically determined by the panel's [anchor]:
   /// - Top/Bottom anchors: [Alignment.centerRight] (usually).
   /// - Left/Right anchors: [Alignment.topCenter].
   final Alignment? railIconAlignment;
-
-  /// The total size of the panel when collapsed.
-  ///
-  /// Calculated as [toggleIconSize] + [toggleIconPadding].
-  double get collapsedSize => toggleIconSize + toggleIconPadding;
 
   /// Whether the panel can be manually resized by the user (via drag handle).
   final bool resizable;

@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import '../widgets/base_panel.dart';
-import '../widgets/inline_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
 
@@ -18,6 +17,7 @@ class PanelLayoutData {
     required this.state,
     this.visualFactor = 1.0,
     this.collapseFactor = 0.0,
+    required this.collapsedSize,
   });
 
   /// The static configuration (ID, Anchor, Mode, etc.)
@@ -34,6 +34,9 @@ class PanelLayoutData {
   /// 0.0 = Expanded, 1.0 = Collapsed.
   final double collapseFactor;
 
+  /// The calculated size of the panel when collapsed (rail size).
+  final double collapsedSize;
+
   /// Calculated effective size for layout.
   ///
   /// Takes into account the current size (or flex) and interpolates it
@@ -43,9 +46,6 @@ class PanelLayoutData {
     // If factor is 0, we take 0 space.
     // If factor is 1, we take full size.
     final baseSize = state.size;
-    final collapsedSize = config is InlinePanel
-        ? (config as InlinePanel).collapsedSize
-        : 0.0;
 
     // Interpolate between full size and collapsed size based on collapseFactor
     final currentSize = baseSize + (collapsedSize - baseSize) * collapseFactor;
@@ -57,10 +57,7 @@ class PanelLayoutData {
   double? get animatedWidth {
     if (config.width == null) return null;
     final base = config.width!;
-    final collapsed = config is InlinePanel
-        ? (config as InlinePanel).collapsedSize
-        : 0.0;
-    final current = base + (collapsed - base) * collapseFactor;
+    final current = base + (collapsedSize - base) * collapseFactor;
     return current * visualFactor;
   }
 
@@ -68,10 +65,7 @@ class PanelLayoutData {
   double? get animatedHeight {
     if (config.height == null) return null;
     final base = config.height!;
-    final collapsed = config is InlinePanel
-        ? (config as InlinePanel).collapsedSize
-        : 0.0;
-    final current = base + (collapsed - base) * collapseFactor;
+    final current = base + (collapsedSize - base) * collapseFactor;
     return current * visualFactor;
   }
 }

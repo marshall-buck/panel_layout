@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
+import '../constants.dart';
 
 /// Defines the visual styling for panels and their headers.
 ///
@@ -19,12 +20,13 @@ import 'package:equatable/equatable.dart';
 @immutable
 class PanelThemeData extends Equatable {
   const PanelThemeData({
-    this.headerHeight = 32.0,
+    this.headerHeight = kDefaultHeaderHeight,
     this.headerDecoration,
-    this.headerTextStyle,
-    this.headerIconColor,
-    this.headerIconSize = 16.0,
-    this.panelDecoration,
+    this.titleStyle,
+    this.iconColor,
+    this.iconSize = kDefaultIconSize,
+    this.panelBoxDecoration,
+    this.railDecoration,
   });
 
   /// The height of the panel header.
@@ -34,42 +36,48 @@ class PanelThemeData extends Equatable {
   final BoxDecoration? headerDecoration;
 
   /// The text style for the panel title.
-  final TextStyle? headerTextStyle;
+  final TextStyle? titleStyle;
 
-  /// The color of the header icon.
-  final Color? headerIconColor;
+  /// The color of the icon.
+  final Color? iconColor;
 
-  /// The size of the header icon.
-  final double headerIconSize;
+  /// The size of the icon.
+  final double iconSize;
 
   /// The decoration (background, border) for the panel content container.
-  final BoxDecoration? panelDecoration;
+  final BoxDecoration? panelBoxDecoration;
+
+  /// The decoration (background, border) for the collapsed rail.
+  final BoxDecoration? railDecoration;
 
   @override
   List<Object?> get props => [
-    headerHeight,
-    headerDecoration,
-    headerTextStyle,
-    headerIconColor,
-    headerIconSize,
-    panelDecoration,
-  ];
+        headerHeight,
+        headerDecoration,
+        titleStyle,
+        iconColor,
+        iconSize,
+        panelBoxDecoration,
+        railDecoration,
+      ];
 
   PanelThemeData copyWith({
     double? headerHeight,
     BoxDecoration? headerDecoration,
-    TextStyle? headerTextStyle,
-    Color? headerIconColor,
-    double? headerIconSize,
-    BoxDecoration? panelDecoration,
+    TextStyle? titleStyle,
+    Color? iconColor,
+    double? iconSize,
+    BoxDecoration? panelBoxDecoration,
+    BoxDecoration? railDecoration,
   }) {
     return PanelThemeData(
       headerHeight: headerHeight ?? this.headerHeight,
       headerDecoration: headerDecoration ?? this.headerDecoration,
-      headerTextStyle: headerTextStyle ?? this.headerTextStyle,
-      headerIconColor: headerIconColor ?? this.headerIconColor,
-      headerIconSize: headerIconSize ?? this.headerIconSize,
-      panelDecoration: panelDecoration ?? this.panelDecoration,
+      titleStyle: titleStyle ?? this.titleStyle,
+      iconColor: iconColor ?? this.iconColor,
+      iconSize: iconSize ?? this.iconSize,
+      panelBoxDecoration: panelBoxDecoration ?? this.panelBoxDecoration,
+      railDecoration: railDecoration ?? this.railDecoration,
     );
   }
 }
@@ -81,8 +89,8 @@ class PanelTheme extends InheritedWidget {
   final PanelThemeData data;
 
   static PanelThemeData of(BuildContext context) {
-    final PanelTheme? result = context
-        .dependOnInheritedWidgetOfExactType<PanelTheme>();
+    final PanelTheme? result =
+        context.dependOnInheritedWidgetOfExactType<PanelTheme>();
     return result?.data ?? const PanelThemeData();
   }
 

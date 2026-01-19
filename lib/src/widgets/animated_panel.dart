@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
+import '../theme/panel_theme.dart';
+import '../constants.dart';
 import 'base_panel.dart';
 import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
@@ -33,21 +35,25 @@ class AnimatedPanel extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final theme = PanelTheme.of(context);
     final base = state.size;
-    final collapsed = config is InlinePanel
-        ? (config as InlinePanel).collapsedSize
-        : 0.0;
-    final currentSize = base + (collapsed - base) * collapseFactor;
 
+    double collapsed = 0.0;
+    double? iconSize;
+
+    if (config is InlinePanel) {
+      iconSize = config.iconSize ?? theme.iconSize;
+      collapsed = iconSize + kDefaultRailPadding;
+    }
+
+    final currentSize = base + (collapsed - base) * collapseFactor;
     final animatedSize = currentSize * factor;
 
     final bool hasFixedWidth = config.width != null;
     final bool hasFixedHeight = config.height != null;
 
     final expandedSize = state.size;
-    final stripSize = config is InlinePanel
-        ? (config as InlinePanel).collapsedSize
-        : 0.0;
+    final stripSize = collapsed;
 
     // Use icon to build the strip widget
     Widget? stripWidget;
@@ -58,11 +64,23 @@ class AnimatedPanel extends StatelessWidget {
       stripWidget = PanelToggleButton(
         icon: effectiveIcon,
         panelId: config.id,
-        size: inline.toggleIconSize, // Explicitly pass the rail icon size
-        color: config.iconColor, // Inherit icon color from config
+        size: iconSize ?? theme.iconSize,
+        color: config.iconColor ?? theme.iconColor,
         closingDirection: inline.closingDirection,
         shouldRotate: inline.rotateIcon,
       );
+
+      // Fix Vertical Alignment:
+      // If the rail is vertical (Left/Right anchor), the icon sits at the top.
+      // We need to center it vertically within the 'headerHeight' to match the
+      // position it had in the expanded header.
+      if (config.anchor == PanelAnchor.left ||
+          config.anchor == PanelAnchor.right) {
+        stripWidget = SizedBox(
+          height: theme.headerHeight,
+          child: Center(child: stripWidget),
+        );
+      }
     }
 
     // Opacity for the Expanded Content
@@ -121,19 +139,14 @@ class AnimatedPanel extends StatelessWidget {
 
     if (config is InlinePanel) {
       final inline = config as InlinePanel;
-      railDecoration = inline.railDecoration;
+      railDecoration = inline.railDecoration ?? theme.railDecoration;
 
       // Fallback: If no railDecoration, try to mimic header style
       if (railDecoration == null) {
-        if (config.headerColor != null) {
-          railDecoration = BoxDecoration(
-            color: config.headerColor,
-            border: config.headerBorder,
-          );
-        } else if (config.decoration != null &&
-            config.decoration!.color != null) {
-           // Maybe fallback to panel background if strictly needed?
-           // For now, headerColor is the main one we want continuity with.
+        if (config.headerDecoration != null) {
+           railDecoration = config.headerDecoration;
+        } else if (theme.headerDecoration != null) {
+           railDecoration = theme.headerDecoration;
         }
       }
 
@@ -161,36 +174,34 @@ class AnimatedPanel extends StatelessWidget {
           Positioned(
             left:
                 (config.anchor == PanelAnchor.left ||
-                    config.anchor == PanelAnchor.right)
-                ? (config.anchor == PanelAnchor.left ? 0 : null)
-                : 0,
+                        config.anchor == PanelAnchor.right)
+                    ? (config.anchor == PanelAnchor.left ? 0 : null)
+                    : 0,
             right:
                 (config.anchor == PanelAnchor.left ||
-                    config.anchor == PanelAnchor.right)
-                ? (config.anchor == PanelAnchor.right ? 0 : null)
-                : 0,
+                        config.anchor == PanelAnchor.right)
+                    ? (config.anchor == PanelAnchor.right ? 0 : null)
+                    : 0,
             top:
                 (config.anchor == PanelAnchor.top ||
-                    config.anchor == PanelAnchor.bottom)
-                ? (config.anchor == PanelAnchor.top ? 0 : null)
-                : 0,
+                        config.anchor == PanelAnchor.bottom)
+                    ? (config.anchor == PanelAnchor.top ? 0 : null)
+                    : 0,
             bottom:
                 (config.anchor == PanelAnchor.top ||
-                    config.anchor == PanelAnchor.bottom)
-                ? (config.anchor == PanelAnchor.bottom ? 0 : null)
-                : 0,
-
+                        config.anchor == PanelAnchor.bottom)
+                    ? (config.anchor == PanelAnchor.bottom ? 0 : null)
+                    : 0,
             width:
                 (config.anchor == PanelAnchor.left ||
-                    config.anchor == PanelAnchor.right)
-                ? stripSize
-                : null,
+                        config.anchor == PanelAnchor.right)
+                    ? stripSize
+                    : null,
             height:
                 (config.anchor == PanelAnchor.top ||
-                    config.anchor == PanelAnchor.bottom)
-                ? stripSize
-                : null,
-
+                        config.anchor == PanelAnchor.bottom)
+                    ? stripSize
+                    : null,
             child: IgnorePointer(
               ignoring: collapseFactor == 0.0,
               child: Opacity(

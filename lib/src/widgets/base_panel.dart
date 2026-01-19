@@ -30,9 +30,8 @@ abstract class BasePanel extends StatelessWidget {
     this.icon,
     this.iconSize,
     this.iconColor,
-    this.decoration,
-    this.headerColor,
-    this.headerBorder,
+    this.panelBoxDecoration,
+    this.headerDecoration,
     super.key,
   });
 
@@ -96,14 +95,11 @@ abstract class BasePanel extends StatelessWidget {
 
   /// Decoration for the panel container (background, border, shadow).
   ///
-  /// If null, defaults to [PanelThemeData.panelDecoration].
-  final BoxDecoration? decoration;
+  /// If null, defaults to [PanelThemeData.panelBoxDecoration].
+  final BoxDecoration? panelBoxDecoration;
 
-  /// Background color for the header.
-  final Color? headerColor;
-
-  /// Border for the header.
-  final BoxBorder? headerBorder;
+  /// Decoration for the header.
+  final BoxDecoration? headerDecoration;
 
   /// Handles the action when the header icon is tapped.
   ///
@@ -117,19 +113,17 @@ abstract class BasePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (title == null && icon == null && decoration == null) {
+    if (title == null && icon == null && panelBoxDecoration == null) {
       return child;
     }
 
     final theme = PanelTheme.of(context);
-    final effectiveDecoration = decoration ?? theme.panelDecoration;
+    final effectiveDecoration = panelBoxDecoration ?? theme.panelBoxDecoration;
 
     Widget? header;
     if (title != null || icon != null) {
       final effectiveHeaderDecoration =
-          (headerColor != null || headerBorder != null)
-              ? BoxDecoration(color: headerColor, border: headerBorder)
-              : theme.headerDecoration;
+          headerDecoration ?? theme.headerDecoration;
 
       header = Container(
         height: theme.headerHeight,
@@ -137,31 +131,51 @@ abstract class BasePanel extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
+            // If anchored left, show icon first so it aligns with the left rail
+            if (anchor == PanelAnchor.left && icon != null) ...[
+              // Use PanelToggleButton instead of GestureDetector for consistency.
+              PanelToggleButton(
+                icon: icon!,
+                // Explicitly pass the header icon size.
+                size: iconSize ?? theme.iconSize,
+                color: iconColor ?? theme.iconColor,
+                onTap: () => onHeaderIconTap(context),
+                shouldRotate: (this is InlinePanel)
+                    ? (this as InlinePanel).rotateIcon
+                    : false,
+                closingDirection: (this is InlinePanel)
+                    ? (this as InlinePanel).closingDirection
+                    : null,
+                panelId: id,
+              ),
+              if (title != null) const SizedBox(width: 8),
+            ],
+
             if (title != null)
               Expanded(
                 child: Text(
                   title!,
-                  style: titleStyle ?? theme.headerTextStyle,
+                  style: titleStyle ?? theme.titleStyle,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-            if (icon != null) ...[
+
+            // If NOT anchored left (e.g. Right, Top, Bottom), show icon last
+            if (anchor != PanelAnchor.left && icon != null) ...[
               if (title != null) const SizedBox(width: 8),
               // Use PanelToggleButton instead of GestureDetector for consistency.
               PanelToggleButton(
                 icon: icon!,
                 // Explicitly pass the header icon size.
-                size: iconSize ?? theme.headerIconSize,
-                color: iconColor ?? theme.headerIconColor,
+                size: iconSize ?? theme.iconSize,
+                color: iconColor ?? theme.iconColor,
                 onTap: () => onHeaderIconTap(context),
-                shouldRotate:
-                    (this is InlinePanel)
-                        ? (this as InlinePanel).rotateIcon
-                        : false,
-                closingDirection:
-                    (this is InlinePanel)
-                        ? (this as InlinePanel).closingDirection
-                        : null,
+                shouldRotate: (this is InlinePanel)
+                    ? (this as InlinePanel).rotateIcon
+                    : false,
+                closingDirection: (this is InlinePanel)
+                    ? (this as InlinePanel).closingDirection
+                    : null,
                 panelId: id,
               ),
             ],

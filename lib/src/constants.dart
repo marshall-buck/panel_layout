@@ -33,3 +33,14 @@ const kDefaultHandleActiveColor = Color(0x99000000);
 
 /// The default color of the resize handle icon.
 const kDefaultHandleIconColor = Color(0xAA000000);
+
+// --- Panel Dimensions & Styling ---
+
+/// The default height of the panel header.
+const kDefaultHeaderHeight = 24.0;
+
+/// The default size of the panel icon (used in header and rail).
+const kDefaultIconSize = 16.0;
+
+/// The default total horizontal/vertical padding for the rail around the icon.
+const kDefaultRailPadding = 2.0;

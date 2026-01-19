@@ -1,3 +1,15 @@
+## 0.5.3
+
+*   **Refactor (Breaking)**: Removed `toggleIcon`, `toggleIconSize`, and `toggleIconPadding`. Panels now use a single `icon` and `iconSize`.
+*   **Refactor (Breaking)**: Collapsed rail size is now automatically calculated as `iconSize + 16.0`.
+*   **Refactor (Breaking)**: Updated `PanelThemeData` properties to strictly match `BasePanel`:
+    *   `headerTextStyle` -> `titleStyle`
+    *   `panelDecoration` -> `panelBoxDecoration`
+    *   `headerIconSize` -> `iconSize`
+    *   `headerIconColor` -> `iconColor`
+    *   Added `railDecoration`
+*   **Refactor (Breaking)**: Removed `headerColor` and `headerBorder` from `BasePanel`. Use `headerDecoration`.
+
 ## 0.5.2
 
 *   **Refactor (Breaking)**: Consolidated icon properties. `headerIcon` and `toggleIcon` are now a single `icon` property on `BasePanel`. The icon is automatically used in the header (if present) and the collapsed rail (for `InlinePanel`).

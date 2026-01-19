@@ -138,8 +138,8 @@ class PanelToggleButton extends StatelessWidget {
             },
             child: IconTheme(
               data: IconThemeData(
-                size: theme.headerIconSize,
-                color: color ?? theme.headerIconColor,
+                size: theme.iconSize,
+                color: color ?? theme.iconColor,
               ),
               child: icon,
             ),
