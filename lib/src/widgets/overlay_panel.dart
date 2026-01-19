@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../models/panel_enums.dart';
+import '../state/panel_scope.dart';
 import 'base_panel.dart';
 
 /// A panel that floats on top of the layout (Overlay).
@@ -44,5 +45,23 @@ class OverlayPanel extends BasePanel {
   final CrossAxisAlignment? crossAxisAlignment;
 
   @override
-  bool get isOverlay => true;
+  void onHeaderIconTap(BuildContext context) {
+    PanelScope.of(context).setVisible(id, false);
+  }
+
+  @override
+  Widget buildPanelLayout(
+    BuildContext context,
+    Widget? header,
+    Widget content,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (header != null) header,
+        content,
+      ],
+    );
+  }
 }

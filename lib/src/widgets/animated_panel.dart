@@ -53,6 +53,8 @@ class AnimatedPanel extends StatelessWidget {
       stripWidget = PanelToggleButton(
         icon: effectiveIcon,
         panelId: config.id,
+        size: inline.toggleIconSize, // Explicitly pass the rail icon size
+        color: config.iconColor, // Inherit icon color from config
         closingDirection: inline.closingDirection,
         shouldRotate: inline.rotateIcon,
       );
@@ -115,6 +117,20 @@ class AnimatedPanel extends StatelessWidget {
     if (config is InlinePanel) {
       final inline = config as InlinePanel;
       railDecoration = inline.railDecoration;
+
+      // Fallback: If no railDecoration, try to mimic header style
+      if (railDecoration == null) {
+        if (config.headerColor != null) {
+          railDecoration = BoxDecoration(
+            color: config.headerColor,
+            border: config.headerBorder,
+          );
+        } else if (config.decoration != null &&
+            config.decoration!.color != null) {
+           // Maybe fallback to panel background if strictly needed?
+           // For now, headerColor is the main one we want continuity with.
+        }
+      }
 
       if (inline.railIconAlignment != null) {
         stripAlignment = inline.railIconAlignment!;

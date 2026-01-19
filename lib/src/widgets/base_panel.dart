@@ -2,7 +2,8 @@ import 'package:flutter/widgets.dart';
 import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
 import '../theme/panel_theme.dart';
-import '../state/panel_scope.dart';
+import 'inline_panel.dart';
+import 'panel_toggle_button.dart';
 
 /// An abstract base class for panels in a [PanelLayout].
 ///
@@ -85,9 +86,13 @@ abstract class BasePanel extends StatelessWidget {
   /// Border for the header.
   final BoxBorder? headerBorder;
 
-  /// Determines if this panel is an overlay.
-  /// Used to decide default icon behavior (close vs toggle).
-  bool get isOverlay;
+  /// Handles the action when the header icon is tapped.
+  @protected
+  void onHeaderIconTap(BuildContext context);
+
+  /// Builds the internal layout of the panel (inside the styled Container).
+  @protected
+  Widget buildPanelLayout(BuildContext context, Widget? header, Widget content);
 
   @override
   Widget build(BuildContext context) {
@@ -100,9 +105,10 @@ abstract class BasePanel extends StatelessWidget {
 
     Widget? header;
     if (title != null || icon != null) {
-      final effectiveHeaderDecoration = (headerColor != null || headerBorder != null)
-          ? BoxDecoration(color: headerColor, border: headerBorder)
-          : theme.headerDecoration;
+      final effectiveHeaderDecoration =
+          (headerColor != null || headerBorder != null)
+              ? BoxDecoration(color: headerColor, border: headerBorder)
+              : theme.headerDecoration;
 
       header = Container(
         height: theme.headerHeight,
@@ -120,22 +126,22 @@ abstract class BasePanel extends StatelessWidget {
               ),
             if (icon != null) ...[
               if (title != null) const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () {
-                  final controller = PanelScope.of(context);
-                  if (isOverlay) {
-                    controller.setVisible(id, false);
-                  } else {
-                    controller.toggleCollapsed(id);
-                  }
-                },
-                child: IconTheme(
-                  data: IconThemeData(
-                    size: iconSize ?? theme.headerIconSize,
-                    color: iconColor ?? theme.headerIconColor,
-                  ),
-                  child: icon!,
-                ),
+              // Use PanelToggleButton instead of GestureDetector for consistency.
+              PanelToggleButton(
+                icon: icon!,
+                // Explicitly pass the header icon size.
+                size: iconSize ?? theme.headerIconSize,
+                color: iconColor ?? theme.headerIconColor,
+                onTap: () => onHeaderIconTap(context),
+                shouldRotate:
+                    (this is InlinePanel)
+                        ? (this as InlinePanel).rotateIcon
+                        : false,
+                closingDirection:
+                    (this is InlinePanel)
+                        ? (this as InlinePanel).closingDirection
+                        : null,
+                panelId: id,
               ),
             ],
           ],
@@ -146,17 +152,7 @@ abstract class BasePanel extends StatelessWidget {
     return Container(
       decoration: effectiveDecoration,
       clipBehavior: effectiveDecoration != null ? Clip.antiAlias : Clip.none,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: isOverlay ? MainAxisSize.min : MainAxisSize.max,
-        children: [
-          if (header != null) header,
-          if (isOverlay)
-            child
-          else
-            Expanded(child: child),
-        ],
-      ),
+      child: buildPanelLayout(context, header, child),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../models/panel_enums.dart';
+import '../state/panel_scope.dart';
 import 'base_panel.dart';
 
 /// A panel that participates in the linear layout (Row/Column).
@@ -84,5 +85,23 @@ class InlinePanel extends BasePanel {
   final bool rotateIcon;
 
   @override
-  bool get isOverlay => false;
+  void onHeaderIconTap(BuildContext context) {
+    PanelScope.of(context).toggleCollapsed(id);
+  }
+
+  @override
+  Widget buildPanelLayout(
+    BuildContext context,
+    Widget? header,
+    Widget content,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        if (header != null) header,
+        Expanded(child: content),
+      ],
+    );
+  }
 }

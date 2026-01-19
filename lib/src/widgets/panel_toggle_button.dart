@@ -5,7 +5,6 @@ import '../models/panel_enums.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
 import '../theme/panel_theme.dart';
-import 'inline_panel.dart';
 
 import 'package:meta/meta.dart';
 
@@ -21,6 +20,8 @@ class PanelToggleButton extends StatelessWidget {
     this.size = 24.0,
     this.closingDirection,
     this.shouldRotate = true,
+    this.onTap,
+    this.color,
     super.key,
   });
 
@@ -41,16 +42,23 @@ class PanelToggleButton extends StatelessWidget {
   /// Whether to automatically rotate the icon based on the panel's state.
   final bool shouldRotate;
 
+  /// Optional override for the tap action.
+  /// If null, defaults to toggling the panel collapse state.
+  final VoidCallback? onTap;
+
+  /// Optional override for the icon color.
+  /// If null, uses the theme's headerIconColor.
+  final Color? color;
+
   @override
   Widget build(BuildContext context) {
     final scope = PanelDataScope.maybeOf(context);
     final controller = PanelScope.of(context);
     final theme = PanelTheme.of(context);
 
-    double effectiveSize = size;
-    if (scope?.config is InlinePanel) {
-      effectiveSize = (scope!.config as InlinePanel).toggleIconSize;
-    }
+    // Use the explicitly provided size.
+    // The caller is responsible for passing the correct size (e.g. toggleIconSize for rail, headerIconSize for header).
+    final double effectiveSize = size;
 
     PanelAnchor anchor = PanelAnchor.left;
     bool isCollapsed = false;
@@ -107,12 +115,13 @@ class PanelToggleButton extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () {
-        final targetId = panelId ?? scope?.config.id;
-        if (targetId != null) {
-          controller.toggleCollapsed(targetId);
-        }
-      },
+      onTap: onTap ??
+          () {
+            final targetId = panelId ?? scope?.config.id;
+            if (targetId != null) {
+              controller.toggleCollapsed(targetId);
+            }
+          },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: effectiveSize,
@@ -127,7 +136,7 @@ class PanelToggleButton extends StatelessWidget {
             child: IconTheme(
               data: IconThemeData(
                 size: theme.headerIconSize,
-                color: theme.headerIconColor,
+                color: color ?? theme.headerIconColor,
               ),
               child: icon,
             ),

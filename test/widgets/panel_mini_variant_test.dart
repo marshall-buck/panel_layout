@@ -73,16 +73,21 @@ void main() {
     );
 
     // Target the icon in the Rail (PanelToggleButton)
+    // The rail is rendered inside a Positioned widget within AnimatedPanel
     final railIconFinder = find.descendant(
-      of: find.byType(PanelToggleButton),
+      of: find.descendant(
+        of: find.byType(Positioned),
+        matching: find.byType(PanelToggleButton),
+      ),
       matching: find.byKey(const Key('icon_text')),
     );
 
     // Find the Transform widget that is an ancestor of the rail icon text
+    // There is only one Transform inside PanelToggleButton
     final transformFinder = find.ancestor(
       of: railIconFinder,
       matching: find.byType(Transform),
-    );
+    ).first;
 
     // Initial state: Not collapsed, rail might be hidden or opacity 0.
     // Wait, if not collapsed, the rail is not rendered?
