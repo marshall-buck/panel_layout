@@ -1,3 +1,18 @@
+## 0.5.2
+
+*   **Refactor (Breaking)**: Consolidated icon properties. `headerIcon` and `toggleIcon` are now a single `icon` property on `BasePanel`. The icon is automatically used in the header (if present) and the collapsed rail (for `InlinePanel`).
+*   **Refactor (Breaking)**: Renamed/Consolidated styling properties for consistency:
+    *   `headerTextStyle` -> `titleStyle`
+    *   `headerIconSize` -> `iconSize`
+    *   `headerIconColor` -> `iconColor`
+*   **Refactor (Breaking)**: Simplified header decoration. `headerDecoration` is replaced by `headerColor` and `headerBorder`.
+*   **Refactor (Breaking)**: Renamed "Toggle" properties to "Rail" in `InlinePanel` for clarity:
+    *   `toggleIconAlignment` -> `railIconAlignment`
+    *   `collapsedDecoration` -> `railDecoration`
+    *   `rotateToggleIcon` -> `rotateIcon`
+*   **Refactor (Breaking)**: Removed `headerAction`. `InlinePanel` header icons now toggle collapse by default, and `OverlayPanel` header icons close the panel by default.
+*   **Docs**: Massive update to documentation comments across the entire public API for better clarity and developer experience.
+
 ## 0.5.1
 
 *   **Breaking**: `PanelToggleButton` is now internal. It is automatically rendered by `InlinePanel` when `toggleIcon` is provided.
