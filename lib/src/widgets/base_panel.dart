@@ -15,22 +15,18 @@ abstract class BasePanel extends StatelessWidget {
     this.anchorTo,
     this.width,
     this.height,
-    this.toggleIcon,
-    this.closingDirection,
-    this.collapsedDecoration,
     this.initialVisible = true,
     required this.initialCollapsed,
     this.animationDuration,
     this.animationCurve,
     this.title,
-    this.headerIcon,
+    this.titleStyle,
+    this.icon,
+    this.iconSize,
+    this.iconColor,
     this.decoration,
-    this.headerDecoration,
-    this.headerTextStyle,
-    this.headerIconColor,
-    this.headerIconSize,
-    this.headerAction,
-    this.rotateToggleIcon = true,
+    this.headerColor,
+    this.headerBorder,
     super.key,
   });
 
@@ -52,19 +48,6 @@ abstract class BasePanel extends StatelessWidget {
   /// The initial fixed height of the panel.
   final double? height;
 
-  /// The icon to display when collapsed.
-  /// If provided, a toggle button will be rendered in the collapsed strip.
-  /// This should be a left-pointing chevron for correct rotation logic.
-  final Widget? toggleIcon;
-
-  /// The direction the panel moves when closing.
-  /// Used to determine the rotation of the [toggleIcon].
-  /// If null, defaults to [anchor].
-  final PanelAnchor? closingDirection;
-
-  /// Decoration for the collapsed strip container (e.g. background color).
-  final BoxDecoration? collapsedDecoration;
-
   /// Whether the panel is initially visible.
   final bool initialVisible;
 
@@ -78,35 +61,29 @@ abstract class BasePanel extends StatelessWidget {
   final Curve? animationCurve;
 
   /// The title to display in the header.
-  /// If null, no header is shown unless [headerIcon] is provided.
+  /// If null, no header is shown unless [icon] is provided.
   final String? title;
 
-  /// The action icon to display in the header (e.g., close/toggle).
-  final Widget? headerIcon;
+  /// Text style override for the header title.
+  final TextStyle? titleStyle;
+
+  /// The primary icon for the panel (used in header and collapsed rail).
+  final Widget? icon;
+
+  /// Size override for the icon.
+  final double? iconSize;
+
+  /// Color override for the icon.
+  final Color? iconColor;
 
   /// Decoration for the panel container.
   final BoxDecoration? decoration;
 
-  /// Decoration override for the header.
-  final BoxDecoration? headerDecoration;
+  /// Background color for the header.
+  final Color? headerColor;
 
-  /// Text style override for the header title.
-  final TextStyle? headerTextStyle;
-
-  /// Color override for the header icon.
-  final Color? headerIconColor;
-
-  /// Size override for the header icon.
-  final double? headerIconSize;
-
-  /// The action to perform when the [headerIcon] is pressed.
-  /// If null, defaults to [PanelAction.collapse] for InlinePanels and
-  /// [PanelAction.close] for OverlayPanels.
-  final PanelAction? headerAction;
-
-  /// Whether the [toggleIcon] should rotate automatically based on the panel anchor.
-  /// Defaults to true.
-  final bool rotateToggleIcon;
+  /// Border for the header.
+  final BoxBorder? headerBorder;
 
   /// Determines if this panel is an overlay.
   /// Used to decide default icon behavior (close vs toggle).
@@ -114,7 +91,7 @@ abstract class BasePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (title == null && headerIcon == null && decoration == null) {
+    if (title == null && icon == null && decoration == null) {
       return child;
     }
 
@@ -122,10 +99,14 @@ abstract class BasePanel extends StatelessWidget {
     final effectiveDecoration = decoration ?? theme.panelDecoration;
 
     Widget? header;
-    if (title != null || headerIcon != null) {
+    if (title != null || icon != null) {
+      final effectiveHeaderDecoration = (headerColor != null || headerBorder != null)
+          ? BoxDecoration(color: headerColor, border: headerBorder)
+          : theme.headerDecoration;
+
       header = Container(
         height: theme.headerHeight,
-        decoration: headerDecoration ?? theme.headerDecoration,
+        decoration: effectiveHeaderDecoration,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
@@ -133,37 +114,27 @@ abstract class BasePanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   title!,
-                  style: headerTextStyle ?? theme.headerTextStyle,
+                  style: titleStyle ?? theme.headerTextStyle,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-            if (headerIcon != null) ...[
+            if (icon != null) ...[
               if (title != null) const SizedBox(width: 8),
               GestureDetector(
                 onTap: () {
                   final controller = PanelScope.of(context);
-
-                  final effectiveAction =
-                      headerAction ??
-                      (isOverlay ? PanelAction.close : PanelAction.collapse);
-
-                  switch (effectiveAction) {
-                    case PanelAction.collapse:
-                      controller.toggleCollapsed(id);
-                      break;
-                    case PanelAction.close:
-                      controller.setVisible(id, false);
-                      break;
-                    case PanelAction.none:
-                      break;
+                  if (isOverlay) {
+                    controller.setVisible(id, false);
+                  } else {
+                    controller.toggleCollapsed(id);
                   }
                 },
                 child: IconTheme(
                   data: IconThemeData(
-                    size: headerIconSize ?? theme.headerIconSize,
-                    color: headerIconColor ?? theme.headerIconColor,
+                    size: iconSize ?? theme.headerIconSize,
+                    color: iconColor ?? theme.headerIconColor,
                   ),
-                  child: headerIcon!,
+                  child: icon!,
                 ),
               ),
             ],
@@ -181,9 +152,9 @@ abstract class BasePanel extends StatelessWidget {
         children: [
           if (header != null) header,
           if (isOverlay)
-            child // Overlay panels size to content (or fixed size via parent), no expansion logic needed to avoid unbounded errors.
+            child
           else
-            Expanded(child: child), // Inline panels fill their slot.
+            Expanded(child: child),
         ],
       ),
     );

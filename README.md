@@ -7,13 +7,15 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 ## Key Features
 
 -   **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
--   **Type-Safe Panels**: Use `InlinePanel` for docked content and `OverlayPanel` for floating content.
+-   **Type-Safe Panels**:
+    -   **`InlinePanel`**: Participates in the layout flow (pushes other panels aside), affects sibling layout, and supports resizing. Supports "Mini Variants" (collapsing to a strip).
+    -   **`OverlayPanel`**: Floats on top of the layout, does not affect the position of other widgets, and is ideal for dialogs, popovers, or floating tools. Supports `zIndex`.
 -   **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
--   **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns. Panels can collapse to a small strip instead of disappearing completely.
+-   **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns (InlinePanel only).
 -   **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
 -   **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
 -   **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels.
--   **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds and ensure smooth 60/120fps interactions.
+-   **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds.
 
 ## Getting Started
 
@@ -30,9 +32,10 @@ InlinePanel(
   anchor: PanelAnchor.left,
   
   // Optional: Define a collapsed "mini" state
-  collapsedSize: 48,
-  toggleIcon: Icon(Icons.chevron_left), 
-  collapsedDecoration: BoxDecoration(color: Colors.grey),
+  // The collapsed size is derived from toggleIconSize + toggleIconPadding
+  icon: Icon(Icons.chevron_left), 
+  toggleIconSize: 24.0,
+  railDecoration: BoxDecoration(color: Colors.grey),
   
   child: SidebarContent(),
 )
@@ -46,6 +49,11 @@ OverlayPanel(
   anchor: PanelAnchor.right,
   anchorTo: const PanelId('sidebar'), // Anchor to another panel!
   width: 300,
+  
+  // Overlay specific properties
+  zIndex: 10,
+  alignment: Alignment.topRight,
+  
   child: SettingsContent(),
 )
 ```
@@ -66,29 +74,29 @@ PanelLayout(
 
 ## Built-in Headers
 
-Panels often need a title bar with actions. `BasePanel` (and its subclasses) now includes built-in support for a standard header.
+Panels often need a title bar with actions. Both `InlinePanel` and `OverlayPanel` include built-in support for a standard header.
 
 ```dart
 InlinePanel(
   id: const PanelId('inspector'),
   // Header configuration
   title: "Inspector",
-  headerIcon: Icon(Icons.close), 
-  headerAction: PanelAction.close, // Defaults to 'collapse' for Inline, 'close' for Overlay
+  icon: Icon(Icons.close), 
+  // Tap action defaults to 'collapse' for Inline, 'close' for Overlay
   
-  // Custom styling (optional, defaults to PanelTheme)
-  headerDecoration: BoxDecoration(color: Colors.grey[200]),
-  headerTextStyle: TextStyle(fontWeight: FontWeight.bold),
+  // Custom styling
+  headerColor: Colors.grey[200],
+  titleStyle: TextStyle(fontWeight: FontWeight.bold),
   
   child: InspectorContent(),
 )
 ```
 
-## Mini Variants & Collapsing
+## Mini Variants & Collapsing (InlinePanel)
 
-You can allow panels to collapse into a "Mini Variant" (like a toolbar or icon rail) by providing a `collapsedSize`.
+You can allow `InlinePanel`s to collapse into a "Mini Variant" (like a toolbar or icon rail). The collapsed size is automatically calculated based on the `toggleIconSize`.
 
-The `toggleIcon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
+The `icon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
 
 ```dart
 InlinePanel(
@@ -96,14 +104,14 @@ InlinePanel(
   width: 200,
   
   // Mini Variant Config
-  collapsedSize: 48,
-  toggleIcon: Icon(Icons.chevron_left),
+  icon: Icon(Icons.chevron_left),
+  toggleIconSize: 24.0,
+  toggleIconPadding: 12.0, // Adds padding around the icon
   
   // Advanced Customization
-  toggleIconSize: 24,
-  toggleIconPadding: 2.0,
-  toggleIconAlignment: Alignment.topCenter, // Control where the icon sits
-  rotateToggleIcon: true, // Default
+  railIconAlignment: Alignment.topCenter, // Control where the icon sits
+  rotateIcon: true, // Default
+  railDecoration: BoxDecoration(color: Colors.blueGrey), // Style the collapsed rail
   
   child: NavContent(),
 )

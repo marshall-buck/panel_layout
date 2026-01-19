@@ -67,7 +67,7 @@ void main() {
                     height: 50,
                     alignment: Alignment.centerRight,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    initialCollapsed: false,
+                    
                     child: Container(),
                   ),
                   // Anchor Bottom, Alignment Center (x=0.0)
@@ -79,7 +79,7 @@ void main() {
                     height: 50,
                     alignment: Alignment.bottomCenter,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    initialCollapsed: false,
+                    
                     child: Container(),
                   ),
                 ],

@@ -44,16 +44,17 @@ class AnimatedPanel extends StatelessWidget {
         ? (config as InlinePanel).collapsedSize
         : 0.0;
 
-    // Use toggleIcon to build the strip widget, fallback to headerIcon
+    // Use icon to build the strip widget
     Widget? stripWidget;
-    final effectiveIcon = config.toggleIcon ?? config.headerIcon;
+    final effectiveIcon = config.icon;
 
-    if (effectiveIcon != null) {
+    if (effectiveIcon != null && config is InlinePanel) {
+      final inline = config as InlinePanel;
       stripWidget = PanelToggleButton(
         icon: effectiveIcon,
         panelId: config.id,
-        closingDirection: config.closingDirection,
-        shouldRotate: config.rotateToggleIcon,
+        closingDirection: inline.closingDirection,
+        shouldRotate: inline.rotateIcon,
       );
     }
 
@@ -109,10 +110,14 @@ class AnimatedPanel extends StatelessWidget {
     }
 
     Alignment stripAlignment = Alignment.center;
+    BoxDecoration? railDecoration;
+
     if (config is InlinePanel) {
       final inline = config as InlinePanel;
-      if (inline.toggleIconAlignment != null) {
-        stripAlignment = inline.toggleIconAlignment!;
+      railDecoration = inline.railDecoration;
+
+      if (inline.railIconAlignment != null) {
+        stripAlignment = inline.railIconAlignment!;
       } else {
         switch (config.anchor) {
           case PanelAnchor.top:
@@ -131,7 +136,7 @@ class AnimatedPanel extends StatelessWidget {
       alignment: _getAlignment(config.anchor),
       children: [
         childWidget,
-        if (stripWidget != null || config.collapsedDecoration != null)
+        if (stripWidget != null || railDecoration != null)
           Positioned(
             left:
                 (config.anchor == PanelAnchor.left ||
@@ -170,7 +175,7 @@ class AnimatedPanel extends StatelessWidget {
               child: Opacity(
                 opacity: collapseFactor.clamp(0.0, 1.0),
                 child: Container(
-                  decoration: config.collapsedDecoration,
+                  decoration: railDecoration,
                   alignment: stripAlignment,
                   child: stripWidget,
                 ),

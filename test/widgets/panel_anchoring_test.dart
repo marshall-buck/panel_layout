@@ -28,7 +28,7 @@ void main() {
                   anchorTo: const PanelId('base'),
                   anchor: PanelAnchor.right,
                   width: 100,
-                  initialCollapsed: false,
+                  
                   child: Container(color: const Color(0xFFFF0000)),
                 ),
               ],
@@ -66,7 +66,7 @@ void main() {
                   id: const PanelId('overlay1'),
                   width: 100,
                   height: 100,
-                  initialCollapsed: false,
+                  
                   // Center of screen roughly? Default alignment is centerLeft of screen if no anchorTo.
                   // Default delegate puts unanchored overlays at top left if alignment not specified?
                   // Let's specify alignment for clarity or rely on default.
@@ -81,7 +81,7 @@ void main() {
                   anchor: PanelAnchor.right, // Should be to the right of overlay1
                   width: 50,
                   height: 50,
-                  initialCollapsed: false,
+                  
                   child: Container(color: const Color(0xFF0000FF)),
                 ),
               ],

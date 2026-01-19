@@ -18,24 +18,23 @@ class InlinePanel extends BasePanel {
     this.maxSize,
     this.toggleIconSize = 24.0,
     this.toggleIconPadding = 1.0,
-    this.toggleIconAlignment,
-    super.toggleIcon,
-    super.closingDirection,
-    super.collapsedDecoration,
+    this.railIconAlignment,
+    this.closingDirection,
+    this.railDecoration,
     this.resizable = true,
     super.initialVisible = true,
     super.initialCollapsed = false,
     super.animationDuration,
     super.animationCurve,
     super.title,
-    super.headerIcon,
+    super.titleStyle,
+    super.icon,
+    super.iconSize,
+    super.iconColor,
     super.decoration,
-    super.headerDecoration,
-    super.headerTextStyle,
-    super.headerIconColor,
-    super.headerIconSize,
-    super.headerAction,
-    super.rotateToggleIcon,
+    super.headerColor,
+    super.headerBorder,
+    this.rotateIcon = true,
     super.key,
   }) : assert(
          (width != null || height != null) ? flex == null : true,
@@ -51,7 +50,7 @@ class InlinePanel extends BasePanel {
   /// The maximum size (width or height) the panel can be resized to.
   final double? maxSize;
 
-  /// The size of the toggle icon. Defaults to 24.0.
+  /// The size of the icon in the collapsed rail. Defaults to 24.0.
   final double toggleIconSize;
 
   /// The padding to add to the toggle icon size when calculating the collapsed panel size.
@@ -62,7 +61,7 @@ class InlinePanel extends BasePanel {
   /// If null, it is automatically determined by the panel's anchor:
   /// - Top/Bottom anchors: [Alignment.centerLeft]
   /// - Left/Right anchors: [Alignment.topCenter]
-  final Alignment? toggleIconAlignment;
+  final Alignment? railIconAlignment;
 
   /// The size of the panel when collapsed.
   ///
@@ -71,6 +70,18 @@ class InlinePanel extends BasePanel {
 
   /// Whether the panel can be resized by the user.
   final bool resizable;
+
+  /// The direction the panel moves when closing.
+  /// Used to determine the rotation of the icon in the rail.
+  /// If null, defaults to [anchor].
+  final PanelAnchor? closingDirection;
+
+  /// Decoration for the collapsed strip container (e.g. background color).
+  final BoxDecoration? railDecoration;
+
+  /// Whether the icon should rotate automatically in the rail based on the panel anchor.
+  /// Defaults to true.
+  final bool rotateIcon;
 
   @override
   bool get isOverlay => false;

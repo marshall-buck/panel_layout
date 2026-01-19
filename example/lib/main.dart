@@ -110,10 +110,8 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           minSize: 150,
           maxSize: 400,
           title: 'EXPLORER',
-          // Icon in header to collapse
-          headerIcon: const Icon(Icons.chevron_left),
-          // Icon in collapsed strip to expand
-          toggleIcon: const Icon(Icons.chevron_left),
+          // Icon used for both header and collapsed rail
+          icon: const Icon(Icons.chevron_left),
           child: ListView.builder(
             itemCount: 20,
             itemBuilder: (context, index) => ListTile(
@@ -152,20 +150,18 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           anchor: PanelAnchor.right,
           width: 280,
           title: 'PROPERTIES',
-          headerIcon: const Icon(Icons.close),
-          toggleIcon: const Icon(Icons.menu),
-
-          // Explicitly set action to CLOSE (hide) instead of the default COLLAPSE
-          headerAction: PanelAction.close,
+          
+          // Icon for toggle (collapse/expand)
+          icon: const Icon(Icons.chevron_right),
 
           // Overriding visual properties for this specific panel
-          headerDecoration: const BoxDecoration(color: Color(0xFF2D2D2D)),
-          headerTextStyle: const TextStyle(
+          headerColor: const Color(0xFF2D2D2D),
+          titleStyle: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 12,
           ),
-          headerIconColor: Colors.white70,
+          iconColor: Colors.white70,
           decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
 
           child: const Center(
@@ -228,7 +224,7 @@ class VerticalSplitTab extends StatelessWidget {
           // - Open: Points Down (v)
           // - Collapsed: Points Up (^)
           // This assumes standard left-chevron input logic.
-          headerIcon: const Icon(Icons.chevron_left),
+          icon: const Icon(Icons.chevron_left),
           child: Container(
             color: Colors.black,
             padding: const EdgeInsets.all(8),
@@ -301,11 +297,10 @@ class _OverlaysTabState extends State<OverlaysTab> {
           anchor: PanelAnchor.right,
           // Start hidden
           initialVisible: false,
-          initialCollapsed: false,
 
           title: 'SETTINGS OVERLAY',
           // Use a close icon for overlays as they usually "dismiss" rather than "collapse" to a strip
-          headerIcon: const Icon(Icons.close),
+          icon: const Icon(Icons.close),
 
           // Distinct decoration to make it pop over the content
           decoration: BoxDecoration(

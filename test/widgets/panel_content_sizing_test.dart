@@ -90,7 +90,7 @@ void main() {
                 OverlayPanel(
                   id: const PanelId('overlay'),
                   width: 200,
-                  initialCollapsed: false,
+                  
                   // Content sizing height (requires shrinkWrap for ListView if no height)
                   child: ListView(
                     shrinkWrap: true,
@@ -136,7 +136,7 @@ void main() {
                   id: const PanelId('fixed'),
                   width: 150,
                   height: 150,
-                  initialCollapsed: false,
+                  
                   child: const Center(child: Text('Fixed')),
                 ),
               ],
@@ -208,7 +208,7 @@ void main() {
                   id: const PanelId('overlay_scroll'),
                   width: 200,
                   height: 300,
-                  initialCollapsed: false,
+                  
                   child: SingleChildScrollView(
                     child: Column(
                       children: List.generate(

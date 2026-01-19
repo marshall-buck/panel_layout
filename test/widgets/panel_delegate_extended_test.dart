@@ -30,7 +30,7 @@ void main() {
                     anchor: PanelAnchor.top,
                     anchorTo: const PanelId('base'),
                     height: 50,
-                    initialCollapsed: false,
+                    
                     child: Container(),
                   ),
                 ],
@@ -71,7 +71,7 @@ void main() {
                     anchor: PanelAnchor.bottom,
                     anchorTo: const PanelId('base'),
                     height: 50,
-                    initialCollapsed: false,
+                    
                     child: Container(),
                   ),
                 ],
@@ -110,7 +110,7 @@ void main() {
                     width: 100,
                     height: 50,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    initialCollapsed: false,
+                    
                     child: Container(),
                   ),
                 ],

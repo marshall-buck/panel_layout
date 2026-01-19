@@ -68,7 +68,7 @@ void main() {
                   anchor: PanelAnchor.right,
                   anchorTo: const PanelId('main'),
                   width: 100,
-                  initialCollapsed: false,
+                  
                   child: const SizedBox.shrink(),
                 ),
               ],

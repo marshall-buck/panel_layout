@@ -20,7 +20,7 @@ void main() {
               OverlayPanel(
                 id: const PanelId('high'),
                 zIndex: 10,
-                initialCollapsed: false,
+                
                 child: Builder(
                   builder: (context) {
                     buildOrder.add('high');
@@ -31,7 +31,7 @@ void main() {
               OverlayPanel(
                 id: const PanelId('low'),
                 zIndex: 1,
-                initialCollapsed: false,
+                
                 child: Builder(
                   builder: (context) {
                     buildOrder.add('low');

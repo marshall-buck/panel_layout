@@ -13,11 +13,7 @@ class OverlayPanel extends BasePanel {
     super.anchorTo,
     super.width,
     super.height,
-    super.toggleIcon,
-    super.closingDirection,
-    super.collapsedDecoration,
     super.initialVisible = true,
-    super.initialCollapsed = false, // Default to false (Expanded)
     super.animationDuration,
     super.animationCurve,
     this.anchorLink,
@@ -25,16 +21,15 @@ class OverlayPanel extends BasePanel {
     this.alignment,
     this.crossAxisAlignment,
     super.title,
-    super.headerIcon,
+    super.titleStyle,
+    super.icon,
+    super.iconSize,
+    super.iconColor,
     super.decoration,
-    super.headerDecoration,
-    super.headerTextStyle,
-    super.headerIconColor,
-    super.headerIconSize,
-    super.headerAction,
-    super.rotateToggleIcon,
+    super.headerColor,
+    super.headerBorder,
     super.key,
-  });
+  }) : super(initialCollapsed: false);
 
   /// A layer link to anchor this panel to an external widget.
   final LayerLink? anchorLink;

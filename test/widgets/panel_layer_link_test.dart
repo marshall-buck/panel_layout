@@ -29,7 +29,7 @@ void main() {
                   OverlayPanel(
                     id: const PanelId('follower'),
                     anchorLink: link,
-                    initialCollapsed: false,
+                    
                     child: const SizedBox(width: 100, height: 100),
                   ),
                 ],

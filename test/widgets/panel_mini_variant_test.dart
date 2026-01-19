@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
+import 'package:panel_layout/src/widgets/panel_toggle_button.dart';
 
 void main() {
   testWidgets('Panel collapse animation respects collapsedSize', (
@@ -20,7 +21,7 @@ void main() {
               toggleIconSize: 50,
               toggleIconPadding: 0,
               initialCollapsed: false,
-              toggleIcon: SizedBox(key: Key('toggle_icon')),
+              icon: SizedBox(key: Key('toggle_icon')),
               child: Container(key: const Key('content')),
             ),
           ],
@@ -30,7 +31,8 @@ void main() {
 
     expect(tester.getSize(find.byType(LayoutId)).width, 200.0);
     expect(find.byKey(const Key('content')), findsOneWidget);
-    expect(find.byKey(const Key('toggle_icon')), findsOneWidget);
+    // Expect 2 icons: One in Header, One in Rail
+    expect(find.byKey(const Key('toggle_icon')), findsNWidgets(2));
 
     final controller = PanelLayout.of(
       tester.element(find.byKey(const Key('content'))),
@@ -62,7 +64,7 @@ void main() {
               toggleIconSize: 50,
               toggleIconPadding: 0,
               anchor: PanelAnchor.left,
-              toggleIcon: const Text('Icon', key: Key('icon_text')),
+              icon: const Text('Icon', key: Key('icon_text')),
               child: const SizedBox(),
             ),
           ],
@@ -70,11 +72,24 @@ void main() {
       ),
     );
 
-    // Find the Transform widget that is an ancestor of the icon text
+    // Target the icon in the Rail (PanelToggleButton)
+    final railIconFinder = find.descendant(
+      of: find.byType(PanelToggleButton),
+      matching: find.byKey(const Key('icon_text')),
+    );
+
+    // Find the Transform widget that is an ancestor of the rail icon text
     final transformFinder = find.ancestor(
-      of: find.byKey(const Key('icon_text')),
+      of: railIconFinder,
       matching: find.byType(Transform),
     );
+
+    // Initial state: Not collapsed, rail might be hidden or opacity 0.
+    // Wait, if not collapsed, the rail is not rendered?
+    // AnimatedPanel logic:
+    // child: Stack(children: [childWidget, if (stripWidget != null) Positioned(...)])
+    // Positioned child: IgnorePointer(ignoring: collapseFactor == 0.0, child: Opacity(...))
+    // So it IS in the tree.
 
     expect(transformFinder, findsOneWidget);
 
@@ -84,7 +99,7 @@ void main() {
     expect(angle, 0.0);
 
     final controller = PanelLayout.of(
-      tester.element(find.byKey(const Key('icon_text'))),
+      tester.element(railIconFinder),
     );
     controller.setCollapsed(id, true);
     await tester.pumpAndSettle();
@@ -111,8 +126,8 @@ void main() {
               width: 200,
               toggleIconSize: 50,
               toggleIconPadding: 0,
-              toggleIcon: SizedBox(),
-              collapsedDecoration: BoxDecoration(color: Color(0xFFFF0000)),
+              icon: SizedBox(),
+              railDecoration: BoxDecoration(color: Color(0xFFFF0000)),
               child: Row(
                 children: [
                   SizedBox(
@@ -130,7 +145,12 @@ void main() {
 
     expect(tester.takeException(), isNull);
 
-    final controller = PanelLayout.of(tester.element(find.byType(Row)));
+    final contentRowFinder = find.ancestor(
+      of: find.text('Wide Content'),
+      matching: find.byType(Row),
+    );
+
+    final controller = PanelLayout.of(tester.element(contentRowFinder));
     controller.setCollapsed(id, true);
 
     await tester.pump();
@@ -160,8 +180,8 @@ void main() {
               toggleIconSize: 40,
               toggleIconPadding: 0,
               anchor: PanelAnchor.top,
-              toggleIcon: SizedBox(key: Key('toggle_icon')),
-              collapsedDecoration: BoxDecoration(color: Color(0xFFFF0000)),
+              icon: SizedBox(key: Key('toggle_icon')),
+              railDecoration: BoxDecoration(color: Color(0xFFFF0000)),
               child: Container(
                 key: const Key('content'),
                 color: const Color(0xFF00FF00),
@@ -172,10 +192,12 @@ void main() {
       ),
     );
 
-    // We can't easily test the strip container frame since it's private in AnimatedPanel stack.
-    // But we can verify the content is at 0,0 and the layout size is correct.
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 0.0);
-    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0);
+    // Header (32.0) pushes content down.
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 32.0);
+    // Height is panel height (200) - header height (32) ?
+    // No, BasePanel is a Column [Header, Expanded(child)].
+    // So child height = 200 - 32 = 168.
+    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0 - 32.0);
 
     final controller = PanelLayout.of(
       tester.element(find.byKey(const Key('content'))),
@@ -185,10 +207,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.getSize(find.byType(LayoutId)).height, 40.0);
-    // Content should still be at top left in the stack, even if clipped/hidden
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 0.0);
+    // Content should still be at top (offset by header)
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 32.0);
 
-    // Verify icon is present
-    expect(find.byKey(const Key('toggle_icon')), findsOneWidget);
+    // Verify icon is present (2 of them)
+    expect(find.byKey(const Key('toggle_icon')), findsNWidgets(2));
   });
 }

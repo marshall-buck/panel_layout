@@ -23,7 +23,7 @@ void main() {
                   alignment: Alignment.topRight,
                   width: 100,
                   height: 100,
-                  initialCollapsed: false,
+                  
                   child: Container(),
                 ),
                 OverlayPanel(
@@ -31,7 +31,7 @@ void main() {
                   alignment: Alignment.bottomLeft,
                   width: 100,
                   height: 100,
-                  initialCollapsed: false,
+                  
                   child: Container(),
                 ),
               ],
