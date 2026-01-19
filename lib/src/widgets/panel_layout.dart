@@ -11,11 +11,36 @@ import '../controllers/panel_layout_controller.dart';
 import 'widgets.dart';
 import 'animated_panel.dart';
 
-/// The declarative orchestrator for the panel layout system.
+/// The root widget of the panel layout system.
 ///
-/// [PanelLayout] manages a list of [BasePanel] children. It tracks their
-/// ephemeral state (like dragged size or collapse state) and calculates
-/// their layout using a custom delegate.
+/// [PanelLayout] is a declarative widget that manages a list of [BasePanel] children,
+/// orchestrating their layout, sizing, and animations.
+///
+/// ### Features:
+/// - **Declarative Configuration**: Define panels as a list of [InlinePanel] and [OverlayPanel] widgets.
+/// - **State Management**: Internally tracks panel sizes (from user resizing) and visibility/collapse states.
+/// - **Controller**: Optionally accepts a [PanelLayoutController] for external programmatic control.
+/// - **Animations**: Automatically handles size and opacity transitions when panel state changes.
+/// - **Resizing**: Renders [PanelResizeHandle]s between adjacent resizable inline panels.
+///
+/// ### Example:
+/// ```dart
+/// PanelLayout(
+///   controller: myController,
+///   children: [
+///     InlinePanel(
+///       id: PanelId('sidebar'),
+///       width: 250,
+///       child: Sidebar(),
+///     ),
+///     InlinePanel(
+///       id: PanelId('content'),
+///       flex: 1,
+///       child: MainContent(),
+///     ),
+///   ],
+/// )
+/// ```
 class PanelLayout extends StatefulWidget {
   /// Creates a declarative panel layout.
   const PanelLayout({
@@ -29,13 +54,20 @@ class PanelLayout extends StatefulWidget {
 
   /// The list of declarative panel configurations.
   ///
-  /// These widgets should extend [BasePanel].
+  /// These widgets should extend [BasePanel] (typically [InlinePanel] or [OverlayPanel]).
+  /// The order of [InlinePanel]s in this list determines their layout order.
   final List<BasePanel> children;
 
   /// An optional controller to manipulate panel state programmatically.
+  ///
+  /// If provided, you must dispose of it yourself. If not provided,
+  /// the layout creates and manages its own internal controller.
   final PanelLayoutController? controller;
 
   /// The main axis of the layout.
+  ///
+  /// - [Axis.horizontal]: Panels are laid out in a row (Left-to-Right).
+  /// - [Axis.vertical]: Panels are laid out in a column (Top-to-Bottom).
   final Axis axis;
 
   /// Optional callback called when a user begins dragging a resize handle.
@@ -57,6 +89,7 @@ class _PanelLayoutState extends State<PanelLayout>
     with TickerProviderStateMixin
     implements PanelLayoutStateInterface {
   /// Internal state for each panel, keyed by ID.
+  /// This persists the "runtime" values like current width (if resized) or visibility.
   final Map<PanelId, PanelRuntimeState> _panelStates = {};
 
   /// Animation controllers for each panel's visibility.
@@ -172,6 +205,8 @@ class _PanelLayoutState extends State<PanelLayout>
     }
   }
 
+  /// Ensures internal state maps match the current list of children.
+  /// Adds missing states and removes orphaned ones.
   void _reconcileState() {
     final currentIds = widget.children.map((p) => p.id).toSet();
 
@@ -231,6 +266,7 @@ class _PanelLayoutState extends State<PanelLayout>
       uniquePanelConfigs[panel.id] = panel;
     }
 
+    // Prepare data for the layout delegate
     final layoutData = uniquePanelConfigs.values.map((config) {
       final state = _panelStates[config.id]!;
       final anim = _animationControllers[config.id]!;
@@ -250,7 +286,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
     final children = <Widget>[];
 
-    // Add Panels
+    // Add Panel Widgets
     for (final panel in uniquePanelConfigs.values) {
       final state = _panelStates[panel.id]!;
       final factor = _animationControllers[panel.id]!.value;
@@ -283,6 +319,7 @@ class _PanelLayoutState extends State<PanelLayout>
       );
     }
 
+    // Add Resize Handles
     for (var i = 0; i < dockedPanels.length - 1; i++) {
       final prev = dockedPanels[i];
       final next = dockedPanels[i + 1];
@@ -324,6 +361,7 @@ class _PanelLayoutState extends State<PanelLayout>
     );
   }
 
+  /// Sorts children to ensure correct painting order (z-index).
   List<Widget> _sortChildren(
     List<Widget> unsorted,
     Map<PanelId, BasePanel> configs,
@@ -366,6 +404,7 @@ class _PanelLayoutState extends State<PanelLayout>
       final prevConfig = prevData.config as InlinePanel;
       final nextConfig = nextData.config as InlinePanel;
 
+      // Case 1: Prev is fixed, Next is whatever. Resize Prev.
       if (prevConfig.flex == null && prevConfig.resizable) {
         final newSize = (prev.size + delta).clamp(
           prevConfig.minSize ?? 0.0,
@@ -375,6 +414,7 @@ class _PanelLayoutState extends State<PanelLayout>
         return;
       }
 
+      // Case 2: Prev is flex (or not resizable), Next is fixed. Resize Next (inverse).
       if (nextConfig.flex == null && nextConfig.resizable) {
         final newSize = (next.size - delta).clamp(
           nextConfig.minSize ?? 0.0,
@@ -384,6 +424,7 @@ class _PanelLayoutState extends State<PanelLayout>
         return;
       }
 
+      // Case 3: Both are flexible. Adjust flex weights.
       if (prevConfig.flex != null &&
           nextConfig.flex != null &&
           prevConfig.resizable &&

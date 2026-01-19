@@ -12,6 +12,9 @@ import 'package:meta/meta.dart';
 ///
 /// It strictly expects a left-pointing chevron icon and automatically rotates
 /// it based on the [closingDirection] or the panel's anchor.
+///
+/// This component is used internally by [BasePanel] headers and by [AnimatedPanel]
+/// in the collapsed rail strip.
 @internal
 class PanelToggleButton extends StatelessWidget {
   const PanelToggleButton({

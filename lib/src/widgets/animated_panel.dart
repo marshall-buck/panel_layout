@@ -7,6 +7,11 @@ import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
 
 /// An internal wrapper that handles animations for a panel's size and visibility.
+///
+/// This widget is responsible for:
+/// 1. Interpolating the size of the panel based on [factor] (visibility) and [collapseFactor] (rail).
+/// 2. Managing the opacity cross-fade between the full panel content and the collapsed rail.
+/// 3. Clipping the content during transitions.
 @internal
 class AnimatedPanel extends StatelessWidget {
   const AnimatedPanel({

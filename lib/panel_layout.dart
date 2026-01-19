@@ -1,3 +1,5 @@
+library;
+
 export 'src/controllers/controllers.dart';
 export 'src/debug_flag.dart';
 export 'src/models/models.dart';

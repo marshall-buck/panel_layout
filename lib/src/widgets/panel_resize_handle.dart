@@ -6,6 +6,8 @@ import '../theme/resize_handle_theme.dart';
 ///
 /// This widget renders a transparent hit target that captures drag gestures
 /// and reports the delta back to the parent [PanelLayout].
+///
+/// It does not manage size state itself; it only invokes callbacks.
 class PanelResizeHandle extends StatelessWidget {
   /// Creates a [PanelResizeHandle].
   const PanelResizeHandle({

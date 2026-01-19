@@ -4,7 +4,10 @@ import '../controllers/panel_layout_controller.dart';
 
 /// An inherited widget that exposes the [PanelLayoutController] to the widget tree.
 ///
-/// Use [PanelLayout.of] to access the controller.
+/// This allows any descendant widget to control the layout (e.g., toggle panels)
+/// without needing the controller passed down explicitly.
+///
+/// Use [PanelLayout.of] or [PanelScope.of] to access the controller.
 class PanelScope extends InheritedWidget {
   /// Creates a [PanelScope].
   const PanelScope({required this.controller, required super.child, super.key});

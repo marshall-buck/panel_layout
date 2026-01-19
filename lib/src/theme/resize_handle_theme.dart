@@ -4,6 +4,9 @@ import 'package:equatable/equatable.dart';
 import '../constants.dart';
 
 /// Defines the visual styling for the resize handles in the layout system.
+///
+/// Resize handles appear between resizable inline panels.
+/// You can customize their color, width, and add an optional grip icon.
 @immutable
 class ResizeHandleThemeData extends Equatable {
   /// Creates a [ResizeHandleThemeData].
@@ -17,16 +20,17 @@ class ResizeHandleThemeData extends Equatable {
     this.iconAlignment = Alignment.center,
   });
 
-  /// The color of the resize handle.
+  /// The color of the resize handle line.
   final Color color;
 
-  /// The visual width of the resize handle.
+  /// The visual width of the resize handle line.
   final double width;
 
   /// The width of the area that captures mouse events for resizing.
+  /// Increasing this makes the handle easier to grab without making it visually thicker.
   final double hitTestWidth;
 
-  /// The optional icon to display in the resize handle (e.g., a grip).
+  /// The optional icon to display in the resize handle (e.g., a grip or dots).
   final IconData? icon;
 
   /// The color of the resize handle icon.

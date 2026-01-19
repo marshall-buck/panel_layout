@@ -172,6 +172,27 @@ ResizeHandleTheme(
 )
 ```
 
+## Global Panel Styling
+
+You can style all panels in a subtree using `PanelTheme`. This is useful for setting a consistent header height, decoration, or font style across your entire app.
+
+```dart
+PanelTheme(
+  data: PanelThemeData(
+    headerHeight: 32.0,
+    headerDecoration: BoxDecoration(
+      color: Colors.grey[900],
+      border: Border(bottom: BorderSide(color: Colors.black)),
+    ),
+    headerTextStyle: TextStyle(fontSize: 12, color: Colors.white),
+    panelDecoration: BoxDecoration(
+      color: Colors.grey[800],
+    ),
+  ),
+  child: PanelLayout(...),
+)
+```
+
 ## Installation
 
 Add `panel_layout` to your `pubspec.yaml`:

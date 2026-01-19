@@ -10,6 +10,17 @@ import 'layout_data.dart';
 ///
 /// This is the "brain" of the layout engine, responsible for positioning
 /// inline and overlay panels according to their anchors and sizes.
+///
+/// ## Layout Algorithm
+/// 1. **Inline Panels**:
+///    - Measure fixed panels and content-sized panels.
+///    - Calculate remaining space.
+///    - Measure flexible panels based on their flex weights.
+///    - Position all inline panels (and resize handles) sequentially.
+/// 2. **Overlay Panels**:
+///    - Determine anchor rects (from inline panels or global layout).
+///    - Measure overlays based on constraints (e.g., match anchor width).
+///    - Position overlays using alignment or relative offsets.
 @internal
 class PanelLayoutDelegate extends MultiChildLayoutDelegate {
   PanelLayoutDelegate({

@@ -5,7 +5,12 @@ import 'base_panel.dart';
 
 /// A panel that participates in the linear layout (Row/Column).
 ///
-/// Inline panels push other panels aside and can be resized or flexed.
+/// Inline panels are tiled next to each other. They can be:
+/// - **Fixed**: Specific [width] or [height].
+/// - **Flexible**: Takes up remaining space based on [flex].
+/// - **Content Sized**: Sized to its content if both fixed and flex are null.
+///
+/// Inline panels can be **collapsed** into a thin "rail" showing only the icon.
 class InlinePanel extends BasePanel {
   const InlinePanel({
     required super.id,
@@ -23,7 +28,9 @@ class InlinePanel extends BasePanel {
     this.closingDirection,
     this.railDecoration,
     this.resizable = true,
+    /// Whether the panel is initially visible.
     super.initialVisible = true,
+    /// Whether the panel is initially collapsed into a rail.
     super.initialCollapsed = false,
     super.animationDuration,
     super.animationCurve,
@@ -42,37 +49,42 @@ class InlinePanel extends BasePanel {
          'Cannot provide both fixed size (width/height) and flex.',
        );
 
-  /// The flex factor for fluid sizing. Use this or [width]/[height], not both.
+  /// The flex factor for fluid sizing.
+  ///
+  /// If non-null, the panel will expand to fill available space relative to other flexible panels.
+  /// Use this OR [width]/[height], not both.
   final double? flex;
 
-  /// The minimum size (width or height) the panel can be resized to.
+  /// The minimum size (width or height) the panel can be resized to by the user.
   final double? minSize;
 
-  /// The maximum size (width or height) the panel can be resized to.
+  /// The maximum size (width or height) the panel can be resized to by the user.
   final double? maxSize;
 
   /// The size of the icon in the collapsed rail. Defaults to 24.0.
   final double toggleIconSize;
 
-  /// The padding to add to the toggle icon size when calculating the collapsed panel size.
+  /// The padding to add to the toggle icon size when calculating the collapsed rail size.
   /// Defaults to 1.0.
   final double toggleIconPadding;
 
   /// The alignment of the toggle icon within the collapsed strip.
-  /// If null, it is automatically determined by the panel's anchor:
-  /// - Top/Bottom anchors: [Alignment.centerLeft]
-  /// - Left/Right anchors: [Alignment.topCenter]
+  ///
+  /// If null, it is automatically determined by the panel's [anchor]:
+  /// - Top/Bottom anchors: [Alignment.centerRight] (usually).
+  /// - Left/Right anchors: [Alignment.topCenter].
   final Alignment? railIconAlignment;
 
-  /// The size of the panel when collapsed.
+  /// The total size of the panel when collapsed.
   ///
   /// Calculated as [toggleIconSize] + [toggleIconPadding].
   double get collapsedSize => toggleIconSize + toggleIconPadding;
 
-  /// Whether the panel can be resized by the user.
+  /// Whether the panel can be manually resized by the user (via drag handle).
   final bool resizable;
 
-  /// The direction the panel moves when closing.
+  /// The direction the panel moves when closing (collapsing).
+  ///
   /// Used to determine the rotation of the icon in the rail.
   /// If null, defaults to [anchor].
   final PanelAnchor? closingDirection;

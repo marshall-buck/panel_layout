@@ -4,7 +4,12 @@ import '../widgets/base_panel.dart';
 
 /// An inherited widget that exposes the runtime state and configuration of a specific panel.
 ///
-/// Use [PanelDataScope.of] to access the data.
+/// This widget is automatically injected by [PanelLayout] for each of its children.
+/// Use [PanelDataScope.of] within a custom panel builder to access data like
+/// current size, visibility, or collapse state.
+///
+/// This is useful if you want your panel content to react to its own state
+/// (e.g., showing a different widget when collapsed).
 class PanelDataScope extends InheritedModel<String> {
   const PanelDataScope({
     required this.state,
@@ -13,7 +18,10 @@ class PanelDataScope extends InheritedModel<String> {
     super.key,
   });
 
+  /// The dynamic runtime state of the panel (size, visibility, etc.).
   final PanelRuntimeState state;
+
+  /// The static configuration of the panel (ID, initial settings).
   final BasePanel config;
 
   /// Retrieves the closest [PanelDataScope] instance.
@@ -22,6 +30,8 @@ class PanelDataScope extends InheritedModel<String> {
   }
 
   /// Retrieves the runtime state from the closest [PanelDataScope].
+  ///
+  /// Throws an error if no scope is found.
   static PanelRuntimeState of(BuildContext context) {
     return maybeOf(context)!.state;
   }

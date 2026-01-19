@@ -2,6 +2,20 @@ import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines the visual styling for panels and their headers.
+///
+/// You can provide a [PanelTheme] widget above your [PanelLayout] to
+/// automatically apply these styles to all panels in the subtree.
+///
+/// Example:
+/// ```dart
+/// PanelTheme(
+///   data: PanelThemeData(
+///     headerHeight: 40.0,
+///     headerDecoration: BoxDecoration(color: Colors.grey[200]),
+///   ),
+///   child: PanelLayout(...),
+/// )
+/// ```
 @immutable
 class PanelThemeData extends Equatable {
   const PanelThemeData({

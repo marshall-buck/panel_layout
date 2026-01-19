@@ -5,10 +5,12 @@ import '../widgets/inline_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
 
-/// A unified data structure for the layout engine.
+/// A unified data structure used by the [PanelLayoutDelegate].
 ///
 /// It combines the static configuration from [BasePanel] with the
-/// dynamic runtime state from [PanelRuntimeState].
+/// dynamic runtime state from [PanelRuntimeState], along with current animation values.
+///
+/// This class acts as the "snapshot" of a panel for a single layout pass.
 @internal
 class PanelLayoutData {
   PanelLayoutData({
@@ -25,6 +27,7 @@ class PanelLayoutData {
   final PanelRuntimeState state;
 
   /// The current animation factor (0.0 to 1.0) for visibility.
+  /// 1.0 = Fully Visible, 0.0 = Hidden.
   final double visualFactor;
 
   /// The current animation factor (0.0 to 1.0) for collapse.
@@ -32,6 +35,10 @@ class PanelLayoutData {
   final double collapseFactor;
 
   /// Calculated effective size for layout.
+  ///
+  /// Takes into account the current size (or flex) and interpolates it
+  /// based on the [collapseFactor]. If the panel is collapsing, it shrinks
+  /// towards the rail size.
   double get effectiveSize {
     // If factor is 0, we take 0 space.
     // If factor is 1, we take full size.
@@ -46,6 +53,7 @@ class PanelLayoutData {
     return currentSize * visualFactor;
   }
 
+  /// The width to use for animation purposes (for Overlay panels).
   double? get animatedWidth {
     if (config.width == null) return null;
     final base = config.width!;
@@ -56,6 +64,7 @@ class PanelLayoutData {
     return current * visualFactor;
   }
 
+  /// The height to use for animation purposes (for Overlay panels).
   double? get animatedHeight {
     if (config.height == null) return null;
     final base = config.height!;

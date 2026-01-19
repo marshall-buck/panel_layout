@@ -5,9 +5,14 @@ import '../theme/panel_theme.dart';
 import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
 
-/// An abstract base class for panels in a [PanelLayout].
+/// An abstract configuration class for panels in a [PanelLayout].
 ///
-/// Defines properties shared by both [InlinePanel] and [OverlayPanel].
+/// **Do not implement this class directly.** Instead, use one of the concrete implementations:
+/// - [InlinePanel]: For panels that share space in a linear layout (Row/Column).
+/// - [OverlayPanel]: For floating panels that sit on top of others.
+///
+/// This class defines the shared properties for identification, initial state,
+/// and basic visual styling (header, icon, background).
 abstract class BasePanel extends StatelessWidget {
   const BasePanel({
     required this.id,
@@ -32,43 +37,55 @@ abstract class BasePanel extends StatelessWidget {
   });
 
   /// The unique identifier for this panel.
+  ///
+  /// Required for state management (visibility, collapsing) and layout linkage.
   final PanelId id;
 
   /// The content to display within the panel.
   final Widget child;
 
-  /// The edge or direction to which the panel is anchored.
+  /// The edge or direction to which the panel is logically anchored.
+  ///
+  /// - For [InlinePanel]: Determines the resize handle position and collapse animation.
+  /// - For [OverlayPanel]: Determines where the panel is positioned relative to its target.
   final PanelAnchor anchor;
 
   /// The ID of another panel to anchor this one to.
+  ///
+  /// If provided, this panel will try to position itself relative to the target panel.
   final PanelId? anchorTo;
 
   /// The initial fixed width of the panel.
+  /// Use this for fixed-size panels.
   final double? width;
 
   /// The initial fixed height of the panel.
+  /// Use this for fixed-size panels.
   final double? height;
 
-  /// Whether the panel is initially visible.
+  /// Whether the panel is initially visible when the layout is first built.
   final bool initialVisible;
 
-  /// Whether the panel is initially collapsed.
+  /// Whether the panel is initially collapsed (minimized) when the layout is first built.
   final bool initialCollapsed;
 
-  /// Optional override for animation duration.
+  /// Optional override for the duration of size/visibility animations.
   final Duration? animationDuration;
 
-  /// Optional override for animation curve.
+  /// Optional override for the curve of size/visibility animations.
   final Curve? animationCurve;
 
   /// The title to display in the header.
-  /// If null, no header is shown unless [icon] is provided.
+  ///
+  /// If null, no header text is shown.
   final String? title;
 
   /// Text style override for the header title.
   final TextStyle? titleStyle;
 
-  /// The primary icon for the panel (used in header and collapsed rail).
+  /// The primary icon for the panel.
+  ///
+  /// Displayed in the header (if present) and in the collapsed rail (for [InlinePanel]).
   final Widget? icon;
 
   /// Size override for the icon.
@@ -77,7 +94,9 @@ abstract class BasePanel extends StatelessWidget {
   /// Color override for the icon.
   final Color? iconColor;
 
-  /// Decoration for the panel container.
+  /// Decoration for the panel container (background, border, shadow).
+  ///
+  /// If null, defaults to [PanelThemeData.panelDecoration].
   final BoxDecoration? decoration;
 
   /// Background color for the header.
@@ -87,10 +106,12 @@ abstract class BasePanel extends StatelessWidget {
   final BoxBorder? headerBorder;
 
   /// Handles the action when the header icon is tapped.
+  ///
+  /// Implementations define whether this toggles collapse or visibility.
   @protected
   void onHeaderIconTap(BuildContext context);
 
-  /// Builds the internal layout of the panel (inside the styled Container).
+  /// Builds the internal layout of the panel (wrapping content with header if needed).
   @protected
   Widget buildPanelLayout(BuildContext context, Widget? header, Widget content);
 
