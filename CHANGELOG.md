@@ -1,3 +1,17 @@
+## 0.5.4
+
+*   **Breaking**: Internalized core widgets. `PanelResizeHandle`, `AnimatedPanel`, and `PanelToggleButton` are now `@internal` and no longer exported.
+*   **Breaking**: Header structure refactored. The icon/title order in `BasePanel` now depends on the `anchor` to ensure visual consistency.
+*   **Feat**: Added `onResizeStart` and `onResizeEnd` callbacks to `PanelLayout`.
+*   **Feat**: Added `InlinePanel.closingDirection` to override automatic icon rotation logic.
+*   **Feat**: Added `InlinePanel.resizable` to toggle manual resizing per panel.
+*   **Feat**: Added `OverlayPanel.crossAxisAlignment` to support stretching overlays.
+*   **Feat**: `PanelThemeData.railPadding` is now themeable.
+*   **Fix**: Vertically centered rail icons within `headerHeight` in `AnimatedPanel` to match header positioning for side-anchored panels.
+*   **Fix**: Fixed "jumping icons" for Left-anchored panels by keeping the icon on the left in both expanded and rail states.
+*   **Fix**: Resolved 'BoxConstraints forces an infinite width' error in layout clipping for fixed-size panels.
+*   **Fix**: Improved state reconciliation when dynamically adding/removing panels from the layout.
+
 ## 0.5.3
 
 *   **Refactor (Breaking)**: Removed `toggleIcon`, `toggleIconSize`, and `toggleIconPadding`. Panels now use a single `icon` and `iconSize`.
