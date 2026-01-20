@@ -243,7 +243,7 @@ class VerticalSplitTab extends StatelessWidget {
 
 // -----------------------------------------------------------------------------
 // Tab 3: Overlays
-// Demonstrates: Overlay panels, Anchor positioning
+// Demonstrates: Overlay panels, Anchor positioning, Z-Order
 // -----------------------------------------------------------------------------
 class OverlaysTab extends StatefulWidget {
   const OverlaysTab({super.key});
@@ -266,7 +266,42 @@ class _OverlaysTabState extends State<OverlaysTab> {
     return PanelLayout(
       controller: _controller,
       children: [
-        // Background Content
+        // 1. Z-Order Demo: Popover Overlay
+        // Placed FIRST in the list so it paints BEHIND the Right Sidebar.
+        // Anchored to the LEFT of 'right_sidebar'.
+        OverlayPanel(
+          id: const PanelId('popover_behind'),
+          anchorTo: const PanelId('right_sidebar'),
+          anchor: PanelAnchor.left,
+          width: 200,
+          initialVisible: false,
+          title: 'POPOVER',
+          icon: const Icon(Icons.close),
+          panelBoxDecoration: BoxDecoration(
+            color: Colors.amber[50],
+            border: Border.all(color: Colors.amber[300]!),
+            // Shadow ensures it looks like a distinct layer, but z-order puts it "under" the sidebar
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(-5, 0),
+              ),
+            ],
+          ),
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'I animated out from BEHIND the sidebar!',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.brown),
+              ),
+            ),
+          ),
+        ),
+
+        // 2. Main Content
         InlinePanel(
           id: const PanelId('bg'),
           flex: 1,
@@ -274,21 +309,47 @@ class _OverlaysTabState extends State<OverlaysTab> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Press the button to show overlay'),
+                const Text('Main Content Area'),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     _controller.setVisible(const PanelId('overlay'), true);
                   },
-                  child: const Text('Open Settings Overlay'),
+                  child: const Text('Open Global Overlay'),
                 ),
               ],
             ),
           ),
         ),
 
-        // 3. Overlay Panel
-        // 4. Correct icon usage (Close icon for overlay)
+        // 3. Right Sidebar
+        // Anchored Right. The 'popover_behind' attaches to this panel's left edge.
+        InlinePanel(
+          id: const PanelId('right_sidebar'),
+          anchor: PanelAnchor.right,
+          width: 250,
+          title: 'SIDEBAR',
+          icon: const Icon(Icons.chevron_right),
+          child: Column(
+            children: [
+              const ListTile(
+                title: Text('Sidebar Content'),
+                subtitle: Text('Click below to test Z-Order'),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    _controller.toggleVisible(const PanelId('popover_behind'));
+                  },
+                  child: const Text('Toggle Popover (Behind)'),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 4. Global Overlay (Existing)
         OverlayPanel(
           id: const PanelId('overlay'),
           width: 300,
