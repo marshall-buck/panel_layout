@@ -26,6 +26,7 @@ class OverlayPanel extends BasePanel {
     this.crossAxisAlignment,
     super.title,
     super.titleStyle,
+    super.headerHeight,
     super.icon,
     super.iconSize,
     super.iconColor,

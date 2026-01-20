@@ -35,7 +35,7 @@ const kDefaultHandleActiveColor = Color(0x99000000);
 const kDefaultHandleIconColor = Color(0xAA000000);
 
 // --- Panel Dimensions & Styling ---
-// TODO: add props to theme and panel props for overrides
+
 /// The default height of the panel header.
 const kDefaultHeaderHeight = 24.0;
 

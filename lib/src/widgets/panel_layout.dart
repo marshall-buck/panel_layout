@@ -278,7 +278,7 @@ class _PanelLayoutState extends State<PanelLayout>
       double collapsedSize = 0.0;
       if (config is InlinePanel) {
         final iconSize = config.iconSize ?? theme.iconSize;
-        collapsedSize = iconSize + kDefaultRailPadding;
+        collapsedSize = iconSize + (config.railPadding ?? theme.railPadding);
       }
 
       return PanelLayoutData(

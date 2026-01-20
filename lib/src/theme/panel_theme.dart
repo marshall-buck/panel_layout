@@ -27,6 +27,7 @@ class PanelThemeData extends Equatable {
     this.iconSize = kDefaultIconSize,
     this.panelBoxDecoration,
     this.railDecoration,
+    this.railPadding = kDefaultRailPadding,
   });
 
   /// The height of the panel header.
@@ -50,6 +51,9 @@ class PanelThemeData extends Equatable {
   /// The decoration (background, border) for the collapsed rail.
   final BoxDecoration? railDecoration;
 
+  /// The total padding (horizontal + vertical depending on axis) around the icon in the rail.
+  final double railPadding;
+
   @override
   List<Object?> get props => [
         headerHeight,
@@ -59,6 +63,7 @@ class PanelThemeData extends Equatable {
         iconSize,
         panelBoxDecoration,
         railDecoration,
+        railPadding,
       ];
 
   PanelThemeData copyWith({
@@ -69,6 +74,7 @@ class PanelThemeData extends Equatable {
     double? iconSize,
     BoxDecoration? panelBoxDecoration,
     BoxDecoration? railDecoration,
+    double? railPadding,
   }) {
     return PanelThemeData(
       headerHeight: headerHeight ?? this.headerHeight,
@@ -78,6 +84,7 @@ class PanelThemeData extends Equatable {
       iconSize: iconSize ?? this.iconSize,
       panelBoxDecoration: panelBoxDecoration ?? this.panelBoxDecoration,
       railDecoration: railDecoration ?? this.railDecoration,
+      railPadding: railPadding ?? this.railPadding,
     );
   }
 }

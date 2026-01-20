@@ -110,6 +110,7 @@ InlinePanel(
   railIconAlignment: Alignment.topCenter, // Control where the icon sits
   rotateIcon: true, // Default
   railDecoration: BoxDecoration(color: Colors.blueGrey), // Style the collapsed rail
+  railPadding: 16.0, // Optional: Override default padding (18.0)
 
   child: NavContent(),
 )
@@ -186,6 +187,9 @@ PanelTheme(
     panelBoxDecoration: BoxDecoration(
       color: Colors.grey[800],
     ),
+    // New: Global settings for rail padding and icons
+    railPadding: 16.0,
+    iconSize: 20.0,
   ),
   child: PanelLayout(...),
 )

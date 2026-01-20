@@ -27,6 +27,7 @@ abstract class BasePanel extends StatelessWidget {
     this.animationCurve,
     this.title,
     this.titleStyle,
+    this.headerHeight,
     this.icon,
     this.iconSize,
     this.iconColor,
@@ -82,6 +83,9 @@ abstract class BasePanel extends StatelessWidget {
   /// Text style override for the header title.
   final TextStyle? titleStyle;
 
+  /// The height of the panel header.
+  final double? headerHeight;
+
   /// The primary icon for the panel.
   ///
   /// Displayed in the header (if present) and in the collapsed rail (for [InlinePanel]).
@@ -126,7 +130,7 @@ abstract class BasePanel extends StatelessWidget {
           headerDecoration ?? theme.headerDecoration;
 
       header = Container(
-        height: theme.headerHeight,
+        height: headerHeight ?? theme.headerHeight,
         decoration: effectiveHeaderDecoration,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(

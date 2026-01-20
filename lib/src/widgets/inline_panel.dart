@@ -34,11 +34,13 @@ class InlinePanel extends BasePanel {
     super.animationCurve,
     super.title,
     super.titleStyle,
+    super.headerHeight,
     super.icon,
     super.iconSize,
     super.iconColor,
     super.panelBoxDecoration,
     super.headerDecoration,
+    this.railPadding,
     this.rotateIcon = true,
     super.key,
   }) : assert(
@@ -76,6 +78,9 @@ class InlinePanel extends BasePanel {
 
   /// Decoration for the collapsed strip container (e.g. background color).
   final BoxDecoration? railDecoration;
+
+  /// Padding around the icon in the collapsed rail.
+  final double? railPadding;
 
   /// Whether the icon should rotate automatically in the rail based on the panel anchor.
   /// Defaults to true.

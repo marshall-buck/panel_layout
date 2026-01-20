@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
 import '../theme/panel_theme.dart';
-import '../constants.dart';
 import 'base_panel.dart';
 import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
@@ -64,8 +63,9 @@ class AnimatedPanel extends StatelessWidget {
     // Determine the size of the "Rail" (collapsed state).
     // Currently only InlinePanels support a rail state.
     if (config is InlinePanel) {
-      iconSize = config.iconSize ?? theme.iconSize;
-      collapsed = iconSize + kDefaultRailPadding;
+      final inline = config as InlinePanel;
+      iconSize = inline.iconSize ?? theme.iconSize;
+      collapsed = iconSize + (inline.railPadding ?? theme.railPadding);
     }
 
     // Interpolate size between Expanded (fullSize) and Collapsed state.
@@ -257,7 +257,7 @@ class AnimatedPanel extends StatelessWidget {
     if (config.anchor == PanelAnchor.left ||
         config.anchor == PanelAnchor.right) {
       railContent = SizedBox(
-        height: theme.headerHeight,
+        height: config.headerHeight ?? theme.headerHeight,
         child: Center(child: railContent),
       );
     }
