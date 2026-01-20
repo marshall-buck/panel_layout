@@ -54,7 +54,7 @@ class AnimatedPanel extends StatelessWidget {
     }
 
     final theme = PanelTheme.of(context);
-    final base = state.size;
+    final fullSize = state.size;
 
     // --- 1. Calculate Target Sizes ---
 
@@ -68,10 +68,10 @@ class AnimatedPanel extends StatelessWidget {
       collapsed = iconSize + kDefaultRailPadding;
     }
 
-    // Interpolate size between Expanded (base) and Collapsed state.
-    // collapseFactor 0.0 -> base size
+    // Interpolate size between Expanded (fullSize) and Collapsed state.
+    // collapseFactor 0.0 -> fullSize
     // collapseFactor 1.0 -> collapsed size
-    final currentSize = base + (collapsed - base) * collapseFactor;
+    final currentSize = fullSize + (collapsed - fullSize) * collapseFactor;
 
     // Apply visibility factor.
     // factor 1.0 -> full computed size
@@ -167,27 +167,33 @@ class AnimatedPanel extends StatelessWidget {
             // Pin the rail to the correct edge based on anchor.
             // For Left/Right anchors, it's a vertical strip (top:0, bottom:0).
             // For Top/Bottom anchors, it's a horizontal strip (left:0, right:0).
-            left: (config.anchor == PanelAnchor.left ||
+            left:
+                (config.anchor == PanelAnchor.left ||
                     config.anchor == PanelAnchor.right)
                 ? (config.anchor == PanelAnchor.left ? 0 : null)
                 : 0,
-            right: (config.anchor == PanelAnchor.left ||
+            right:
+                (config.anchor == PanelAnchor.left ||
                     config.anchor == PanelAnchor.right)
                 ? (config.anchor == PanelAnchor.right ? 0 : null)
                 : 0,
-            top: (config.anchor == PanelAnchor.top ||
+            top:
+                (config.anchor == PanelAnchor.top ||
                     config.anchor == PanelAnchor.bottom)
                 ? (config.anchor == PanelAnchor.top ? 0 : null)
                 : 0,
-            bottom: (config.anchor == PanelAnchor.top ||
+            bottom:
+                (config.anchor == PanelAnchor.top ||
                     config.anchor == PanelAnchor.bottom)
                 ? (config.anchor == PanelAnchor.bottom ? 0 : null)
                 : 0,
-            width: (config.anchor == PanelAnchor.left ||
+            width:
+                (config.anchor == PanelAnchor.left ||
                     config.anchor == PanelAnchor.right)
                 ? railSize
                 : null,
-            height: (config.anchor == PanelAnchor.top ||
+            height:
+                (config.anchor == PanelAnchor.top ||
                     config.anchor == PanelAnchor.bottom)
                 ? railSize
                 : null,
@@ -271,7 +277,7 @@ class AnimatedPanel extends StatelessWidget {
   BoxDecoration? _getRailDecoration(PanelThemeData theme) {
     if (config is! InlinePanel) return null;
     final inline = config as InlinePanel;
-    
+
     BoxDecoration? decoration = inline.railDecoration ?? theme.railDecoration;
 
     // Fallback: If no specific rail decoration is provided, try to match the
