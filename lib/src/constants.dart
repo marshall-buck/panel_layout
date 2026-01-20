@@ -35,12 +35,12 @@ const kDefaultHandleActiveColor = Color(0x99000000);
 const kDefaultHandleIconColor = Color(0xAA000000);
 
 // --- Panel Dimensions & Styling ---
-
+// TODO: add props to theme and panel props for overrides
 /// The default height of the panel header.
 const kDefaultHeaderHeight = 24.0;
 
 /// The default size of the panel icon (used in header and rail).
-const kDefaultIconSize = 16.0;
+const kDefaultIconSize = 24.0;
 
 /// The default total horizontal/vertical padding for the rail around the icon.
-const kDefaultRailPadding = 2.0;
+const kDefaultRailPadding = 18.0;

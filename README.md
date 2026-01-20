@@ -30,12 +30,12 @@ InlinePanel(
   minSize: 100,
   maxSize: 400,
   anchor: PanelAnchor.left,
-  
+
   // Optional: Define a collapsed "mini" state
   // The collapsed size is derived from iconSize + standard padding
-  icon: Icon(Icons.chevron_left), 
+  icon: Icon(Icons.chevron_left),
   railDecoration: BoxDecoration(color: Colors.grey),
-  
+
   child: SidebarContent(),
 )
 ```
@@ -48,11 +48,11 @@ OverlayPanel(
   anchor: PanelAnchor.right,
   anchorTo: const PanelId('sidebar'), // Anchor to another panel!
   width: 300,
-  
+
   // Overlay specific properties
   zIndex: 10,
   alignment: Alignment.topRight,
-  
+
   child: SettingsContent(),
 )
 ```
@@ -80,20 +80,20 @@ InlinePanel(
   id: const PanelId('inspector'),
   // Header configuration
   title: "Inspector",
-  icon: Icon(Icons.close), 
+  icon: Icon(Icons.close),
   // Tap action defaults to 'collapse' for Inline, 'close' for Overlay
-  
+
   // Custom styling
   headerDecoration: BoxDecoration(color: Colors.grey[200]),
   titleStyle: TextStyle(fontWeight: FontWeight.bold),
-  
+
   child: InspectorContent(),
 )
 ```
 
 ## Mini Variants & Collapsing (InlinePanel)
 
-You can allow `InlinePanel`s to collapse into a "Mini Variant" (like a toolbar or icon rail). The collapsed size is automatically calculated based on the `iconSize`.
+You can allow `InlinePanel`s to collapse into an icon rail. The collapsed size is automatically calculated based on the `iconSize`.
 
 The `icon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
 
@@ -101,16 +101,16 @@ The `icon` property allows you to provide an icon (typically a chevron) that wil
 InlinePanel(
   id: const PanelId('nav'),
   width: 200,
-  
+
   // Mini Variant Config
   icon: Icon(Icons.chevron_left),
   iconSize: 24.0,
-  
+
   // Advanced Customization
   railIconAlignment: Alignment.topCenter, // Control where the icon sits
   rotateIcon: true, // Default
   railDecoration: BoxDecoration(color: Colors.blueGrey), // Style the collapsed rail
-  
+
   child: NavContent(),
 )
 ```
@@ -144,7 +144,7 @@ class SidebarContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = PanelDataScope.of(context);
-    
+
     return Column(
       children: [
         if (!state.collapsed) Text("I am expanded!"),
@@ -191,13 +191,3 @@ PanelTheme(
 )
 ```
 
-## Installation
-
-Add `panel_layout` to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  panel_layout:
-    git:
-      url: https://github.com/marshall-buck/panel_layout.git
-```
