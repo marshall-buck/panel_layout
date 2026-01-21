@@ -108,7 +108,8 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           width: 250,
           minSize: 150,
           maxSize: 400,
-          title: 'EXPLORER',
+          headerHeight: 48,
+          title: 'headerHeight: 48',
           // Icon used for both header and collapsed rail
           icon: const Icon(Icons.chevron_left),
           child: ListView.builder(
@@ -151,7 +152,8 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           title: 'PROPERTIES',
 
           // Icon for toggle (collapse/expand)
-          icon: const Icon(Icons.chevron_right),
+          // ALWAYS use chevron_left. The system rotates it.
+          icon: const Icon(Icons.chevron_left),
 
           // Overriding visual properties for this specific panel
           headerDecoration: const BoxDecoration(color: Color(0xFF2D2D2D)),
@@ -195,6 +197,8 @@ class VerticalSplitTab extends StatelessWidget {
           height: 60,
           resizable: false, // User cannot resize this
           title: 'TOOLBAR (FIXED)',
+          // Add chevron_left to demonstrate rotation (Should point Down v when open, Up ^ when collapsed)
+          icon: const Icon(Icons.chevron_left),
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -253,116 +257,138 @@ class OverlaysTab extends StatefulWidget {
 }
 
 class _OverlaysTabState extends State<OverlaysTab> {
-  final _controller = PanelLayoutController();
+  final _rootController = PanelLayoutController();
+  final _innerController = PanelLayoutController();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _rootController.dispose();
+    _innerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // ROOT LAYOUT: Vertical
+    // Manages the Top Bar, the Content Area, and Global Overlays.
     return PanelLayout(
-      controller: _controller,
+      controller: _rootController,
+      axis: Axis.vertical,
       children: [
-        // 1. Z-Order Demo: Popover Overlay
-        // Placed FIRST in the list so it paints BEHIND the Right Sidebar.
-        // Anchored to the LEFT of 'right_sidebar'.
-        OverlayPanel(
-          id: const PanelId('popover_behind'),
-          anchorTo: const PanelId('right_sidebar'),
-          anchor: PanelAnchor.left,
-          width: 200,
-          initialVisible: false,
-          title: 'POPOVER',
-          icon: const Icon(Icons.close),
-          panelBoxDecoration: BoxDecoration(
-            color: Colors.amber[50],
-            border: Border.all(color: Colors.amber[300]!),
-            // Shadow ensures it looks like a distinct layer, but z-order puts it "under" the sidebar
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(-5, 0),
-              ),
-            ],
-          ),
-          child: const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'I animated out from BEHIND the sidebar!',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.brown),
-              ),
-            ),
+        // 1. Top Panel (Inline, Fixed Height)
+        InlinePanel(
+          id: const PanelId('top_bar'),
+          height: 60,
+          title: 'TOP BAR (Nested Layout)',
+          icon: const Icon(Icons.chevron_left),
+          child: Container(
+            color: Colors.blue[50],
+            alignment: Alignment.center,
+            child: const Text('I am an InlinePanel in the Root Vertical Layout'),
           ),
         ),
 
-        // 2. Main Content
+        // 2. Content Area (Inline, Flex)
+        // Contains the nested Horizontal Layout.
         InlinePanel(
-          id: const PanelId('bg'),
+          id: const PanelId('inner_layout'),
           flex: 1,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Main Content Area'),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _controller.setVisible(const PanelId('overlay'), true);
-                  },
-                  child: const Text('Open Global Overlay'),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // 3. Right Sidebar
-        // Anchored Right. The 'popover_behind' attaches to this panel's left edge.
-        InlinePanel(
-          id: const PanelId('right_sidebar'),
-          anchor: PanelAnchor.right,
-          width: 250,
-          title: 'SIDEBAR',
-          icon: const Icon(Icons.chevron_right),
-          child: Column(
+          child: PanelLayout(
+            controller: _innerController,
             children: [
-              const ListTile(
-                title: Text('Sidebar Content'),
-                subtitle: Text('Click below to test Z-Order'),
+              // 2a. Z-Order Demo: Popover Overlay (Inner Scope)
+              // Anchored to 'right_sidebar' within this inner layout.
+              OverlayPanel(
+                id: const PanelId('popover_behind'),
+                anchorTo: const PanelId('right_sidebar'),
+                anchor: PanelAnchor.left,
+                width: 200,
+                initialVisible: false,
+                title: 'POPOVER',
+                icon: const Icon(Icons.close),
+                panelBoxDecoration: BoxDecoration(
+                  color: Colors.amber[50],
+                  border: Border.all(color: Colors.amber[300]!),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(-5, 0),
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      'I animated out from BEHIND the sidebar!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.brown),
+                    ),
+                  ),
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    _controller.toggleVisible(const PanelId('popover_behind'));
-                  },
-                  child: const Text('Toggle Popover (Behind)'),
+
+              // 2b. Main Content (Inner Scope)
+              InlinePanel(
+                id: const PanelId('bg'),
+                flex: 1,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Main Content Area (Nested Horizontal)'),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Opens 'overlay' which is in the Root Layout
+                          _rootController.setVisible(const PanelId('overlay'), true);
+                        },
+                        child: const Text('Open Global Overlay'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 2c. Right Sidebar (Inner Scope)
+              InlinePanel(
+                id: const PanelId('right_sidebar'),
+                anchor: PanelAnchor.right,
+                width: 250,
+                title: 'SIDEBAR',
+                icon: const Icon(Icons.chevron_left),
+                child: Column(
+                  children: [
+                    const ListTile(
+                      title: Text('Sidebar Content'),
+                      subtitle: Text('Click below to test Z-Order'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _innerController.toggleVisible(const PanelId('popover_behind'));
+                        },
+                        child: const Text('Toggle Popover (Behind)'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
 
-        // 4. Global Overlay (Existing)
+        // 3. Global Overlay (Root Scope)
+        // Covers the entire screen including the Top Bar.
         OverlayPanel(
           id: const PanelId('overlay'),
           width: 300,
-          // Anchored to the right side of the screen
           anchor: PanelAnchor.right,
-          // Start hidden
           initialVisible: false,
-
           title: 'SETTINGS OVERLAY',
-          // Use a close icon for overlays as they usually "dismiss" rather than "collapse" to a strip
           icon: const Icon(Icons.close),
-
-          // Distinct decoration to make it pop over the content
           panelBoxDecoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -374,7 +400,6 @@ class _OverlaysTabState extends State<OverlaysTab> {
             ],
             border: Border.all(color: Colors.grey[300]!),
           ),
-
           child: ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.all(16),

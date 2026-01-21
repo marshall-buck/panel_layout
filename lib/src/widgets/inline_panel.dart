@@ -36,6 +36,10 @@ class InlinePanel extends BasePanel {
     super.titleStyle,
     super.headerHeight,
     super.headerPadding,
+    /// The primary icon for the panel.
+    ///
+    /// **Important:** To use the built-in rotation animations, provide a **Left-Pointing Chevron**
+    /// (e.g., `Icons.chevron_left`). The system automatically rotates this icon.
     super.icon,
     super.iconSize,
     super.iconColor,

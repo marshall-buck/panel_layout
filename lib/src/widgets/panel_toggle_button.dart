@@ -10,8 +10,8 @@ import 'package:meta/meta.dart';
 
 /// A private button that toggles the collapsed state of a panel.
 ///
-/// It strictly expects a left-pointing chevron icon and automatically rotates
-/// it based on the [closingDirection] or the panel's anchor.
+/// It strictly expects a **Left-Pointing Chevron** icon (e.g., `Icons.chevron_left`)
+/// and automatically rotates it based on the [closingDirection] or the panel's anchor.
 ///
 /// This component is used internally by [BasePanel] headers and by [AnimatedPanel]
 /// in the collapsed rail strip.

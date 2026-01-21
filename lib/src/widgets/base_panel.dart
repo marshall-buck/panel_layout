@@ -97,6 +97,10 @@ abstract class BasePanel extends StatelessWidget {
 
   /// The primary icon for the panel.
   ///
+  /// **Important:** To use the built-in rotation animations for collapse/expand,
+  /// you must provide a **Left-Pointing Chevron** (e.g., `Icons.chevron_left`).
+  /// The system automatically rotates this icon based on the panel's anchor and state.
+  ///
   /// Displayed in the header (if present) and in the collapsed rail (for [InlinePanel]).
   final Widget? icon;
 
@@ -143,14 +147,28 @@ abstract class BasePanel extends StatelessWidget {
       final effectiveHeaderHeight =
           headerHeight ?? (effectiveIconSize + (effectivePadding * 2));
 
+      // UX Logic for Icon Placement:
+      // The icon should be placed on the "opening side" of the panel.
+      // - Closes Right (Anchor Right) -> Opens Left -> Icon on Left.
+      // - Closes Left (Anchor Left) -> Opens Right -> Icon on Right.
+      // - Closes Up/Down (Anchor Top/Bottom) -> Icon on Right (Standard).
+
+      PanelAnchor effectiveClosingDir = anchor;
+      if (this is InlinePanel) {
+        effectiveClosingDir = (this as InlinePanel).closingDirection ?? anchor;
+      }
+
+      final bool showIconOnLeft = effectiveClosingDir == PanelAnchor.right;
+
       header = Container(
+        key: Key('panel_header_${id.value}'),
         height: effectiveHeaderHeight,
         decoration: effectiveHeaderDecoration,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
-            // If anchored left, show icon first so it aligns with the left rail
-            if (anchor == PanelAnchor.left && icon != null) ...[
+            // If anchored Right (closes right), show icon first (on the left edge)
+            if (showIconOnLeft && icon != null) ...[
               // Use PanelToggleButton instead of GestureDetector for consistency.
               PanelToggleButton(
                 icon: icon!,
@@ -178,8 +196,8 @@ abstract class BasePanel extends StatelessWidget {
                 ),
               ),
 
-            // If NOT anchored left (e.g. Right, Top, Bottom), show icon last
-            if (anchor != PanelAnchor.left && icon != null) ...[
+            // If anchored Left/Top/Bottom, show icon last (on the right edge)
+            if (!showIconOnLeft && icon != null) ...[
               if (title != null) const SizedBox(width: 8),
               // Use PanelToggleButton instead of GestureDetector for consistency.
               PanelToggleButton(
