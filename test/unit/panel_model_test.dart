@@ -26,13 +26,13 @@ void main() {
       expect(id1.hashCode, id2.hashCode);
     });
 
-    test('ResizeHandleThemeData equality', () {
-      const t1 = ResizeHandleThemeData(width: 10);
-      const t2 = ResizeHandleThemeData(width: 10);
-      const t3 = ResizeHandleThemeData(width: 20);
+    test('PanelLayoutConfig equality', () {
+      const c1 = PanelLayoutConfig(headerPadding: 10);
+      const c2 = PanelLayoutConfig(headerPadding: 10);
+      const c3 = PanelLayoutConfig(headerPadding: 20);
 
-      expect(t1, t2);
-      expect(t1, isNot(t3));
+      expect(c1, c2);
+      expect(c1, isNot(c3));
     });
   });
 }

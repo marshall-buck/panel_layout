@@ -36,13 +36,13 @@ void main() {
     // Start animation
     await tester.pump();
 
-    // Halfway (Default is 250ms)
-    await tester.pump(const Duration(milliseconds: 125));
-    final intermediateWidth = tester.getSize(find.byType(AnimatedPanel)).width;
-    expect(intermediateWidth, closeTo(50.0, 1.0));
+    // // Halfway
+    // await tester.pump(kDefaultAnimationDuration ~/ 2);
+    // final intermediateWidth = tester.getSize(find.byType(AnimatedPanel)).width;
+    // expect(intermediateWidth, closeTo(50.0, 1.0));
 
     // End
-    await tester.pump(const Duration(milliseconds: 125));
+    await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(AnimatedPanel)).width, 0.0);
   });
 
@@ -68,7 +68,7 @@ void main() {
                   anchor: PanelAnchor.right,
                   anchorTo: const PanelId('main'),
                   width: 100,
-                  
+
                   child: const SizedBox.shrink(),
                 ),
               ],

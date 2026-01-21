@@ -15,44 +15,39 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelTheme(
-            data: const PanelThemeData(
-              // No decoration to simplify hit/paint checks, or distinct colors
-            ),
-            child: SizedBox(
-              width: 800,
-              height: 600,
-              child: PanelLayout(
-                controller: controller,
-                children: [
-                  // Widget B: The Overlay that should be BEHIND
-                  // We explicitly set Z-Index to -1 to be sure, or rely on list order.
-                  // Relying on list order (default behavior):
-                  OverlayPanel(
-                    id: const PanelId('overlay_behind'),
-                    anchorTo: const PanelId('inline_front'),
-                    anchor: PanelAnchor.left,
-                    width: 200,
-                    initialVisible: false, // Start hidden
-                    child: Container(color: Colors.red),
-                  ),
+          child: SizedBox(
+            width: 800,
+            height: 600,
+            child: PanelLayout(
+              controller: controller,
+              children: [
+                // Widget B: The Overlay that should be BEHIND
+                // We explicitly set Z-Index to -1 to be sure, or rely on list order.
+                // Relying on list order (default behavior):
+                OverlayPanel(
+                  id: const PanelId('overlay_behind'),
+                  anchorTo: const PanelId('inline_front'),
+                  anchor: PanelAnchor.left,
+                  width: 200,
+                  initialVisible: false, // Start hidden
+                  child: Container(color: Colors.red),
+                ),
 
-                  // Spacer to push the Right panel to the right side
-                  InlinePanel(
-                    id: const PanelId('spacer'),
-                    flex: 1,
-                    child: const SizedBox(),
-                  ),
+                // Spacer to push the Right panel to the right side
+                InlinePanel(
+                  id: const PanelId('spacer'),
+                  flex: 1,
+                  child: const SizedBox(),
+                ),
 
-                  // Widget A: The Inline Panel in FRONT
-                  InlinePanel(
-                    id: const PanelId('inline_front'),
-                    anchor: PanelAnchor.right,
-                    width: 300,
-                    child: Container(color: Colors.blue),
-                  ),
-                ],
-              ),
+                // Widget A: The Inline Panel in FRONT
+                InlinePanel(
+                  id: const PanelId('inline_front'),
+                  anchor: PanelAnchor.right,
+                  width: 300,
+                  child: Container(color: Colors.blue),
+                ),
+              ],
             ),
           ),
         ),

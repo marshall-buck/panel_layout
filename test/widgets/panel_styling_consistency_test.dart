@@ -14,31 +14,29 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: PanelTheme(
-          data: const PanelThemeData(
+        home: PanelLayout(
+          controller: controller,
+          config: const PanelLayoutConfig(
             headerDecoration: BoxDecoration(
               color: Colors.white,
             ), // Default
           ),
-          child: PanelLayout(
-            controller: controller,
-            children: [
-              InlinePanel(
-                id: panelId,
-                width: 200,
-                // Custom styling that should persist
-                icon: const Icon(Icons.chevron_left),
-                iconColor: testIconColor,
-                headerDecoration: const BoxDecoration(color: testHeaderColor),
-                child: const Text('Content'),
-              ),
-              const InlinePanel(
-                id: PanelId('main'),
-                flex: 1,
-                child: Text('Main'),
-              ),
-            ],
-          ),
+          children: [
+            InlinePanel(
+              id: panelId,
+              width: 200,
+              // Custom styling that should persist
+              icon: const Icon(Icons.chevron_left),
+              iconColor: testIconColor,
+              headerDecoration: const BoxDecoration(color: testHeaderColor),
+              child: const Text('Content'),
+            ),
+            const InlinePanel(
+              id: PanelId('main'),
+              flex: 1,
+              child: Text('Main'),
+            ),
+          ],
         ),
       ),
     );

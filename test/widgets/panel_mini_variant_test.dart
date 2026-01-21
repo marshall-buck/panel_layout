@@ -209,7 +209,7 @@ void main() {
     // Content should still be at top (offset by header)
     expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, expectedHeaderHeight);
 
-    // Verify icon is present (2 of them)
-    expect(find.byKey(const Key('toggle_icon')), findsNWidgets(2));
+    // Verify icon is present (1 of them, since we reuse the header)
+    expect(find.byKey(const Key('toggle_icon')), findsOneWidget);
   });
 }

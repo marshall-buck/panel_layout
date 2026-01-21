@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
-import '../theme/panel_theme.dart';
+import '../layout/panel_layout_config.dart';
 import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
 
@@ -24,6 +25,8 @@ abstract class BasePanel extends StatelessWidget {
     this.initialVisible = true,
     required this.initialCollapsed,
     this.animationDuration,
+    this.sizeDuration,
+    this.fadeDuration,
     this.animationCurve,
     this.title,
     this.titleStyle,
@@ -71,7 +74,16 @@ abstract class BasePanel extends StatelessWidget {
   final bool initialCollapsed;
 
   /// Optional override for the duration of size/visibility animations.
+  /// If provided, this overrides the controller's total duration.
   final Duration? animationDuration;
+
+  /// Optional override for the duration of the size change (slide) animation.
+  /// If null, defaults to [PanelLayoutConfig.sizeDuration].
+  final Duration? sizeDuration;
+
+  /// Optional override for the duration of the opacity change (fade) animation.
+  /// If null, defaults to [PanelLayoutConfig.fadeDuration].
+  final Duration? fadeDuration;
 
   /// Optional override for the curve of size/visibility animations.
   final Curve? animationCurve;
@@ -87,12 +99,12 @@ abstract class BasePanel extends StatelessWidget {
   /// The height of the panel header.
   ///
   /// If null, the height is automatically calculated using [headerPadding]
-  /// (or [PanelThemeData.headerPadding]) and the icon size.
+  /// (or [PanelLayoutConfig.headerPadding]) and the icon size.
   final double? headerHeight;
 
   /// Vertical padding for the header.
   ///
-  /// If null, defaults to [PanelThemeData.headerPadding].
+  /// If null, defaults to [PanelLayoutConfig.headerPadding].
   final double? headerPadding;
 
   /// The primary icon for the panel.
@@ -112,7 +124,7 @@ abstract class BasePanel extends StatelessWidget {
 
   /// Decoration for the panel container (background, border, shadow).
   ///
-  /// If null, defaults to [PanelThemeData.panelBoxDecoration].
+  /// If null, defaults to [PanelLayoutConfig.panelBoxDecoration].
   final BoxDecoration? panelBoxDecoration;
 
   /// Decoration for the header.
@@ -128,95 +140,98 @@ abstract class BasePanel extends StatelessWidget {
   @protected
   Widget buildPanelLayout(BuildContext context, Widget? header, Widget content);
 
+  /// Builds the header row content (Icon + Title).
+  ///
+  /// Used by [BasePanel] for the expanded state and by [AnimatedPanel]
+  /// for the rail state (when [InlinePanel.showTitleInRail] is true).
+  @internal
+  Widget buildHeaderRow(BuildContext context, PanelLayoutConfig config) {
+    final effectiveIconSize = iconSize ?? config.iconSize;
+
+    // UX Logic for Icon Placement:
+    // The icon should be placed on the "opening side" of the panel.
+    PanelAnchor effectiveClosingDir = anchor;
+    if (this is InlinePanel) {
+      effectiveClosingDir = (this as InlinePanel).closingDirection ?? anchor;
+    }
+
+    final bool showIconOnLeft = effectiveClosingDir == PanelAnchor.right;
+
+    return Row(
+      children: [
+        // If anchored Right (closes right), show icon first (on the left edge)
+        if (showIconOnLeft && icon != null) ...[
+          PanelToggleButton(
+            icon: icon!,
+            size: effectiveIconSize,
+            color: iconColor ?? config.iconColor,
+            onTap: () => onHeaderIconTap(context),
+            shouldRotate: (this is InlinePanel)
+                ? (this as InlinePanel).rotateIcon
+                : false,
+            closingDirection: (this is InlinePanel)
+                ? (this as InlinePanel).closingDirection
+                : null,
+            panelId: id,
+          ),
+          if (title != null) const SizedBox(width: 8),
+        ],
+
+        if (title != null)
+          Expanded(
+            child: Text(
+              title!,
+              style: titleStyle ?? config.titleStyle,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+        // If anchored Left/Top/Bottom, show icon last (on the right edge)
+        if (!showIconOnLeft && icon != null) ...[
+          if (title != null) const SizedBox(width: 8),
+          PanelToggleButton(
+            icon: icon!,
+            size: effectiveIconSize,
+            color: iconColor ?? config.iconColor,
+            onTap: () => onHeaderIconTap(context),
+            shouldRotate: (this is InlinePanel)
+                ? (this as InlinePanel).rotateIcon
+                : false,
+            closingDirection: (this is InlinePanel)
+                ? (this as InlinePanel).closingDirection
+                : null,
+            panelId: id,
+          ),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (title == null && icon == null && panelBoxDecoration == null) {
       return child;
     }
 
-    final theme = PanelTheme.of(context);
-    final effectiveDecoration = panelBoxDecoration ?? theme.panelBoxDecoration;
+    final config = PanelConfigurationScope.of(context);
+    final effectiveDecoration = panelBoxDecoration ?? config.panelBoxDecoration;
 
     Widget? header;
     if (title != null || icon != null) {
       final effectiveHeaderDecoration =
-          headerDecoration ?? theme.headerDecoration;
+          headerDecoration ?? config.headerDecoration;
 
-      final effectiveIconSize = iconSize ?? theme.iconSize;
-      final effectivePadding = headerPadding ?? theme.headerPadding;
+      final effectiveIconSize = iconSize ?? config.iconSize;
+      final effectivePadding = headerPadding ?? config.headerPadding;
       final effectiveHeaderHeight =
           headerHeight ?? (effectiveIconSize + (effectivePadding * 2));
-
-      // UX Logic for Icon Placement:
-      // The icon should be placed on the "opening side" of the panel.
-      // - Closes Right (Anchor Right) -> Opens Left -> Icon on Left.
-      // - Closes Left (Anchor Left) -> Opens Right -> Icon on Right.
-      // - Closes Up/Down (Anchor Top/Bottom) -> Icon on Right (Standard).
-
-      PanelAnchor effectiveClosingDir = anchor;
-      if (this is InlinePanel) {
-        effectiveClosingDir = (this as InlinePanel).closingDirection ?? anchor;
-      }
-
-      final bool showIconOnLeft = effectiveClosingDir == PanelAnchor.right;
 
       header = Container(
         key: Key('panel_header_${id.value}'),
         height: effectiveHeaderHeight,
         decoration: effectiveHeaderDecoration,
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          children: [
-            // If anchored Right (closes right), show icon first (on the left edge)
-            if (showIconOnLeft && icon != null) ...[
-              // Use PanelToggleButton instead of GestureDetector for consistency.
-              PanelToggleButton(
-                icon: icon!,
-                // Explicitly pass the header icon size.
-                size: iconSize ?? theme.iconSize,
-                color: iconColor ?? theme.iconColor,
-                onTap: () => onHeaderIconTap(context),
-                shouldRotate: (this is InlinePanel)
-                    ? (this as InlinePanel).rotateIcon
-                    : false,
-                closingDirection: (this is InlinePanel)
-                    ? (this as InlinePanel).closingDirection
-                    : null,
-                panelId: id,
-              ),
-              if (title != null) const SizedBox(width: 8),
-            ],
-
-            if (title != null)
-              Expanded(
-                child: Text(
-                  title!,
-                  style: titleStyle ?? theme.titleStyle,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-
-            // If anchored Left/Top/Bottom, show icon last (on the right edge)
-            if (!showIconOnLeft && icon != null) ...[
-              if (title != null) const SizedBox(width: 8),
-              // Use PanelToggleButton instead of GestureDetector for consistency.
-              PanelToggleButton(
-                icon: icon!,
-                // Explicitly pass the header icon size.
-                size: iconSize ?? theme.iconSize,
-                color: iconColor ?? theme.iconColor,
-                onTap: () => onHeaderIconTap(context),
-                shouldRotate: (this is InlinePanel)
-                    ? (this as InlinePanel).rotateIcon
-                    : false,
-                closingDirection: (this is InlinePanel)
-                    ? (this as InlinePanel).closingDirection
-                    : null,
-                panelId: id,
-              ),
-            ],
-          ],
-        ),
+        child: buildHeaderRow(context, config),
       );
     }
 

@@ -47,6 +47,7 @@ class InlinePanel extends BasePanel {
     super.headerDecoration,
     this.railPadding,
     this.rotateIcon = true,
+    this.showTitleInRail = true,
     super.key,
   }) : assert(
          (width != null || height != null) ? flex == null : true,
@@ -90,6 +91,12 @@ class InlinePanel extends BasePanel {
   /// Whether the icon should rotate automatically in the rail based on the panel anchor.
   /// Defaults to true.
   final bool rotateIcon;
+
+  /// Whether to show the panel title (if available) when the panel is collapsed into a rail.
+  ///
+  /// Useful for Top/Bottom panels where the rail is a horizontal strip that can accommodate text.
+  /// Defaults to true.
+  final bool showTitleInRail;
 
   @override
   void onHeaderIconTap(BuildContext context) {

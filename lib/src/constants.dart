@@ -2,8 +2,11 @@ import 'package:flutter/widgets.dart';
 
 // --- Durations ---
 
-/// The default duration for panel animations (expansion, collapse, visibility changes).
-const kDefaultAnimationDuration = Duration(milliseconds: 250);
+/// The duration of the size/slide animation part of the sequence.
+const kDefaultSlideDuration = Duration(milliseconds: 250);
+
+/// The duration of the opacity/fade animation part of the sequence.
+const kDefaultFadeDuration = Duration(milliseconds: 400);
 
 /// The default duration for hover effects on resize handles.
 const kDefaultHoverDuration = Duration(milliseconds: 150);

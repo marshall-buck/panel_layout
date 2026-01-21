@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-import '../theme/resize_handle_theme.dart';
+import '../layout/panel_layout_config.dart';
 
 /// A draggable handle widget used to resize adjacent panels.
 ///
@@ -34,7 +34,7 @@ class PanelResizeHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ResizeHandleTheme.of(context);
+    final config = PanelConfigurationScope.of(context);
     final isVertical = axis == Axis.vertical;
 
     return MouseRegion(
@@ -50,26 +50,26 @@ class PanelResizeHandle extends StatelessWidget {
         behavior: HitTestBehavior.translucent,
         child: Container(
           // Hit target size (larger than visible line)
-          width: isVertical ? theme.hitTestWidth : double.infinity,
-          height: isVertical ? double.infinity : theme.hitTestWidth,
+          width: isVertical ? config.handleHitTestWidth : double.infinity,
+          height: isVertical ? double.infinity : config.handleHitTestWidth,
           color: const Color(0x00000000), // Colors.transparent
           child: Stack(
             alignment: Alignment.center,
             children: [
               // Visible line
               Container(
-                width: isVertical ? theme.width : double.infinity,
-                height: isVertical ? double.infinity : theme.width,
-                decoration: BoxDecoration(color: theme.color),
+                width: isVertical ? config.handleWidth : double.infinity,
+                height: isVertical ? double.infinity : config.handleWidth,
+                decoration: BoxDecoration(color: config.handleColor),
               ),
               // Icon/Grip
-              if (theme.icon != null)
+              if (config.handleIcon != null)
                 Align(
-                  alignment: theme.iconAlignment,
+                  alignment: config.handleIconAlignment,
                   child: Icon(
-                    theme.icon,
-                    size: theme.iconSize,
-                    color: theme.iconColor,
+                    config.handleIcon,
+                    size: config.handleIconSize,
+                    color: config.handleIconColor,
                   ),
                 ),
             ],

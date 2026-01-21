@@ -156,43 +156,27 @@ class SidebarContent extends StatelessWidget {
 }
 ```
 
-## Customizing Resize Handles
+## Configuration & Styling
 
-Use `ResizeHandleTheme` to customize the appearance and behavior of the draggable dividers.
+You can configure the global styling and behavior of the layout by passing a `PanelLayoutConfig` to the `PanelLayout` constructor. This replaces the need for `PanelTheme` or `ResizeHandleTheme` widgets.
 
 ```dart
-ResizeHandleTheme(
-  data: ResizeHandleThemeData(
-    width: 2.0,
-    color: Colors.blue,
-    hitTestWidth: 12.0,
+PanelLayout(
+  config: PanelLayoutConfig(
+    // Global styling
+    headerPadding: 8.0,
+    headerDecoration: BoxDecoration(color: Colors.grey[200]),
+    panelBoxDecoration: BoxDecoration(color: Colors.white),
+    
+    // Resize Handle styling
+    handleColor: Colors.blue,
+    handleWidth: 4.0,
+    
+    // Animation defaults
+    sizeDuration: Duration(milliseconds: 300),
   ),
-  child: PanelLayout(...),
+  children: [...],
 )
 ```
 
-## Global Panel Styling
-
-You can style all panels in a subtree using `PanelTheme`. This is useful for setting a consistent header height, decoration, or font style across your entire app.
-
-```dart
-PanelTheme(
-  data: PanelThemeData(
-    // Global settings for rail padding and icons
-    railPadding: 16.0,
-    iconSize: 20.0,
-    // Header height is calculated from iconSize + (headerPadding * 2)
-    headerPadding: 6.0,
-    headerDecoration: BoxDecoration(
-      color: Colors.grey[900],
-      border: Border(bottom: BorderSide(color: Colors.black)),
-    ),
-    titleStyle: TextStyle(fontSize: 12, color: Colors.white),
-    panelBoxDecoration: BoxDecoration(
-      color: Colors.grey[800],
-    ),
-  ),
-  child: PanelLayout(...),
-)
-```
-<!-- TODO: re,ove fixed header height an d base on icons and title strings -->
+Each panel can override these global defaults by setting its own properties (e.g. `InlinePanel(headerPadding: 12, ...)`).

@@ -25,51 +25,48 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// Global Configuration for the example app
+final kAppPanelConfig = PanelLayoutConfig(
+  headerPadding: 8.0,
+  titleStyle: const TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+    letterSpacing: 0.5,
+  ),
+  headerDecoration: BoxDecoration(
+    color: Colors.grey[200],
+    border: Border(
+      bottom: BorderSide(color: Colors.grey[300]!, width: 1),
+    ),
+  ),
+  panelBoxDecoration: BoxDecoration(
+    color: Colors.white,
+    border: Border.all(color: Colors.grey[300]!, width: 1),
+  ),
+);
+
 class ExampleHome extends StatelessWidget {
   const ExampleHome({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 1. Base Theme Setup
-    // We wrap the entire example area in a PanelTheme to establish default styling.
-    return PanelTheme(
-      data: PanelThemeData(
-        headerPadding: 8.0,
-
-        titleStyle: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-          letterSpacing: 0.5,
-        ),
-        headerDecoration: BoxDecoration(
-          color: Colors.grey[200],
-          border: Border(
-            bottom: BorderSide(color: Colors.grey[300]!, width: 1),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Panel Layout Gallery'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Classic IDE', icon: Icon(Icons.grid_view)),
+              Tab(text: 'Vertical Split', icon: Icon(Icons.splitscreen)),
+              Tab(text: 'Overlays', icon: Icon(Icons.layers)),
+            ],
           ),
         ),
-        panelBoxDecoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.grey[300]!, width: 1),
-        ),
-      ),
-      child: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Panel Layout Gallery'),
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'Classic IDE', icon: Icon(Icons.grid_view)),
-                Tab(text: 'Vertical Split', icon: Icon(Icons.splitscreen)),
-                Tab(text: 'Overlays', icon: Icon(Icons.layers)),
-              ],
-            ),
-          ),
-          body: const TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: [ClassicIdeTab(), VerticalSplitTab(), OverlaysTab()],
-          ),
+        body: const TabBarView(
+          physics: NeverScrollableScrollPhysics(),
+          children: [ClassicIdeTab(), VerticalSplitTab(), OverlaysTab()],
         ),
       ),
     );
@@ -78,7 +75,7 @@ class ExampleHome extends StatelessWidget {
 
 // -----------------------------------------------------------------------------
 // Tab 1: Classic IDE
-// Demonstrates: Inline panels, Resizable panels, Theme Overrides
+// Demonstrates: Inline panels, Resizable panels, Config Overrides
 // -----------------------------------------------------------------------------
 class ClassicIdeTab extends StatefulWidget {
   const ClassicIdeTab({super.key});
@@ -100,6 +97,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
   Widget build(BuildContext context) {
     return PanelLayout(
       controller: _controller,
+      config: kAppPanelConfig, // Apply global config
       children: [
         // LEFT PANEL: Explorer
         // Standard usage. Inline, resizable.
@@ -143,8 +141,8 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
         ),
 
         // RIGHT PANEL: Properties
-        // 2. Panel with Theme Changes
-        // This panel overrides the global theme to look "Dark".
+        // 2. Panel with Style Overrides
+        // This panel overrides the global config to look "Dark".
         InlinePanel(
           id: const PanelId('properties'),
           anchor: PanelAnchor.right,
@@ -189,11 +187,13 @@ class VerticalSplitTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return PanelLayout(
       axis: Axis.vertical,
+      config: kAppPanelConfig,
       children: [
         // TOP PANEL: Header / Toolbar
         // 6. Non-resizable panel
         InlinePanel(
           id: const PanelId('header'),
+          anchor: PanelAnchor.top,
           height: 60,
           resizable: false, // User cannot resize this
           title: 'TOOLBAR (FIXED)',
@@ -273,11 +273,13 @@ class _OverlaysTabState extends State<OverlaysTab> {
     // Manages the Top Bar, the Content Area, and Global Overlays.
     return PanelLayout(
       controller: _rootController,
+      config: kAppPanelConfig,
       axis: Axis.vertical,
       children: [
         // 1. Top Panel (Inline, Fixed Height)
         InlinePanel(
           id: const PanelId('top_bar'),
+          anchor: PanelAnchor.top,
           height: 60,
           title: 'TOP BAR (Nested Layout)',
           icon: const Icon(Icons.chevron_left),
@@ -295,6 +297,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
           flex: 1,
           child: PanelLayout(
             controller: _innerController,
+            config: kAppPanelConfig,
             children: [
               // 2a. Z-Order Demo: Popover Overlay (Inner Scope)
               // Anchored to 'right_sidebar' within this inner layout.

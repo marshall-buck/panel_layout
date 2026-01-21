@@ -4,7 +4,7 @@ import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
-import '../theme/panel_theme.dart';
+import '../layout/panel_layout_config.dart';
 
 import 'package:meta/meta.dart';
 
@@ -57,7 +57,7 @@ class PanelToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final scope = PanelDataScope.maybeOf(context);
     final controller = PanelScope.of(context);
-    final theme = PanelTheme.of(context);
+    final config = PanelConfigurationScope.of(context);
 
     // Use the explicitly provided size.
     // The caller is responsible for passing the correct size (e.g. toggleIconSize for rail, headerIconSize for header).
@@ -104,15 +104,15 @@ class PanelToggleButton extends StatelessWidget {
           break;
         case PanelAnchor.top:
           // Closes Up (^). Opens Down (v).
-          // Open: Point Up (^) to close. (-90 deg)
-          // Collapsed: Point Down (v) to open. (90 deg)
-          rotation = isCollapsed ? math.pi / 2 : -math.pi / 2;
+          // Open: Point Up (^) to close. (90 deg CW from Left <)
+          // Collapsed: Point Down (v) to open. (-90 deg CW from Left <)
+          rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
           break;
         case PanelAnchor.bottom:
           // Closes Down (v). Opens Up (^).
-          // Open: Point Down (v) to close. (90 deg)
-          // Collapsed: Point Up (^) to open. (-90 deg)
-          rotation = isCollapsed ? -math.pi / 2 : math.pi / 2;
+          // Open: Point Down (v) to close. (-90 deg CW from Left <)
+          // Collapsed: Point Up (^) to open. (90 deg CW from Left <)
+          rotation = isCollapsed ? math.pi / 2 : -math.pi / 2;
           break;
       }
     }
@@ -138,8 +138,8 @@ class PanelToggleButton extends StatelessWidget {
             },
             child: IconTheme(
               data: IconThemeData(
-                size: theme.iconSize,
-                color: color ?? theme.iconColor,
+                size: effectiveSize, // Use passed size
+                color: color ?? config.iconColor,
               ),
               child: icon,
             ),

@@ -2,10 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../models/panel_enums.dart';
 import '../state/panel_runtime_state.dart';
-import '../theme/panel_theme.dart';
+import '../layout/panel_layout_config.dart';
 import 'base_panel.dart';
 import 'inline_panel.dart';
 import 'panel_toggle_button.dart';
+import 'animated_vertical_panel.dart';
 
 /// An internal widget that handles the complex animations for a panel's lifecycle.
 ///
@@ -52,20 +53,46 @@ class AnimatedPanel extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final theme = PanelTheme.of(context);
+    // NEW: Use specialized animator for Top/Bottom panels to ensure persistent header
+    if (config.anchor == PanelAnchor.top ||
+        config.anchor == PanelAnchor.bottom) {
+      return AnimatedVerticalPanel(
+        config: config,
+        state: state,
+        factor: factor,
+        collapseFactor: collapseFactor,
+      );
+    }
+
+    final layoutConfig = PanelConfigurationScope.of(context);
     final fullSize = state.size;
 
     // --- 1. Calculate Target Sizes ---
 
     double collapsed = 0.0;
     double? iconSize;
+    bool showFullHeaderInRail = false;
 
     // Determine the size of the "Rail" (collapsed state).
     // Currently only InlinePanels support a rail state.
     if (config is InlinePanel) {
       final inline = config as InlinePanel;
-      iconSize = inline.iconSize ?? theme.iconSize;
-      collapsed = iconSize + (inline.railPadding ?? theme.railPadding);
+      iconSize = inline.iconSize ?? layoutConfig.iconSize;
+
+      // Check if we should show the full header (with title) in the rail.
+      // This is enabled by default for Top/Bottom panels via [showTitleInRail].
+      if (inline.showTitleInRail &&
+          (config.anchor == PanelAnchor.top ||
+              config.anchor == PanelAnchor.bottom)) {
+        showFullHeaderInRail = true;
+        // Collapsed size is the full header height
+        collapsed =
+            config.headerHeight ??
+            (iconSize + ((config.headerPadding ?? layoutConfig.headerPadding) * 2));
+      } else {
+        // Standard Rail (Icon only)
+        collapsed = iconSize + (inline.railPadding ?? layoutConfig.railPadding);
+      }
     }
 
     // Interpolate size between Expanded (fullSize) and Collapsed state.
@@ -86,9 +113,20 @@ class AnimatedPanel extends StatelessWidget {
 
     // --- 2. Build Rail Components ---
 
-    final railContent = _buildRailContent(context, theme, iconSize);
-    final railDecoration = _getRailDecoration(theme);
-    final railAlignment = _calculateRailAlignment();
+    final railContent = showFullHeaderInRail
+        ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: config.buildHeaderRow(context, layoutConfig),
+          )
+        : _buildRailContent(context, layoutConfig, iconSize);
+
+    final railDecoration = _getRailDecoration(layoutConfig);
+
+    // If showing full header, align center (fill).
+    // Otherwise calculate alignment for icon.
+    final railAlignment = showFullHeaderInRail
+        ? Alignment.center
+        : _calculateRailAlignment();
 
     // --- 3. Build Main Content with Transition Logic ---
 
@@ -229,23 +267,23 @@ class AnimatedPanel extends StatelessWidget {
   /// **Logic:**
   /// 1. If an icon is present in the config, it builds a toggle button.
   /// 2. For vertical rails (Left/Right anchors), it centers the icon vertically
-  ///    within a height matching [PanelTheme.headerHeight] to ensure it aligns
+  ///    within a height matching [PanelLayoutConfig.headerHeight] to ensure it aligns
   ///    visually with the header of the expanded panel.
   Widget? _buildRailContent(
     BuildContext context,
-    PanelThemeData theme,
+    PanelLayoutConfig config,
     double? iconSize,
   ) {
-    if (config is! InlinePanel) return null;
-    final effectiveIcon = config.icon;
+    if (this.config is! InlinePanel) return null;
+    final effectiveIcon = this.config.icon;
     if (effectiveIcon == null) return null;
 
-    final inline = config as InlinePanel;
+    final inline = this.config as InlinePanel;
     Widget railContent = PanelToggleButton(
       icon: effectiveIcon,
-      panelId: config.id,
-      size: iconSize ?? theme.iconSize,
-      color: config.iconColor ?? theme.iconColor,
+      panelId: this.config.id,
+      size: iconSize ?? config.iconSize,
+      color: this.config.iconColor ?? config.iconColor,
       closingDirection: inline.closingDirection,
       shouldRotate: inline.rotateIcon,
     );
@@ -254,11 +292,12 @@ class AnimatedPanel extends StatelessWidget {
     // If the panel is on the Left/Right, the rail is a vertical strip.
     // The icon should logically sit at the "top" of this strip, aligned
     // with where the header icon would be in the expanded state.
-    if (config.anchor == PanelAnchor.left ||
-        config.anchor == PanelAnchor.right) {
-      final effectivePadding = config.headerPadding ?? theme.headerPadding;
-      final effectiveHeaderHeight = config.headerHeight ??
-          ((iconSize ?? theme.iconSize) + (effectivePadding * 2));
+    if (this.config.anchor == PanelAnchor.left ||
+        this.config.anchor == PanelAnchor.right) {
+      final effectivePadding = this.config.headerPadding ?? config.headerPadding;
+      final effectiveHeaderHeight =
+          this.config.headerHeight ??
+          ((iconSize ?? config.iconSize) + (effectivePadding * 2));
 
       railContent = SizedBox(
         height: effectiveHeaderHeight,
@@ -272,25 +311,25 @@ class AnimatedPanel extends StatelessWidget {
   ///
   /// **Priority Order:**
   /// 1. `InlinePanel.railDecoration`: Specific override for this panel's rail.
-  /// 2. `PanelTheme.railDecoration`: Global theme default for rails.
+  /// 2. `PanelLayoutConfig.railDecoration`: Global theme default for rails.
   /// 3. `InlinePanel.headerDecoration`: Fallback to match this panel's header.
-  /// 4. `PanelTheme.headerDecoration`: Fallback to match the global header theme.
+  /// 4. `PanelLayoutConfig.headerDecoration`: Fallback to match the global header theme.
   ///
   /// This fallback chain ensures that if a user hasn't explicitly styled the
   /// rail, it seamlessly blends with the header, creating a "tab-like" effect.
-  BoxDecoration? _getRailDecoration(PanelThemeData theme) {
-    if (config is! InlinePanel) return null;
-    final inline = config as InlinePanel;
+  BoxDecoration? _getRailDecoration(PanelLayoutConfig config) {
+    if (this.config is! InlinePanel) return null;
+    final inline = this.config as InlinePanel;
 
-    BoxDecoration? decoration = inline.railDecoration ?? theme.railDecoration;
+    BoxDecoration? decoration = inline.railDecoration ?? config.railDecoration;
 
     // Fallback: If no specific rail decoration is provided, try to match the
     // header decoration to create a seamless visual transition.
     if (decoration == null) {
-      if (config.headerDecoration != null) {
+      if (this.config.headerDecoration != null) {
+        decoration = this.config.headerDecoration;
+      } else if (config.headerDecoration != null) {
         decoration = config.headerDecoration;
-      } else if (theme.headerDecoration != null) {
-        decoration = theme.headerDecoration;
       }
     }
     return decoration;

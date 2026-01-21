@@ -66,34 +66,33 @@ void main() {
       expect(scope.state.collapsed, isTrue);
     });
 
-    testWidgets('PanelTheme styling is applied', (tester) async {
+    testWidgets('PanelLayoutConfig styling is applied', (tester) async {
       const headerColor = Color(0xFFFF0000);
       const panelColor = Color(0xFF00FF00);
 
       await tester.pumpWidget(
         MaterialApp(
-          home: PanelTheme(
-            data: const PanelThemeData(
+          home: PanelLayout(
+            config: const PanelLayoutConfig(
               headerDecoration: BoxDecoration(color: headerColor),
               panelBoxDecoration: BoxDecoration(color: panelColor),
               headerPadding: 13.0,
             ),
-            child: PanelLayout(
-              children: [
-                InlinePanel(
-                  id: const PanelId('test'),
-                  width: 200,
-                  title: 'Themed Panel',
-                  child: const Text('Content'),
-                ),
-              ],
-            ),
+            children: [
+              InlinePanel(
+                id: const PanelId('test'),
+                width: 200,
+                title: 'Themed Panel',
+                child: const Text('Content'),
+              ),
+            ],
           ),
         ),
       );
 
       // Verify Header Height and Color
       // We look for a Container that has the header height constraint and decoration
+      // Header height = iconSize (24 default) + padding (13) * 2 = 50.0
       final headerFinder = find.byWidgetPredicate((widget) {
         if (widget is Container && widget.constraints?.maxHeight == 50.0) {
           final dec = widget.decoration;

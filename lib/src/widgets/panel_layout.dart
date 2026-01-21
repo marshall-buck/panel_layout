@@ -1,11 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-import '../constants.dart';
 import '../models/panel_id.dart';
 import '../state/panel_runtime_state.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
-import '../theme/panel_theme.dart';
+import '../layout/panel_layout_config.dart';
 import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../controllers/panel_layout_controller.dart';
@@ -48,6 +47,7 @@ class PanelLayout extends StatefulWidget {
   const PanelLayout({
     required this.children,
     this.controller,
+    this.config,
     this.axis = Axis.horizontal,
     this.onResizeStart,
     this.onResizeEnd,
@@ -65,6 +65,9 @@ class PanelLayout extends StatefulWidget {
   /// If provided, you must dispose of it yourself. If not provided,
   /// the layout creates and manages its own internal controller.
   final PanelLayoutController? controller;
+
+  /// The configuration for styling and behavior.
+  final PanelLayoutConfig? config;
 
   /// The main axis of the layout.
   ///
@@ -227,6 +230,14 @@ class _PanelLayoutState extends State<PanelLayout>
       }
     }
 
+    // Default durations (we'll fetch from config if available in build, but here we might need defaults)
+    // Actually, we can use kDefault constants for reconciliation if config isn't available,
+    // or just use defaults. PanelLayoutConfig defaults match constants.
+    // However, if the user provided a config with *different* durations, we should try to use them.
+    // But config is a widget property. We can access `widget.config` here.
+
+    final config = widget.config ?? const PanelLayoutConfig();
+
     for (final panel in widget.children) {
       if (!_panelStates.containsKey(panel.id)) {
         _panelStates[panel.id] = PanelRuntimeState(
@@ -235,9 +246,15 @@ class _PanelLayoutState extends State<PanelLayout>
           collapsed: panel.initialCollapsed,
         );
 
+        // Priority: Panel Override > Config > Default Constant
+        final fade = panel.fadeDuration ?? config.fadeDuration;
+        final slide = panel.sizeDuration ?? config.sizeDuration;
+        final maxDuration = fade > slide ? fade : slide;
+        final effectiveDuration = panel.animationDuration ?? maxDuration;
+
         final controller = AnimationController(
           vsync: this,
-          duration: panel.animationDuration ?? kDefaultAnimationDuration,
+          duration: effectiveDuration,
           value: panel.initialVisible ? 1.0 : 0.0,
         );
         controller.addListener(() => setState(() {}));
@@ -245,7 +262,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
         final collapseController = AnimationController(
           vsync: this,
-          duration: panel.animationDuration ?? kDefaultAnimationDuration,
+          duration: effectiveDuration,
           value: panel.initialCollapsed ? 1.0 : 0.0,
         );
         collapseController.addListener(() => setState(() {}));
@@ -263,26 +280,27 @@ class _PanelLayoutState extends State<PanelLayout>
 
   @override
   Widget build(BuildContext context) {
-    final theme = PanelTheme.of(context);
+    final config = widget.config ?? const PanelLayoutConfig();
     final uniquePanelConfigs = <PanelId, BasePanel>{};
     for (final panel in widget.children) {
       uniquePanelConfigs[panel.id] = panel;
     }
 
     // Prepare data for the layout delegate
-    final layoutData = uniquePanelConfigs.values.map((config) {
-      final state = _panelStates[config.id]!;
-      final anim = _animationControllers[config.id]!;
-      final collapseAnim = _collapseControllers[config.id]!;
+    final layoutData = uniquePanelConfigs.values.map((panelConfig) {
+      final state = _panelStates[panelConfig.id]!;
+      final anim = _animationControllers[panelConfig.id]!;
+      final collapseAnim = _collapseControllers[panelConfig.id]!;
 
       double collapsedSize = 0.0;
-      if (config is InlinePanel) {
-        final iconSize = config.iconSize ?? theme.iconSize;
-        collapsedSize = iconSize + (config.railPadding ?? theme.railPadding);
+      if (panelConfig is InlinePanel) {
+        final iconSize = panelConfig.iconSize ?? config.iconSize;
+        collapsedSize =
+            iconSize + (panelConfig.railPadding ?? config.railPadding);
       }
 
       return PanelLayoutData(
-        config: config,
+        config: panelConfig,
         state: state,
         visualFactor: anim.value,
         collapseFactor: collapseAnim.value,
@@ -360,13 +378,16 @@ class _PanelLayoutState extends State<PanelLayout>
 
     return PanelScope(
       controller: _effectiveController,
-      child: CustomMultiChildLayout(
-        delegate: PanelLayoutDelegate(
-          panels: layoutData,
-          axis: widget.axis,
-          textDirection: Directionality.of(context),
+      child: PanelConfigurationScope(
+        config: config,
+        child: CustomMultiChildLayout(
+          delegate: PanelLayoutDelegate(
+            panels: layoutData,
+            axis: widget.axis,
+            textDirection: Directionality.of(context),
+          ),
+          children: sortedChildren,
         ),
-        children: sortedChildren,
       ),
     );
   }
