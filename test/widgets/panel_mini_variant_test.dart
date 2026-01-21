@@ -167,6 +167,7 @@ void main() {
     final id = PanelId('vertical_test');
     const testIconSize = 24.0;
     const expectedCollapsedSize = testIconSize + kDefaultRailPadding; // 24 + 16 = 40
+    const expectedHeaderHeight = testIconSize + (kDefaultHeaderPadding * 2);
 
     await tester.pumpWidget(
       Directionality(
@@ -191,12 +192,11 @@ void main() {
       ),
     );
 
-    // Header (kDefaultHeaderHeight) pushes content down.
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, kDefaultHeaderHeight);
-    // Height is panel height (200) - header height (kDefaultHeaderHeight) ?
-    // No, BasePanel is a Column [Header, Expanded(child)].
-    // So child height = 200 - kDefaultHeaderHeight.
-    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0 - kDefaultHeaderHeight);
+    // Header (expectedHeaderHeight) pushes content down.
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, expectedHeaderHeight);
+    // Height is panel height (200) - header height (expectedHeaderHeight)
+    // BasePanel is a Column [Header, Expanded(child)].
+    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0 - expectedHeaderHeight);
 
     final controller = PanelLayout.of(
       tester.element(find.byKey(const Key('content'))),
@@ -207,7 +207,7 @@ void main() {
 
     expect(tester.getSize(find.byType(LayoutId)).height, expectedCollapsedSize);
     // Content should still be at top (offset by header)
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, kDefaultHeaderHeight);
+    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, expectedHeaderHeight);
 
     // Verify icon is present (2 of them)
     expect(find.byKey(const Key('toggle_icon')), findsNWidgets(2));

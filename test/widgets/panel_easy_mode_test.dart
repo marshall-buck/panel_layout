@@ -76,7 +76,7 @@ void main() {
             data: const PanelThemeData(
               headerDecoration: BoxDecoration(color: headerColor),
               panelBoxDecoration: BoxDecoration(color: panelColor),
-              headerHeight: 50.0,
+              headerPadding: 13.0,
             ),
             child: PanelLayout(
               children: [

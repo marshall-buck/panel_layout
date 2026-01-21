@@ -28,6 +28,7 @@ abstract class BasePanel extends StatelessWidget {
     this.title,
     this.titleStyle,
     this.headerHeight,
+    this.headerPadding,
     this.icon,
     this.iconSize,
     this.iconColor,
@@ -84,7 +85,15 @@ abstract class BasePanel extends StatelessWidget {
   final TextStyle? titleStyle;
 
   /// The height of the panel header.
+  ///
+  /// If null, the height is automatically calculated using [headerPadding]
+  /// (or [PanelThemeData.headerPadding]) and the icon size.
   final double? headerHeight;
+
+  /// Vertical padding for the header.
+  ///
+  /// If null, defaults to [PanelThemeData.headerPadding].
+  final double? headerPadding;
 
   /// The primary icon for the panel.
   ///
@@ -129,8 +138,13 @@ abstract class BasePanel extends StatelessWidget {
       final effectiveHeaderDecoration =
           headerDecoration ?? theme.headerDecoration;
 
+      final effectiveIconSize = iconSize ?? theme.iconSize;
+      final effectivePadding = headerPadding ?? theme.headerPadding;
+      final effectiveHeaderHeight =
+          headerHeight ?? (effectiveIconSize + (effectivePadding * 2));
+
       header = Container(
-        height: headerHeight ?? theme.headerHeight,
+        height: effectiveHeaderHeight,
         decoration: effectiveHeaderDecoration,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(

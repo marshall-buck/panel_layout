@@ -256,8 +256,12 @@ class AnimatedPanel extends StatelessWidget {
     // with where the header icon would be in the expanded state.
     if (config.anchor == PanelAnchor.left ||
         config.anchor == PanelAnchor.right) {
+      final effectivePadding = config.headerPadding ?? theme.headerPadding;
+      final effectiveHeaderHeight = config.headerHeight ??
+          ((iconSize ?? theme.iconSize) + (effectivePadding * 2));
+
       railContent = SizedBox(
-        height: config.headerHeight ?? theme.headerHeight,
+        height: effectiveHeaderHeight,
         child: Center(child: railContent),
       );
     }

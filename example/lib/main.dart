@@ -34,7 +34,7 @@ class ExampleHome extends StatelessWidget {
     // We wrap the entire example area in a PanelTheme to establish default styling.
     return PanelTheme(
       data: PanelThemeData(
-        headerHeight: 36.0,
+        headerPadding: 8.0,
 
         titleStyle: const TextStyle(
           fontSize: 13,

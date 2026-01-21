@@ -6,16 +6,16 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 
 ## Key Features
 
--   **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
--   **Type-Safe Panels**:
-    -   **`InlinePanel`**: Participates in the layout flow (pushes other panels aside), affects sibling layout, and supports resizing. Supports "Mini Variants" (collapsing to a strip).
-    -   **`OverlayPanel`**: Floats on top of the layout, does not affect the position of other widgets, and is ideal for dialogs, popovers, or floating tools. Supports `zIndex`.
--   **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
--   **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns (InlinePanel only).
--   **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
--   **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
--   **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels.
--   **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds.
+- **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
+- **Type-Safe Panels**:
+  - **`InlinePanel`**: Participates in the layout flow (pushes other panels aside), affects sibling layout, and supports resizing. Supports "Mini Variants" (collapsing to a strip).
+  - **`OverlayPanel`**: Floats on top of the layout, does not affect the position of other widgets, and is ideal for dialogs, popovers, or floating tools. Supports `zIndex`.
+- **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
+- **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns (InlinePanel only).
+- **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
+- **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
+- **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels.
+- **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds.
 
 ## Getting Started
 
@@ -178,7 +178,11 @@ You can style all panels in a subtree using `PanelTheme`. This is useful for set
 ```dart
 PanelTheme(
   data: PanelThemeData(
-    headerHeight: 32.0,
+    // Global settings for rail padding and icons
+    railPadding: 16.0,
+    iconSize: 20.0,
+    // Header height is calculated from iconSize + (headerPadding * 2)
+    headerPadding: 6.0,
     headerDecoration: BoxDecoration(
       color: Colors.grey[900],
       border: Border(bottom: BorderSide(color: Colors.black)),
@@ -187,11 +191,8 @@ PanelTheme(
     panelBoxDecoration: BoxDecoration(
       color: Colors.grey[800],
     ),
-    // New: Global settings for rail padding and icons
-    railPadding: 16.0,
-    iconSize: 20.0,
   ),
   child: PanelLayout(...),
 )
 ```
-
+<!-- TODO: re,ove fixed header height an d base on icons and title strings -->

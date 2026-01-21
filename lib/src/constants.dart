@@ -36,8 +36,8 @@ const kDefaultHandleIconColor = Color(0xAA000000);
 
 // --- Panel Dimensions & Styling ---
 
-/// The default height of the panel header.
-const kDefaultHeaderHeight = 24.0;
+/// The default vertical padding for the panel header (top and bottom).
+const kDefaultHeaderPadding = 8.0;
 
 /// The default size of the panel icon (used in header and rail).
 const kDefaultIconSize = 24.0;

@@ -11,7 +11,7 @@ import '../constants.dart';
 /// ```dart
 /// PanelTheme(
 ///   data: PanelThemeData(
-///     headerHeight: 40.0,
+///     headerPadding: 12.0,
 ///     headerDecoration: BoxDecoration(color: Colors.grey[200]),
 ///   ),
 ///   child: PanelLayout(...),
@@ -20,7 +20,7 @@ import '../constants.dart';
 @immutable
 class PanelThemeData extends Equatable {
   const PanelThemeData({
-    this.headerHeight = kDefaultHeaderHeight,
+    this.headerPadding = kDefaultHeaderPadding,
     this.headerDecoration,
     this.titleStyle,
     this.iconColor,
@@ -30,8 +30,13 @@ class PanelThemeData extends Equatable {
     this.railPadding = kDefaultRailPadding,
   });
 
-  /// The height of the panel header.
-  final double headerHeight;
+  /// The vertical padding applied to the top and bottom of the panel header.
+  ///
+  /// The total height of the header is calculated as:
+  /// `iconSize + (headerPadding * 2)`.
+  ///
+  /// This can be overridden by providing an explicit `headerHeight` to a panel.
+  final double headerPadding;
 
   /// The decoration (background, border) for the panel header.
   final BoxDecoration? headerDecoration;
@@ -56,7 +61,7 @@ class PanelThemeData extends Equatable {
 
   @override
   List<Object?> get props => [
-        headerHeight,
+        headerPadding,
         headerDecoration,
         titleStyle,
         iconColor,
@@ -67,7 +72,7 @@ class PanelThemeData extends Equatable {
       ];
 
   PanelThemeData copyWith({
-    double? headerHeight,
+    double? headerPadding,
     BoxDecoration? headerDecoration,
     TextStyle? titleStyle,
     Color? iconColor,
@@ -77,7 +82,7 @@ class PanelThemeData extends Equatable {
     double? railPadding,
   }) {
     return PanelThemeData(
-      headerHeight: headerHeight ?? this.headerHeight,
+      headerPadding: headerPadding ?? this.headerPadding,
       headerDecoration: headerDecoration ?? this.headerDecoration,
       titleStyle: titleStyle ?? this.titleStyle,
       iconColor: iconColor ?? this.iconColor,

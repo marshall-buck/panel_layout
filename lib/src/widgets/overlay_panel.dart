@@ -27,6 +27,7 @@ class OverlayPanel extends BasePanel {
     super.title,
     super.titleStyle,
     super.headerHeight,
+    super.headerPadding,
     super.icon,
     super.iconSize,
     super.iconColor,
