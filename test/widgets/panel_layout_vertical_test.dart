@@ -13,7 +13,7 @@ void main() {
             width: 100,
             height: 400,
             child: PanelLayout(
-              axis: Axis.vertical,
+              
               children: [
                 InlinePanel(
                   id: const PanelId('t1'),

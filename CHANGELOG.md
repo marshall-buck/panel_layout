@@ -1,4 +1,10 @@
-# 0.5.7
+## 0.5.8
+
+*   **Breaking Change**: Removed `axis` parameter from `PanelLayout`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
+*   Added `ScopedTab` to example app to demonstrate nested, scoped configurations.
+*   Updated documentation to clarify `PanelLayoutConfig` scoping rules.
+
+## 0.5.7
 
 * **Breaking Change**: Removed `PanelTheme` and `ResizeHandleTheme` widgets.
 * **New Feature**: Introduced `PanelLayoutConfig` for centralized, type-safe configuration of layout styling and behavior.

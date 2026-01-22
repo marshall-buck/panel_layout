@@ -4,14 +4,13 @@ import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/panel_toggle_button.dart';
 
 void main() {
-  Widget buildTestLayout(List<BasePanel> children, {Axis axis = Axis.horizontal}) {
+  Widget buildTestLayout(List<BasePanel> children) {
     return MaterialApp(
       home: Scaffold(
         body: SizedBox(
           width: 800,
           height: 600,
           child: PanelLayout(
-            axis: axis,
             children: children,
           ),
         ),
@@ -87,7 +86,7 @@ void main() {
         icon: const Icon(Icons.chevron_left),
         child: const SizedBox(),
       ),
-    ], axis: Axis.vertical));
+    ]));
 
     final headerFinder = find.byKey(const Key('panel_header_top_panel'));
     final textFinder = find.descendant(of: headerFinder, matching: find.text('Title'));

@@ -173,7 +173,7 @@ void main() {
       Directionality(
         textDirection: TextDirection.ltr,
         child: PanelLayout(
-          axis: Axis.vertical,
+          
           children: [
             InlinePanel(
               id: id,

@@ -50,7 +50,7 @@ void main() {
               width: 800,
               height: 600,
               child: PanelLayout(
-                axis: Axis.horizontal,
+                
                 children: [
                   InlinePanel(
                     id: const PanelId('base'),

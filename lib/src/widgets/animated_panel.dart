@@ -54,8 +54,10 @@ class AnimatedPanel extends StatelessWidget {
     }
 
     // NEW: Use specialized animator for Top/Bottom panels to ensure persistent header
-    if (config.anchor == PanelAnchor.top ||
-        config.anchor == PanelAnchor.bottom) {
+    // Only applies to fixed-height panels where we can calculate valid Overflow constraints.
+    if ((config.anchor == PanelAnchor.top ||
+            config.anchor == PanelAnchor.bottom) &&
+        config.height != null) {
       return AnimatedVerticalPanel(
         config: config,
         state: state,

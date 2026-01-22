@@ -7,176 +7,190 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 ## Key Features
 
 - **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
+- **Centralized Configuration**: Type-safe `PanelLayoutConfig` for global styling and behavior (animations, resize handles).
 - **Type-Safe Panels**:
-  - **`InlinePanel`**: Participates in the layout flow (pushes other panels aside), affects sibling layout, and supports resizing. Supports "Mini Variants" (collapsing to a strip).
-  - **`OverlayPanel`**: Floats on top of the layout, does not affect the position of other widgets, and is ideal for dialogs, popovers, or floating tools. Supports `zIndex`.
-- **State Persistence**: Panels "remember" their user-dragged sizes and collapse states even if the parent widget tree rebuilds.
-- **Mini Variants (Collapsed Strips)**: Native support for "Mini Drawer" or "Side Rail" patterns (InlinePanel only).
+  - **`InlinePanel`**: Tiled panels that participate in the flow (Row/Column). Supports resizing and "Mini Variants" (collapsing to a rail).
+  - **`OverlayPanel`**: Floating panels anchored to edges or specific widget IDs. Ideal for dialogs and popovers.
+- **State Persistence**: Panels automatically persist their user-dragged sizes and collapse states during rebuilds.
 - **Automated Animations**: Smooth, built-in transitions for visibility toggles and collapsing.
-- **Intelligent Anchoring**: Overlay panels can be anchored to the container edges, other panels, or arbitrary `LayerLink` targets.
-- **Styling Agnostic**: The layout engine handles sizing and positioning; you own the visual design of your panels.
-- **High Performance**: Uses `CustomMultiChildLayout` and `InheritedModel` to minimize rebuilds.
+- **Intelligent Anchoring**: Overlay panels can be anchored to any other panel or `LayerLink`.
+- **High Performance**: Optimized layout engine minimizes rebuilds using `CustomMultiChildLayout`.
 
-## Getting Started
+## Installation
 
-### 1. Define your Panels
-
-Use `InlinePanel` for panels that participate in the main layout (Row/Column flow).
-
-```dart
-InlinePanel(
-  id: const PanelId('sidebar'),
-  width: 250,
-  minSize: 100,
-  maxSize: 400,
-  anchor: PanelAnchor.left,
-
-  // Optional: Define a collapsed "mini" state
-  // The collapsed size is derived from iconSize + standard padding
-  icon: Icon(Icons.chevron_left),
-  railDecoration: BoxDecoration(color: Colors.grey),
-
-  child: SidebarContent(),
-)
+```yaml
+dependencies:
+  panel_layout: ^0.5.7
 ```
 
-Use `OverlayPanel` for floating panels (Dialogs, Popovers).
+## Usage Guide
 
-```dart
-OverlayPanel(
-  id: const PanelId('settings_popup'),
-  anchor: PanelAnchor.right,
-  anchorTo: const PanelId('sidebar'), // Anchor to another panel!
-  width: 300,
+### 1. The Root: PanelLayout & Configuration
 
-  // Overlay specific properties
-  zIndex: 10,
-  alignment: Alignment.topRight,
-
-  child: SettingsContent(),
-)
-```
-
-### 2. Assemble the Layout
-
-Place your panels inside a `PanelLayout`.
+The `PanelLayout` widget is the entry point. It infers the layout direction from its children and holds the global style configuration.
 
 ```dart
 PanelLayout(
+  // 1. Global Configuration (Optional)
+  config: PanelLayoutConfig(
+    // Styling
+    headerPadding: 8.0,
+    headerDecoration: BoxDecoration(color: Colors.grey[200]),
+    panelBoxDecoration: BoxDecoration(color: Colors.white),
+
+    // Resize Handles
+    handleColor: Colors.blueAccent,
+    handleWidth: 4.0,
+
+    // Animation Speeds
+    sizeDuration: Duration(milliseconds: 300),
+  ),
+
+  // 3. Controller (Optional, for programmatic access)
+  controller: myPanelController,
+
+  // 4. Children (The Panels)
   children: [
-    InlinePanel(...),
-    InlinePanel(id: const PanelId('main'), flex: 1, child: MainContent()),
-    OverlayPanel(...),
+    // ... panels go here
   ],
 )
 ```
 
-## Built-in Headers
+### 2. The Building Blocks: InlinePanel
 
-Panels often need a title bar with actions. Both `InlinePanel` and `OverlayPanel` include built-in support for a standard header.
+`InlinePanel`s are tiles that fill the layout. They can be fixed-size, flexible, or content-sized.
 
 ```dart
 InlinePanel(
-  id: const PanelId('inspector'),
-  // Header configuration
-  title: "Inspector",
-  icon: Icon(Icons.close),
-  // Tap action defaults to 'collapse' for Inline, 'close' for Overlay
+  id: const PanelId('sidebar'),
 
-  // Custom styling
-  headerDecoration: BoxDecoration(color: Colors.grey[200]),
-  titleStyle: TextStyle(fontWeight: FontWeight.bold),
+  // Sizing
+  width: 250,        // Fixed width
+  minSize: 100,      // Constraint
+  maxSize: 400,
 
-  child: InspectorContent(),
+  // Header Config
+  title: "Explorer",
+  icon: Icon(Icons.chevron_left), // Use chevron_left for auto-rotation!
+
+  // Content
+  child: ListView(...),
 )
 ```
 
-## Mini Variants & Collapsing (InlinePanel)
+**Fluid Panels:** Use `flex` to make a panel fill remaining space.
 
-You can allow `InlinePanel`s to collapse into an icon rail. The collapsed size is automatically calculated based on the `iconSize`.
+```dart
+InlinePanel(
+  id: const PanelId('editor'),
+  flex: 1, // Takes all remaining space
+  child: EditorWidget(),
+)
+```
 
-The `icon` property allows you to provide an icon (typically a chevron) that will be automatically rotated and displayed in the collapsed strip.
+### 3. Floating Content: OverlayPanel
+
+`OverlayPanel`s float on top of the layout. They are removed from the flow but can be anchored to specific points.
+
+```dart
+OverlayPanel(
+  id: const PanelId('settings_dialog'),
+
+  // Anchor to the Right edge of the whole layout
+  anchor: PanelAnchor.right,
+
+  // OR Anchor to a specific panel
+  anchorTo: const PanelId('sidebar'),
+
+  width: 300,
+  initialVisible: false,
+
+  child: SettingsWidget(),
+)
+```
+
+### 4. Controlling State
+
+Use `PanelLayoutController` to toggle panels from anywhere.
+
+```dart
+final controller = PanelLayoutController();
+
+// ... pass to PanelLayout ...
+
+// ... later ...
+controller.toggleVisible(const PanelId('sidebar'));
+controller.toggleCollapsed(const PanelId('sidebar'));
+```
+
+## Advanced Features
+
+### Mini Variants (Collapsible Rails)
+
+`InlinePanel`s natively support collapsing into a "Rail" or "Mini Drawer".
+When `collapsed` is true, the panel shrinks to fit its icon (plus padding).
 
 ```dart
 InlinePanel(
   id: const PanelId('nav'),
   width: 200,
 
-  // Mini Variant Config
+  // The icon displayed in the header AND the rail
   icon: Icon(Icons.chevron_left),
-  iconSize: 24.0,
 
-  // Advanced Customization
-  railIconAlignment: Alignment.topCenter, // Control where the icon sits
-  rotateIcon: true, // Default
-  railDecoration: BoxDecoration(color: Colors.blueGrey), // Style the collapsed rail
-  railPadding: 16.0, // Optional: Override default padding (18.0)
+  // Rail Styling
+  railDecoration: BoxDecoration(color: Colors.blueGrey),
+  railIconAlignment: Alignment.topCenter,
 
-  child: NavContent(),
+  child: NavMenu(),
 )
 ```
 
-## Programmatic Control
+### Styling Hierarchy
 
-To manipulate the layout from elsewhere in your app (e.g., a button in the AppBar), use the `PanelLayoutController`.
+`panel_layout` uses a strict hierarchy for resolving styles. You can override styles at any level:
 
-```dart
-final controller = PanelLayoutController();
+1. **Panel Instance**: `InlinePanel(headerPadding: 20)` (Highest Priority)
+2. **Global Config**: `PanelLayout(config: PanelLayoutConfig(headerPadding: 10))`
+3. **Library Defaults**: `8.0`
 
-// ... in build ...
-PanelLayout(
-  controller: controller,
-  children: [...],
-)
+### Accessing State in Children
 
-// ... elsewhere ...
-IconButton(
-  icon: Icon(Icons.menu),
-  onPressed: () => controller.toggleVisible(const PanelId('sidebar')),
-)
-```
-
-## Accessing Panel State
-
-Descendants of a panel can access its real-time runtime state (like whether it is collapsed) using `PanelDataScope`.
+Descendants of a panel can read their own state (e.g., to hide text when collapsed) using `PanelDataScope`.
 
 ```dart
-class SidebarContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final state = PanelDataScope.of(context);
+Widget build(BuildContext context) {
+  final state = PanelDataScope.of(context);
 
-    return Column(
-      children: [
-        if (!state.collapsed) Text("I am expanded!"),
-        Text("My current width is ${state.size}"),
-      ],
-    );
+  if (state.collapsed) {
+    return Icon(Icons.home);
+  } else {
+    return Text("Home");
   }
 }
 ```
 
-## Configuration & Styling
+### Scoped Configuration
 
-You can configure the global styling and behavior of the layout by passing a `PanelLayoutConfig` to the `PanelLayout` constructor. This replaces the need for `PanelTheme` or `ResizeHandleTheme` widgets.
+Since `PanelLayoutConfig` is an `InheritedWidget`, you can nest layouts to create scoped themes.
 
 ```dart
 PanelLayout(
-  config: PanelLayoutConfig(
-    // Global styling
-    headerPadding: 8.0,
-    headerDecoration: BoxDecoration(color: Colors.grey[200]),
-    panelBoxDecoration: BoxDecoration(color: Colors.white),
-    
-    // Resize Handle styling
-    handleColor: Colors.blue,
-    handleWidth: 4.0,
-    
-    // Animation defaults
-    sizeDuration: Duration(milliseconds: 300),
-  ),
-  children: [...],
+  config: DarkThemeConfig, // Outer layout is Dark
+  children: [
+    InlinePanel(
+      id: PanelId('sidebar'), // Uses Dark Theme
+      // ...
+    ),
+    InlinePanel(
+      flex: 1,
+      child: PanelLayout(
+        config: LightThemeConfig, // Inner layout is Light
+        children: [
+          // These panels use Light Theme
+        ],
+      ),
+    ),
+  ],
 )
 ```
-
-Each panel can override these global defaults by setting its own properties (e.g. `InlinePanel(headerPadding: 12, ...)`).

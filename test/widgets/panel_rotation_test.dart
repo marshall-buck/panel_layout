@@ -15,9 +15,6 @@ void main() {
       home: Scaffold(
         body: PanelLayout(
           controller: PanelLayoutController(), // Unused, we set initial state
-          axis: (anchor == PanelAnchor.top || anchor == PanelAnchor.bottom) 
-              ? Axis.vertical 
-              : Axis.horizontal,
           children: [
             InlinePanel(
               id: const PanelId('test_panel'),
@@ -57,7 +54,7 @@ void main() {
       home: Scaffold(
         body: PanelLayout(
           controller: PanelLayoutController(),
-          axis: Axis.vertical,
+          
           children: [
             InlinePanel(
               id: const PanelId('test_panel_collapsed'),
@@ -104,7 +101,7 @@ void main() {
       home: Scaffold(
         body: PanelLayout(
           controller: PanelLayoutController(),
-          axis: Axis.vertical,
+          
           children: [
             InlinePanel(
               id: const PanelId('test_panel_bottom_collapsed'),

@@ -18,15 +18,17 @@ void main() {
                   id: const PanelId('sidebar'),
                   width: 200,
                   child: PanelLayout(
-                    axis: Axis.vertical,
+                    
                     children: [
                       InlinePanel(
                         id: const PanelId('top'),
+                        anchor: PanelAnchor.top,
                         height: 100,
                         child: Container(),
                       ),
                       InlinePanel(
                         id: const PanelId('bottom'),
+                        anchor: PanelAnchor.top,
                         flex: 1,
                         child: Container(),
                       ),

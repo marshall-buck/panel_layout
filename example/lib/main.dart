@@ -52,7 +52,7 @@ class ExampleHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Panel Layout Gallery'),
@@ -61,12 +61,18 @@ class ExampleHome extends StatelessWidget {
               Tab(text: 'Classic IDE', icon: Icon(Icons.grid_view)),
               Tab(text: 'Vertical Split', icon: Icon(Icons.splitscreen)),
               Tab(text: 'Overlays', icon: Icon(Icons.layers)),
+              Tab(text: 'Scoped', icon: Icon(Icons.format_paint)),
             ],
           ),
         ),
         body: const TabBarView(
           physics: NeverScrollableScrollPhysics(),
-          children: [ClassicIdeTab(), VerticalSplitTab(), OverlaysTab()],
+          children: [
+            ClassicIdeTab(),
+            VerticalSplitTab(),
+            OverlaysTab(),
+            ScopedTab(),
+          ],
         ),
       ),
     );
@@ -186,7 +192,6 @@ class VerticalSplitTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PanelLayout(
-      axis: Axis.vertical,
       config: kAppPanelConfig,
       children: [
         // TOP PANEL: Header / Toolbar
@@ -274,7 +279,6 @@ class _OverlaysTabState extends State<OverlaysTab> {
     return PanelLayout(
       controller: _rootController,
       config: kAppPanelConfig,
-      axis: Axis.vertical,
       children: [
         // 1. Top Panel (Inline, Fixed Height)
         InlinePanel(
@@ -418,6 +422,88 @@ class _OverlaysTabState extends State<OverlaysTab> {
                 value: false,
                 onChanged: null,
                 title: Text('Dark Mode'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+// -----------------------------------------------------------------------------
+// Tab 4: Scoped Configuration
+// Demonstrates: Nested Layouts with different PanelLayoutConfig (InheritedWidget)
+// -----------------------------------------------------------------------------
+class ScopedTab extends StatelessWidget {
+  const ScopedTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PanelLayout(
+      // Outer Layout Config: Dark Theme
+      config: PanelLayoutConfig(
+        headerDecoration: const BoxDecoration(
+          color: Color(0xFF212121),
+          border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        ),
+        titleStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+        iconColor: Colors.white,
+        panelBoxDecoration: const BoxDecoration(color: Color(0xFF303030)),
+      ),
+      children: [
+        // Left Panel (Outer Scope)
+        InlinePanel(
+          id: const PanelId('outer_left'),
+          anchor: PanelAnchor.left,
+          width: 200,
+          title: 'OUTER SCOPE',
+          icon: const Icon(Icons.chevron_left),
+          child: const Center(
+            child: Text(
+              'Dark Theme',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
+        ),
+
+        // Center Panel (Contains Nested Scope)
+        InlinePanel(
+          id: const PanelId('center_container'),
+          flex: 1,
+          child: PanelLayout(
+            // Inner Layout Config: Light/Blue Theme
+            // This overrides the outer config for all children in this subtree.
+            config: PanelLayoutConfig(
+              headerDecoration: BoxDecoration(
+                color: Colors.blue[100],
+                border: Border(bottom: BorderSide(color: Colors.blue[300]!)),
+              ),
+              titleStyle: TextStyle(
+                color: Colors.blue[900],
+                fontWeight: FontWeight.w600,
+              ),
+              iconColor: Colors.blue[900],
+              panelBoxDecoration: const BoxDecoration(color: Colors.white),
+            ),
+            children: [
+              InlinePanel(
+                id: const PanelId('inner_top'),
+                anchor: PanelAnchor.top,
+                height: 100,
+                title: 'INNER SCOPE (TOP)',
+                icon: const Icon(Icons.chevron_left),
+                child: const Center(
+                  child: Text('Light/Blue Theme'),
+                ),
+              ),
+              InlinePanel(
+                id: const PanelId('inner_bottom'),
+                flex: 1,
+                child: const Center(child: Text('Content Area')),
               ),
             ],
           ),

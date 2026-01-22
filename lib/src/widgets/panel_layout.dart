@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
 import '../state/panel_runtime_state.dart';
 import '../state/panel_scope.dart';
@@ -48,7 +49,6 @@ class PanelLayout extends StatefulWidget {
     required this.children,
     this.controller,
     this.config,
-    this.axis = Axis.horizontal,
     this.onResizeStart,
     this.onResizeEnd,
     super.key,
@@ -68,12 +68,6 @@ class PanelLayout extends StatefulWidget {
 
   /// The configuration for styling and behavior.
   final PanelLayoutConfig? config;
-
-  /// The main axis of the layout.
-  ///
-  /// - [Axis.horizontal]: Panels are laid out in a row (Left-to-Right).
-  /// - [Axis.vertical]: Panels are laid out in a column (Top-to-Bottom).
-  final Axis axis;
 
   /// Optional callback called when a user begins dragging a resize handle.
   final VoidCallback? onResizeStart;
@@ -278,9 +272,38 @@ class _PanelLayoutState extends State<PanelLayout>
     return 0.0;
   }
 
+  /// Infers the axis from the first [InlinePanel] found in [children].
+  ///
+  /// Validates that all [InlinePanel]s share the same axis.
+  /// Defaults to [Axis.horizontal] if no inline panels are present.
+  Axis _computeAxis(List<BasePanel> children) {
+    Axis? axis;
+    for (final child in children) {
+      if (child is InlinePanel) {
+        final childAxis =
+            (child.anchor == PanelAnchor.left ||
+                    child.anchor == PanelAnchor.right)
+                ? Axis.horizontal
+                : Axis.vertical;
+
+        if (axis == null) {
+          axis = childAxis;
+        } else if (axis != childAxis) {
+          throw FlutterError(
+            'PanelLayout contains InlinePanels with conflicting axes. '
+            'Found both Horizontal (Left/Right) and Vertical (Top/Bottom) anchors. '
+            'InlinePanels in a single PanelLayout must share the same axis.',
+          );
+        }
+      }
+    }
+    return axis ?? Axis.horizontal;
+  }
+
   @override
   Widget build(BuildContext context) {
     final config = widget.config ?? const PanelLayoutConfig();
+    final axis = _computeAxis(widget.children);
     final uniquePanelConfigs = <PanelId, BasePanel>{};
     for (final panel in widget.children) {
       uniquePanelConfigs[panel.id] = panel;
@@ -363,9 +386,7 @@ class _PanelLayoutState extends State<PanelLayout>
         LayoutId(
           id: handleId,
           child: PanelResizeHandle(
-            axis: widget.axis == Axis.horizontal
-                ? Axis.vertical
-                : Axis.horizontal,
+            axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
             onDragUpdate: (delta) => _handleResize(delta, prev, next),
             onDragStart: widget.onResizeStart,
             onDragEnd: widget.onResizeEnd,
@@ -383,7 +404,7 @@ class _PanelLayoutState extends State<PanelLayout>
         child: CustomMultiChildLayout(
           delegate: PanelLayoutDelegate(
             panels: layoutData,
-            axis: widget.axis,
+            axis: axis,
             textDirection: Directionality.of(context),
           ),
           children: sortedChildren,
