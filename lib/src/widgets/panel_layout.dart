@@ -458,8 +458,14 @@ class _PanelLayoutState extends State<PanelLayout>
 
       // Case 1: Prev is fixed, Next is whatever. Resize Prev.
       if (prevConfig.flex == null && prevConfig.resizable) {
+        if (prev.collapsed) return;
+
+        final minSize = prevConfig.minSize ?? 0.0;
+        final effectiveMin =
+            minSize < prevData.collapsedSize ? prevData.collapsedSize : minSize;
+
         final newSize = (prev.size + delta).clamp(
-          prevConfig.minSize ?? 0.0,
+          effectiveMin,
           prevConfig.maxSize ?? double.infinity,
         );
         _panelStates[prevConfig.id] = prev.copyWith(size: newSize);
@@ -468,8 +474,14 @@ class _PanelLayoutState extends State<PanelLayout>
 
       // Case 2: Prev is flex (or not resizable), Next is fixed. Resize Next (inverse).
       if (nextConfig.flex == null && nextConfig.resizable) {
+        if (next.collapsed) return;
+
+        final minSize = nextConfig.minSize ?? 0.0;
+        final effectiveMin =
+            minSize < nextData.collapsedSize ? nextData.collapsedSize : minSize;
+
         final newSize = (next.size - delta).clamp(
-          nextConfig.minSize ?? 0.0,
+          effectiveMin,
           nextConfig.maxSize ?? double.infinity,
         );
         _panelStates[nextConfig.id] = next.copyWith(size: newSize);
@@ -481,6 +493,8 @@ class _PanelLayoutState extends State<PanelLayout>
           nextConfig.flex != null &&
           prevConfig.resizable &&
           nextConfig.resizable) {
+        if (prev.collapsed || next.collapsed) return;
+
         final w1 = prev.size;
         final w2 = next.size;
 

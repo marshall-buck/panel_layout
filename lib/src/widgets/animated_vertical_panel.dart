@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import 'dart:math' as math;
 import '../state/panel_runtime_state.dart';
 import '../layout/panel_layout_config.dart';
 import 'base_panel.dart';
@@ -134,8 +135,8 @@ class AnimatedVerticalPanel extends StatelessWidget {
                     // Allow content to maintain its logical size (e.g. alignment)
                     // while the container shrinks.
                     alignment: Alignment.topLeft,
-                    minHeight: fullSize - headerHeight,
-                    maxHeight: fullSize - headerHeight,
+                    minHeight: math.max(0.0, fullSize - headerHeight),
+                    maxHeight: math.max(0.0, fullSize - headerHeight),
                     child: config.child,
                   ),
                 ),
