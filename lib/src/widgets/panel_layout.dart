@@ -279,7 +279,7 @@ class _PanelLayoutState extends State<PanelLayout>
   Axis _computeAxis(List<BasePanel> children) {
     Axis? axis;
     for (final child in children) {
-      if (child is InlinePanel) {
+      if (child is InlinePanel && child.anchor != null) {
         final childAxis =
             (child.anchor == PanelAnchor.left ||
                     child.anchor == PanelAnchor.right)

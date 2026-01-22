@@ -24,6 +24,7 @@ void main() {
           children: [
             InlinePanel(
               id: panelId,
+              anchor: PanelAnchor.left,
               width: 200,
               // Custom styling that should persist
               icon: const Icon(Icons.chevron_left),

@@ -352,8 +352,10 @@ class AnimatedPanel extends StatelessWidget {
       return inline.railIconAlignment!;
     }
 
+    if (config.anchor == null) return Alignment.center;
+
     // Smart defaults based on anchor position
-    switch (config.anchor) {
+    switch (config.anchor!) {
       case PanelAnchor.top:
       case PanelAnchor.bottom:
         // Horizontal rails: Align to the right
@@ -366,7 +368,8 @@ class AnimatedPanel extends StatelessWidget {
   }
 
   /// Maps the abstract [PanelAnchor] to a concrete [Alignment].
-  Alignment _getAlignment(PanelAnchor anchor) {
+  Alignment _getAlignment(PanelAnchor? anchor) {
+    if (anchor == null) return Alignment.center;
     switch (anchor) {
       case PanelAnchor.left:
         return Alignment.centerLeft;

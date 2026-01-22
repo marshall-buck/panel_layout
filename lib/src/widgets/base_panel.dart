@@ -18,7 +18,7 @@ abstract class BasePanel extends StatelessWidget {
   const BasePanel({
     required this.id,
     required this.child,
-    this.anchor = PanelAnchor.left,
+    this.anchor,
     this.anchorTo,
     this.width,
     this.height,
@@ -52,7 +52,7 @@ abstract class BasePanel extends StatelessWidget {
   ///
   /// - For [InlinePanel]: Determines the resize handle position and collapse animation.
   /// - For [OverlayPanel]: Determines where the panel is positioned relative to its target.
-  final PanelAnchor anchor;
+  final PanelAnchor? anchor;
 
   /// The ID of another panel to anchor this one to.
   ///
@@ -150,7 +150,7 @@ abstract class BasePanel extends StatelessWidget {
 
     // UX Logic for Icon Placement:
     // The icon should be placed on the "opening side" of the panel.
-    PanelAnchor effectiveClosingDir = anchor;
+    PanelAnchor? effectiveClosingDir = anchor;
     if (this is InlinePanel) {
       effectiveClosingDir = (this as InlinePanel).closingDirection ?? anchor;
     }

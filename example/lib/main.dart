@@ -109,6 +109,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
         // Standard usage. Inline, resizable.
         InlinePanel(
           id: const PanelId('explorer'),
+          anchor: PanelAnchor.left,
           width: 250,
           minSize: 150,
           maxSize: 400,

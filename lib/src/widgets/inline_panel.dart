@@ -15,7 +15,7 @@ class InlinePanel extends BasePanel {
   const InlinePanel({
     required super.id,
     required super.child,
-    super.anchor = PanelAnchor.left,
+    super.anchor,
     super.anchorTo,
     super.width,
     super.height,

@@ -63,7 +63,7 @@ class PanelToggleButton extends StatelessWidget {
     // The caller is responsible for passing the correct size (e.g. toggleIconSize for rail, headerIconSize for header).
     final double effectiveSize = size;
 
-    PanelAnchor anchor = PanelAnchor.left;
+    PanelAnchor? anchor = PanelAnchor.left;
     bool isCollapsed = false;
 
     if (panelId != null) {
@@ -81,14 +81,14 @@ class PanelToggleButton extends StatelessWidget {
     // Direction logic:
     // If explicit closingDirection provided, use it.
     // Else, anchor determines closing direction (e.g. Left panel closes to Left).
-    final PanelAnchor effectiveClosingDir = closingDirection ?? anchor;
+    final PanelAnchor? effectiveClosingDir = closingDirection ?? anchor;
 
     // Input: Left Chevron (<)
     // 0 deg = Pointing Left.
 
     double rotation = 0.0;
 
-    if (shouldRotate) {
+    if (shouldRotate && effectiveClosingDir != null) {
       switch (effectiveClosingDir) {
         case PanelAnchor.left:
           // Closes Left (<). Opens Right (>).

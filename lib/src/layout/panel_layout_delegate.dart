@@ -257,25 +257,27 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
       if (config.anchorTo != null && panelRects.containsKey(config.anchorTo)) {
         final anchorRect = panelRects[config.anchorTo]!;
         if (crossAlign == CrossAxisAlignment.stretch) {
-          switch (config.anchor) {
-            case PanelAnchor.left:
-            case PanelAnchor.right:
-              childConstraints = BoxConstraints(
-                minHeight: anchorRect.height,
-                maxHeight: anchorRect.height,
-                minWidth: 0,
-                maxWidth: size.width,
-              );
-              break;
-            case PanelAnchor.top:
-            case PanelAnchor.bottom:
-              childConstraints = BoxConstraints(
-                minWidth: anchorRect.width,
-                maxWidth: anchorRect.width,
-                minHeight: 0,
-                maxHeight: size.height,
-              );
-              break;
+          if (config.anchor != null) {
+            switch (config.anchor!) {
+              case PanelAnchor.left:
+              case PanelAnchor.right:
+                childConstraints = BoxConstraints(
+                  minHeight: anchorRect.height,
+                  maxHeight: anchorRect.height,
+                  minWidth: 0,
+                  maxWidth: size.width,
+                );
+                break;
+              case PanelAnchor.top:
+              case PanelAnchor.bottom:
+                childConstraints = BoxConstraints(
+                  minWidth: anchorRect.width,
+                  maxWidth: anchorRect.width,
+                  minHeight: 0,
+                  maxHeight: size.height,
+                );
+                break;
+            }
           }
         }
       }
@@ -292,39 +294,41 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
         // Relative Positioning
         double dx = 0;
         double dy = 0;
-        switch (config.anchor) {
-          case PanelAnchor.left:
-            dx = anchorRect.left - childSize.width;
-            dy = _alignAxis(
-              anchorRect.top,
-              anchorRect.height,
-              childSize.height,
-              alignment.y,
-            );
-          case PanelAnchor.right:
-            dx = anchorRect.right;
-            dy = _alignAxis(
-              anchorRect.top,
-              anchorRect.height,
-              childSize.height,
-              alignment.y,
-            );
-          case PanelAnchor.top:
-            dy = anchorRect.top - childSize.height;
-            dx = _alignAxis(
-              anchorRect.left,
-              anchorRect.width,
-              childSize.width,
-              alignment.x,
-            );
-          case PanelAnchor.bottom:
-            dy = anchorRect.bottom;
-            dx = _alignAxis(
-              anchorRect.left,
-              anchorRect.width,
-              childSize.width,
-              alignment.x,
-            );
+        if (config.anchor != null) {
+          switch (config.anchor!) {
+            case PanelAnchor.left:
+              dx = anchorRect.left - childSize.width;
+              dy = _alignAxis(
+                anchorRect.top,
+                anchorRect.height,
+                childSize.height,
+                alignment.y,
+              );
+            case PanelAnchor.right:
+              dx = anchorRect.right;
+              dy = _alignAxis(
+                anchorRect.top,
+                anchorRect.height,
+                childSize.height,
+                alignment.y,
+              );
+            case PanelAnchor.top:
+              dy = anchorRect.top - childSize.height;
+              dx = _alignAxis(
+                anchorRect.left,
+                anchorRect.width,
+                childSize.width,
+                alignment.x,
+              );
+            case PanelAnchor.bottom:
+              dy = anchorRect.bottom;
+              dx = _alignAxis(
+                anchorRect.left,
+                anchorRect.width,
+                childSize.width,
+                alignment.x,
+              );
+          }
         }
         position = Offset(dx, dy);
       } else {
@@ -338,7 +342,8 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate {
     }
   }
 
-  Alignment _defaultAlignment(PanelAnchor anchor) {
+  Alignment _defaultAlignment(PanelAnchor? anchor) {
+    if (anchor == null) return Alignment.center;
     switch (anchor) {
       case PanelAnchor.left:
         return Alignment.centerLeft;
