@@ -5,7 +5,11 @@ import '../../state/panel_runtime_state.dart';
 import '../../layout/panel_layout_config.dart';
 import '../panels/base_panel.dart';
 
-/// A specialized animator for Vertical (Top/Bottom) panels.
+/// A specialized animator for "Vertical" panels (Top/Bottom anchored).
+///
+/// This widget acts as a wrapper for panels that visually appear as **Top/Bottom Bars**
+/// or **Horizontal Strips**. It is named "Vertical" because it animates the
+/// panel along the **Vertical Axis** (changing its height).
 ///
 /// Unlike the default animator which cross-fades between a "Panel" and a "Rail",
 /// this widget maintains the Header as a persistent element and simply animates

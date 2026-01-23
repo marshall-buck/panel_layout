@@ -9,8 +9,9 @@ import '../internal/panel_toggle_button.dart';
 
 /// A specialized animator for "Horizontal" panels (Left/Right anchored).
 ///
-/// **Note:** "Horizontal" here refers to the *direction of the animation* (width changes),
-/// not necessarily the aspect ratio of the panel.
+/// This widget acts as a wrapper for panels that visually appear as **Sidebars**
+/// or **Vertical Rails**. It is named "Horizontal" because it animates the
+/// panel along the **Horizontal Axis** (changing its width).
 ///
 /// This widget handles the complex animations for a side panel's lifecycle:
 /// 1. **Size Animation**: Interpolating the panel's width based on its

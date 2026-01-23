@@ -6,9 +6,10 @@ import '../panels/base_panel.dart';
 import 'animated_vertical_panel.dart';
 import 'animated_horizontal_panel.dart';
 
-/// An internal widget that acts as a dispatcher for panel animations.
+/// An internal wrapper widget that acts as a dispatcher for panel animations.
 ///
-/// It delegates the actual rendering to specialized animators:
+/// It connects a panel's static [config] ([BasePanel]) with its dynamic [state]
+/// ([PanelRuntimeState]), delegating the actual rendering to specialized animators:
 /// * [AnimatedVerticalPanel] for Top/Bottom panels (Height animation).
 /// * [AnimatedHorizontalPanel] for Left/Right panels (Width animation).
 ///
