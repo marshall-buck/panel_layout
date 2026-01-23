@@ -50,7 +50,6 @@ void main() {
               width: 800,
               height: 600,
               child: PanelLayout(
-                
                 children: [
                   InlinePanel(
                     id: const PanelId('base'),
@@ -67,7 +66,7 @@ void main() {
                     height: 50,
                     alignment: Alignment.centerRight,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
+
                     child: Container(),
                   ),
                   // Anchor Bottom, Alignment Center (x=0.0)
@@ -79,7 +78,7 @@ void main() {
                     height: 50,
                     alignment: Alignment.bottomCenter,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
+
                     child: Container(),
                   ),
                 ],

@@ -47,7 +47,8 @@ class AnimatedPanel extends StatelessWidget {
 
     // Delegate based on anchor direction.
     // Top/Bottom -> Vertical Animation (Height)
-    if (config.anchor == PanelAnchor.top || config.anchor == PanelAnchor.bottom) {
+    if (config.anchor == PanelAnchor.top ||
+        config.anchor == PanelAnchor.bottom) {
       return AnimatedVerticalPanel(
         config: config,
         state: state,

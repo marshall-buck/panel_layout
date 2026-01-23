@@ -5,7 +5,9 @@ import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
 
 void main() {
   group('PanelLayout Mixed Anchors', () {
-    testWidgets('Vertical Layout with Neutral Center Panel works', (tester) async {
+    testWidgets('Vertical Layout with Neutral Center Panel works', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -39,7 +41,9 @@ void main() {
       expect(find.text('Bottom'), findsOneWidget);
     });
 
-    testWidgets('Horizontal Layout with Neutral Center Panel works', (tester) async {
+    testWidgets('Horizontal Layout with Neutral Center Panel works', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -99,7 +103,9 @@ void main() {
       expect(tester.takeException(), isNotNull);
     });
 
-    testWidgets('Neutral panel respects width in Horizontal layout', (tester) async {
+    testWidgets('Neutral panel respects width in Horizontal layout', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -121,12 +127,16 @@ void main() {
         ),
       );
 
-      final neutralFinder = find.byWidgetPredicate((w) => w is PanelDataScope && w.config.id == const PanelId('h_neutral'));
+      final neutralFinder = find.byWidgetPredicate(
+        (w) => w is PanelDataScope && w.config.id == const PanelId('h_neutral'),
+      );
       final neutralRect = tester.getRect(neutralFinder);
       expect(neutralRect.width, 100);
     });
 
-    testWidgets('Neutral panel respects height in Vertical layout', (tester) async {
+    testWidgets('Neutral panel respects height in Vertical layout', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -148,7 +158,9 @@ void main() {
         ),
       );
 
-      final neutralFinder = find.byWidgetPredicate((w) => w is PanelDataScope && w.config.id == const PanelId('v_neutral'));
+      final neutralFinder = find.byWidgetPredicate(
+        (w) => w is PanelDataScope && w.config.id == const PanelId('v_neutral'),
+      );
       final neutralRect = tester.getRect(neutralFinder);
       expect(neutralRect.height, 120);
     });
@@ -185,12 +197,19 @@ void main() {
 
       // Content should be hidden (opacity 0)
       final contentOpacity = tester.widget<Opacity>(
-        find.ancestor(of: find.text('Neutral Content'), matching: find.byType(Opacity)).first,
+        find
+            .ancestor(
+              of: find.text('Neutral Content'),
+              matching: find.byType(Opacity),
+            )
+            .first,
       );
       expect(contentOpacity.opacity, 0.0);
     });
 
-    testWidgets('Resize handles work between Anchored and Neutral panels', (tester) async {
+    testWidgets('Resize handles work between Anchored and Neutral panels', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -219,7 +238,10 @@ void main() {
       await tester.pump();
 
       // Top panel should now be 70
-      final topFinder = find.byWidgetPredicate((w) => w is PanelDataScope && w.config.id == const PanelId('top_anchor'));
+      final topFinder = find.byWidgetPredicate(
+        (w) =>
+            w is PanelDataScope && w.config.id == const PanelId('top_anchor'),
+      );
       final topRect = tester.getRect(topFinder);
       expect(topRect.height, 70);
     });

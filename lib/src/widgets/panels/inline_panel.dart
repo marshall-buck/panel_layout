@@ -26,8 +26,10 @@ class InlinePanel extends BasePanel {
     this.closingDirection,
     this.railDecoration,
     this.resizable = true,
+
     /// Whether the panel is initially visible.
     super.initialVisible = true,
+
     /// Whether the panel is initially collapsed into a rail.
     super.initialCollapsed = false,
     super.animationDuration,
@@ -36,6 +38,7 @@ class InlinePanel extends BasePanel {
     super.titleStyle,
     super.headerHeight,
     super.headerPadding,
+
     /// The primary icon for the panel.
     ///
     /// **Important:** To use the built-in rotation animations, provide a **Left-Pointing Chevron**

@@ -118,7 +118,8 @@ class PanelToggleButton extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: onTap ??
+      onTap:
+          onTap ??
           () {
             final targetId = panelId ?? scope?.config.id;
             if (targetId != null) {

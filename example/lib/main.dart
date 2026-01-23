@@ -36,9 +36,7 @@ final kAppPanelConfig = PanelLayoutConfig(
   ),
   headerDecoration: BoxDecoration(
     color: Colors.grey[200],
-    border: Border(
-      bottom: BorderSide(color: Colors.grey[300]!, width: 1),
-    ),
+    border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1)),
   ),
   panelBoxDecoration: BoxDecoration(
     color: Colors.white,
@@ -291,7 +289,9 @@ class _OverlaysTabState extends State<OverlaysTab> {
           child: Container(
             color: Colors.blue[50],
             alignment: Alignment.center,
-            child: const Text('I am an InlinePanel in the Root Vertical Layout'),
+            child: const Text(
+              'I am an InlinePanel in the Root Vertical Layout',
+            ),
           ),
         ),
 
@@ -350,7 +350,10 @@ class _OverlaysTabState extends State<OverlaysTab> {
                       ElevatedButton(
                         onPressed: () {
                           // Opens 'overlay' which is in the Root Layout
-                          _rootController.setVisible(const PanelId('overlay'), true);
+                          _rootController.setVisible(
+                            const PanelId('overlay'),
+                            true,
+                          );
                         },
                         child: const Text('Open Global Overlay'),
                       ),
@@ -376,7 +379,9 @@ class _OverlaysTabState extends State<OverlaysTab> {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          _innerController.toggleVisible(const PanelId('popover_behind'));
+                          _innerController.toggleVisible(
+                            const PanelId('popover_behind'),
+                          );
                         },
                         child: const Text('Toggle Popover (Behind)'),
                       ),
@@ -431,6 +436,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
     );
   }
 }
+
 // -----------------------------------------------------------------------------
 // Tab 4: Scoped Configuration
 // Demonstrates: Nested Layouts with different PanelLayoutConfig (InheritedWidget)
@@ -464,10 +470,7 @@ class ScopedTab extends StatelessWidget {
           title: 'OUTER SCOPE',
           icon: const Icon(Icons.chevron_left),
           child: const Center(
-            child: Text(
-              'Dark Theme',
-              style: TextStyle(color: Colors.white70),
-            ),
+            child: Text('Dark Theme', style: TextStyle(color: Colors.white70)),
           ),
         ),
 
@@ -497,9 +500,7 @@ class ScopedTab extends StatelessWidget {
                 height: 100,
                 title: 'INNER SCOPE (TOP)',
                 icon: const Icon(Icons.chevron_left),
-                child: const Center(
-                  child: Text('Light/Blue Theme'),
-                ),
+                child: const Center(child: Text('Light/Blue Theme')),
               ),
               InlinePanel(
                 id: const PanelId('inner_bottom'),

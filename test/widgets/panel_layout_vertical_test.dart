@@ -13,7 +13,6 @@ void main() {
             width: 100,
             height: 400,
             child: PanelLayout(
-              
               children: [
                 InlinePanel(
                   id: const PanelId('t1'),

@@ -2,12 +2,13 @@ import 'package:flutter/widgets.dart';
 
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
-import '../state/panel_runtime_state.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
+import '../state/panel_state_manager.dart';
 import '../layout/panel_layout_config.dart';
 import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
+import '../layout/panel_resizing.dart';
 import '../controllers/panel_layout_controller.dart';
 import 'widgets.dart';
 import 'animation/animated_panel.dart';
@@ -87,15 +88,7 @@ class PanelLayout extends StatefulWidget {
 class _PanelLayoutState extends State<PanelLayout>
     with TickerProviderStateMixin
     implements PanelLayoutStateInterface {
-  /// Internal state for each panel, keyed by ID.
-  /// This persists the "runtime" values like current width (if resized) or visibility.
-  final Map<PanelId, PanelRuntimeState> _panelStates = {};
-
-  /// Animation controllers for each panel's visibility.
-  final Map<PanelId, AnimationController> _animationControllers = {};
-
-  /// Animation controllers for each panel's collapse state.
-  final Map<PanelId, AnimationController> _collapseControllers = {};
+  late final PanelStateManager _stateManager;
 
   PanelLayoutController? _internalController;
   PanelLayoutController get _effectiveController =>
@@ -104,11 +97,17 @@ class _PanelLayoutState extends State<PanelLayout>
   @override
   void initState() {
     super.initState();
+    _stateManager = PanelStateManager();
+    _stateManager.addListener(_onStateChange);
     if (widget.controller == null) {
       _internalController = PanelLayoutController();
     }
     _reconcileState();
     _effectiveController.attach(this);
+  }
+
+  void _onStateChange() {
+    setState(() {});
   }
 
   @override
@@ -134,12 +133,8 @@ class _PanelLayoutState extends State<PanelLayout>
   void dispose() {
     _effectiveController.detach();
     _internalController?.dispose();
-    for (final controller in _animationControllers.values) {
-      controller.dispose();
-    }
-    for (final controller in _collapseControllers.values) {
-      controller.dispose();
-    }
+    _stateManager.removeListener(_onStateChange);
+    _stateManager.dispose();
     super.dispose();
   }
 
@@ -147,129 +142,34 @@ class _PanelLayoutState extends State<PanelLayout>
 
   @override
   void toggleVisible(PanelId id) {
-    if (_panelStates.containsKey(id)) {
-      setVisible(id, !_panelStates[id]!.visible);
+    final state = _stateManager.getState(id);
+    if (state != null) {
+      _stateManager.setVisible(id, !state.visible);
     }
   }
 
   @override
   void toggleCollapsed(PanelId id) {
-    if (_panelStates.containsKey(id)) {
-      setCollapsed(id, !_panelStates[id]!.collapsed);
+    final state = _stateManager.getState(id);
+    if (state != null) {
+      _stateManager.setCollapsed(id, !state.collapsed);
     }
   }
 
   @override
   void setVisible(PanelId id, bool visible) {
-    final state = _panelStates[id];
-    if (state != null && state.visible != visible) {
-      setState(() {
-        _panelStates[id] = state.copyWith(visible: visible);
-      });
-      _animatePanel(id, visible);
-    }
+    _stateManager.setVisible(id, visible);
   }
 
   @override
   void setCollapsed(PanelId id, bool collapsed) {
-    final state = _panelStates[id];
-    if (state != null && state.collapsed != collapsed) {
-      setState(() {
-        _panelStates[id] = state.copyWith(collapsed: collapsed);
-      });
-      // Trigger collapse animation
-      _animateCollapse(id, collapsed);
-    }
-  }
-
-  void _animatePanel(PanelId id, bool visible) {
-    final controller = _animationControllers[id];
-    if (controller != null) {
-      if (visible) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
-    }
-  }
-
-  void _animateCollapse(PanelId id, bool collapsed) {
-    final controller = _collapseControllers[id];
-    if (controller != null) {
-      if (collapsed) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
-    }
+    _stateManager.setCollapsed(id, collapsed);
   }
 
   /// Ensures internal state maps match the current list of children.
-  /// Adds missing states and removes orphaned ones.
   void _reconcileState() {
-    final currentIds = widget.children.map((p) => p.id).toSet();
-
-    _panelStates.removeWhere((id, _) => !currentIds.contains(id));
-
-    for (final id in _animationControllers.keys.toList()) {
-      if (!currentIds.contains(id)) {
-        _animationControllers[id]!.dispose();
-        _animationControllers.remove(id);
-      }
-    }
-    for (final id in _collapseControllers.keys.toList()) {
-      if (!currentIds.contains(id)) {
-        _collapseControllers[id]!.dispose();
-        _collapseControllers.remove(id);
-      }
-    }
-
-    // Default durations (we'll fetch from config if available in build, but here we might need defaults)
-    // Actually, we can use kDefault constants for reconciliation if config isn't available,
-    // or just use defaults. PanelLayoutConfig defaults match constants.
-    // However, if the user provided a config with *different* durations, we should try to use them.
-    // But config is a widget property. We can access `widget.config` here.
-
     final config = widget.config ?? const PanelLayoutConfig();
-
-    for (final panel in widget.children) {
-      if (!_panelStates.containsKey(panel.id)) {
-        _panelStates[panel.id] = PanelRuntimeState(
-          size: _getInitialSize(panel),
-          visible: panel.initialVisible,
-          collapsed: panel.initialCollapsed,
-        );
-
-        // Priority: Panel Override > Config > Default Constant
-        final fade = panel.fadeDuration ?? config.fadeDuration;
-        final slide = panel.sizeDuration ?? config.sizeDuration;
-        final maxDuration = fade > slide ? fade : slide;
-        final effectiveDuration = panel.animationDuration ?? maxDuration;
-
-        final controller = AnimationController(
-          vsync: this,
-          duration: effectiveDuration,
-          value: panel.initialVisible ? 1.0 : 0.0,
-        );
-        controller.addListener(() => setState(() {}));
-        _animationControllers[panel.id] = controller;
-
-        final collapseController = AnimationController(
-          vsync: this,
-          duration: effectiveDuration,
-          value: panel.initialCollapsed ? 1.0 : 0.0,
-        );
-        collapseController.addListener(() => setState(() {}));
-        _collapseControllers[panel.id] = collapseController;
-      }
-    }
-  }
-
-  double _getInitialSize(BasePanel panel) {
-    if (panel is InlinePanel && panel.flex != null) return panel.flex!;
-    if (panel.width != null) return panel.width!;
-    if (panel.height != null) return panel.height!;
-    return 0.0;
+    _stateManager.reconcile(widget.children, config, this);
   }
 
   /// Infers the axis from the first [InlinePanel] found in [children].
@@ -311,9 +211,9 @@ class _PanelLayoutState extends State<PanelLayout>
 
     // Prepare data for the layout delegate
     final layoutData = uniquePanelConfigs.values.map((panelConfig) {
-      final state = _panelStates[panelConfig.id]!;
-      final anim = _animationControllers[panelConfig.id]!;
-      final collapseAnim = _collapseControllers[panelConfig.id]!;
+      final state = _stateManager.getState(panelConfig.id)!;
+      final anim = _stateManager.getAnimationController(panelConfig.id)!;
+      final collapseAnim = _stateManager.getCollapseController(panelConfig.id)!;
 
       double collapsedSize = 0.0;
       if (panelConfig is InlinePanel) {
@@ -339,14 +239,14 @@ class _PanelLayoutState extends State<PanelLayout>
 
     // Add Panel Widgets
     for (final panel in uniquePanelConfigs.values) {
-      final state = _panelStates[panel.id]!;
-      final factor = _animationControllers[panel.id]!.value;
+      final state = _stateManager.getState(panel.id)!;
+      final factor = _stateManager.getAnimationController(panel.id)!.value;
 
       Widget panelWidget = AnimatedPanel(
         config: panel,
         state: state,
         factor: factor,
-        collapseFactor: _collapseControllers[panel.id]!.value,
+        collapseFactor: _stateManager.getCollapseController(panel.id)!.value,
       );
 
       // If anchored to external link, wrap in Follower
@@ -449,65 +349,22 @@ class _PanelLayoutState extends State<PanelLayout>
     PanelLayoutData nextData,
   ) {
     setState(() {
-      final prev = _panelStates[prevData.config.id]!;
-      final next = _panelStates[nextData.config.id]!;
+      // Fetch the latest state to ensure we are accumulating deltas correctly
+      final prevState = _stateManager.getState(prevData.config.id)!;
+      final nextState = _stateManager.getState(nextData.config.id)!;
 
-      // We only resize inline panels, so safe to cast
-      final prevConfig = prevData.config as InlinePanel;
-      final nextConfig = nextData.config as InlinePanel;
+      final changes = PanelResizing.calculateResize(
+        delta: delta,
+        prevConfig: prevData.config as InlinePanel,
+        prevState: prevState,
+        prevCollapsedSize: prevData.collapsedSize,
+        nextConfig: nextData.config as InlinePanel,
+        nextState: nextState,
+        nextCollapsedSize: nextData.collapsedSize,
+      );
 
-      // Case 1: Prev is fixed, Next is whatever. Resize Prev.
-      if (prevConfig.flex == null && prevConfig.resizable) {
-        if (prev.collapsed) return;
-
-        final minSize = prevConfig.minSize ?? 0.0;
-        final effectiveMin = minSize < prevData.collapsedSize
-            ? prevData.collapsedSize
-            : minSize;
-
-        final newSize = (prev.size + delta).clamp(
-          effectiveMin,
-          prevConfig.maxSize ?? double.infinity,
-        );
-        _panelStates[prevConfig.id] = prev.copyWith(size: newSize);
-        return;
-      }
-
-      // Case 2: Prev is flex (or not resizable), Next is fixed. Resize Next (inverse).
-      if (nextConfig.flex == null && nextConfig.resizable) {
-        if (next.collapsed) return;
-
-        final minSize = nextConfig.minSize ?? 0.0;
-        final effectiveMin = minSize < nextData.collapsedSize
-            ? nextData.collapsedSize
-            : minSize;
-
-        final newSize = (next.size - delta).clamp(
-          effectiveMin,
-          nextConfig.maxSize ?? double.infinity,
-        );
-        _panelStates[nextConfig.id] = next.copyWith(size: newSize);
-        return;
-      }
-
-      // Case 3: Both are flexible. Adjust flex weights.
-      if (prevConfig.flex != null &&
-          nextConfig.flex != null &&
-          prevConfig.resizable &&
-          nextConfig.resizable) {
-        if (prev.collapsed || next.collapsed) return;
-
-        final w1 = prev.size;
-        final w2 = next.size;
-
-        const sensitivity = 0.01;
-        _panelStates[prevConfig.id] = prev.copyWith(
-          size: (w1 + delta * sensitivity).clamp(0.0, double.infinity),
-        );
-        _panelStates[nextConfig.id] = next.copyWith(
-          size: (w2 - delta * sensitivity).clamp(0.0, double.infinity),
-        );
-        return;
+      for (final entry in changes.entries) {
+        _stateManager.updateSize(entry.key, entry.value);
       }
     });
   }

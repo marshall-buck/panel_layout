@@ -28,7 +28,7 @@ void main() {
                   anchorTo: const PanelId('base'),
                   anchor: PanelAnchor.right,
                   width: 100,
-                  
+
                   child: Container(color: const Color(0xFFFF0000)),
                 ),
               ],
@@ -47,7 +47,9 @@ void main() {
     expect(overlayRect.width, 100.0);
   });
 
-  testWidgets('Overlay panel can anchor to another Overlay panel', (tester) async {
+  testWidgets('Overlay panel can anchor to another Overlay panel', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -66,7 +68,7 @@ void main() {
                   id: const PanelId('overlay1'),
                   width: 100,
                   height: 100,
-                  
+
                   // Center of screen roughly? Default alignment is centerLeft of screen if no anchorTo.
                   // Default delegate puts unanchored overlays at top left if alignment not specified?
                   // Let's specify alignment for clarity or rely on default.
@@ -78,10 +80,11 @@ void main() {
                 OverlayPanel(
                   id: const PanelId('overlay2'),
                   anchorTo: const PanelId('overlay1'),
-                  anchor: PanelAnchor.right, // Should be to the right of overlay1
+                  anchor:
+                      PanelAnchor.right, // Should be to the right of overlay1
                   width: 50,
                   height: 50,
-                  
+
                   child: Container(color: const Color(0xFF0000FF)),
                 ),
               ],
@@ -96,7 +99,7 @@ void main() {
 
     expect(rect1.topLeft, Offset.zero);
     expect(rect1.width, 100.0);
-    
+
     // overlay2 anchored right of overlay1
     expect(rect2.left, rect1.right);
     expect(rect2.width, 50.0);

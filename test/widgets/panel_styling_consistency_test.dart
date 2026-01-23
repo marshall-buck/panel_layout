@@ -17,9 +17,7 @@ void main() {
         home: PanelLayout(
           controller: controller,
           config: const PanelLayoutConfig(
-            headerDecoration: BoxDecoration(
-              color: Colors.white,
-            ), // Default
+            headerDecoration: BoxDecoration(color: Colors.white), // Default
           ),
           children: [
             InlinePanel(

@@ -53,7 +53,7 @@ class AnimatedHorizontalPanel extends StatelessWidget {
     if (config is InlinePanel) {
       final inline = config as InlinePanel;
       iconSize = inline.iconSize ?? layoutConfig.iconSize;
-      
+
       // Standard Rail (Icon only) for side panels
       collapsed = iconSize + (inline.railPadding ?? layoutConfig.railPadding);
     }
@@ -80,10 +80,7 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     Widget childWidget = Opacity(
       opacity: contentOpacity,
-      child: IgnorePointer(
-        ignoring: contentOpacity == 0.0,
-        child: config,
-      ),
+      child: IgnorePointer(ignoring: contentOpacity == 0.0, child: config),
     );
 
     // Layout Safety for Fixed Sizes:
@@ -102,38 +99,38 @@ class AnimatedHorizontalPanel extends StatelessWidget {
         ),
       );
     } else {
-        // If not fixed width, we still might need to handle the content squeezing.
-        // But for now we trust the content acts responsively or the user set a min width logic elsewhere.
-        // Actually, to match previous behavior for safety, if it's shrinking, we might want to clip.
-    }
-    
-    // Add OverflowBox logic if height is also fixed (generic fallback from original code)
-    // although for "HorizontalPanel" we mostly care about width. 
-    // If the panel has fixed height, that constraint comes from the parent or config.
-    if (config.height != null && hasFixedWidth) {
-         childWidget = OverflowBox(
-            minWidth: expandedSize,
-            maxWidth: expandedSize,
-            minHeight: config.height,
-            maxHeight: config.height,
-            alignment: _getAlignment(config.anchor),
-            child: config, // Need to re-wrap raw config? No, childWidget is already wrapped in Opacity/IgnorePointer.
-            // Wait, previous code wrapped childWidget in OverflowBox.
-         );
-         // Re-applying the Opacity wrapper logic properly:
-         childWidget = OverflowBox(
-            minWidth: expandedSize,
-            maxWidth: expandedSize,
-            minHeight: config.height,
-            maxHeight: config.height,
-            alignment: _getAlignment(config.anchor),
-            child: Opacity(
-                opacity: contentOpacity,
-                child: IgnorePointer(ignoring: contentOpacity == 0.0, child: config),
-            ),
-         );
+      // If not fixed width, we still might need to handle the content squeezing.
+      // But for now we trust the content acts responsively or the user set a min width logic elsewhere.
+      // Actually, to match previous behavior for safety, if it's shrinking, we might want to clip.
     }
 
+    // Add OverflowBox logic if height is also fixed (generic fallback from original code)
+    // although for "HorizontalPanel" we mostly care about width.
+    // If the panel has fixed height, that constraint comes from the parent or config.
+    if (config.height != null && hasFixedWidth) {
+      childWidget = OverflowBox(
+        minWidth: expandedSize,
+        maxWidth: expandedSize,
+        minHeight: config.height,
+        maxHeight: config.height,
+        alignment: _getAlignment(config.anchor),
+        child:
+            config, // Need to re-wrap raw config? No, childWidget is already wrapped in Opacity/IgnorePointer.
+        // Wait, previous code wrapped childWidget in OverflowBox.
+      );
+      // Re-applying the Opacity wrapper logic properly:
+      childWidget = OverflowBox(
+        minWidth: expandedSize,
+        maxWidth: expandedSize,
+        minHeight: config.height,
+        maxHeight: config.height,
+        alignment: _getAlignment(config.anchor),
+        child: Opacity(
+          opacity: contentOpacity,
+          child: IgnorePointer(ignoring: contentOpacity == 0.0, child: config),
+        ),
+      );
+    }
 
     // --- 4. Assemble the Stack ---
 
@@ -166,7 +163,8 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     return SizedBox(
       width: hasFixedWidth ? animatedSize : null,
-      height: config.height, // Pass through fixed height if any, else null (flexible)
+      height: config
+          .height, // Pass through fixed height if any, else null (flexible)
       child: ClipRect(child: content),
     );
   }
@@ -200,7 +198,7 @@ class AnimatedHorizontalPanel extends StatelessWidget {
       height: effectiveHeaderHeight,
       child: Center(child: railContent),
     );
-    
+
     return railContent;
   }
 

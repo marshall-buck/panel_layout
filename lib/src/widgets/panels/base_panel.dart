@@ -149,17 +149,19 @@ abstract class BasePanel extends StatelessWidget {
     final effectiveIconSize = iconSize ?? config.iconSize;
 
     // UX Logic for Icon Placement:
-    // The icon should be placed on the "opening side" of the panel.
+    // The icon should be placed on the "closing side" of the panel.
     PanelAnchor? effectiveClosingDir = anchor;
     if (this is InlinePanel) {
       effectiveClosingDir = (this as InlinePanel).closingDirection ?? anchor;
     }
 
-    final bool showIconOnLeft = effectiveClosingDir == PanelAnchor.right;
+    // If closes LEFT (<--), Icon should be on LEFT.
+    // If closes RIGHT (-->), Icon should be on RIGHT.
+    final bool showIconOnLeft = effectiveClosingDir == PanelAnchor.left;
 
     return Row(
       children: [
-        // If anchored Right (closes right), show icon first (on the left edge)
+        // If anchored Left (closes left), show icon first (on the left edge)
         if (showIconOnLeft && icon != null) ...[
           PanelToggleButton(
             icon: icon!,
@@ -183,10 +185,11 @@ abstract class BasePanel extends StatelessWidget {
               title!,
               style: titleStyle ?? config.titleStyle,
               overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
 
-        // If anchored Left/Top/Bottom, show icon last (on the right edge)
+        // If anchored Right/Top/Bottom, show icon last (on the right edge)
         if (!showIconOnLeft && icon != null) ...[
           if (title != null) const SizedBox(width: 8),
           PanelToggleButton(

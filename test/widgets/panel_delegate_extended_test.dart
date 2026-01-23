@@ -18,7 +18,6 @@ void main() {
               width: 800,
               height: 600,
               child: PanelLayout(
-                
                 children: [
                   InlinePanel(
                     id: const PanelId('base'),
@@ -30,7 +29,7 @@ void main() {
                     anchor: PanelAnchor.top,
                     anchorTo: const PanelId('base'),
                     height: 50,
-                    
+
                     child: Container(),
                   ),
                 ],
@@ -59,7 +58,6 @@ void main() {
               width: 800,
               height: 600,
               child: PanelLayout(
-                
                 children: [
                   InlinePanel(
                     id: const PanelId('base'),
@@ -71,7 +69,7 @@ void main() {
                     anchor: PanelAnchor.bottom,
                     anchorTo: const PanelId('base'),
                     height: 50,
-                    
+
                     child: Container(),
                   ),
                 ],
@@ -110,7 +108,7 @@ void main() {
                     width: 100,
                     height: 50,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
+
                     child: Container(),
                   ),
                 ],

@@ -37,7 +37,9 @@ void main() {
     expect(tester.getSize(findPanel('c1')).width, 123.0);
   });
 
-  testWidgets('InlinePanel works with ListView (unbounded height)', (tester) async {
+  testWidgets('InlinePanel works with ListView (unbounded height)', (
+    tester,
+  ) async {
     // Tests that SingleChildScrollView (the fix) allows ListView to work
     // without "unbounded height" error in an InlinePanel (horizontal layout).
     await tester.pumpWidget(
@@ -72,7 +74,9 @@ void main() {
     expect(tester.getSize(findPanel('list')).width, 200.0);
   });
 
-  testWidgets('OverlayPanel works with ListView (shrinkWrap: true)', (tester) async {
+  testWidgets('OverlayPanel works with ListView (shrinkWrap: true)', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -90,7 +94,7 @@ void main() {
                 OverlayPanel(
                   id: const PanelId('overlay'),
                   width: 200,
-                  
+
                   // Content sizing height (requires shrinkWrap for ListView if no height)
                   child: ListView(
                     shrinkWrap: true,
@@ -136,7 +140,7 @@ void main() {
                   id: const PanelId('fixed'),
                   width: 150,
                   height: 150,
-                  
+
                   child: const Center(child: Text('Fixed')),
                 ),
               ],
@@ -208,7 +212,7 @@ void main() {
                   id: const PanelId('overlay_scroll'),
                   width: 200,
                   height: 300,
-                  
+
                   child: SingleChildScrollView(
                     child: Column(
                       children: List.generate(

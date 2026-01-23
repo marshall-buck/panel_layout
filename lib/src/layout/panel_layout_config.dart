@@ -18,7 +18,7 @@ class PanelLayoutConfig extends Equatable {
     this.iconColor,
     this.iconSize = kDefaultIconSize,
     this.panelBoxDecoration,
-    
+
     // Rail (Collapsed State)
     this.railDecoration,
     this.railPadding = kDefaultRailPadding,
@@ -96,7 +96,6 @@ class PanelLayoutConfig extends Equatable {
   /// The color of the resize handle when actively dragged.
   final Color handleActiveColor;
 
-
   // --- Animation Defaults ---
 
   /// The default duration for size change (slide) animations.
@@ -107,26 +106,26 @@ class PanelLayoutConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        headerPadding,
-        headerDecoration,
-        titleStyle,
-        iconColor,
-        iconSize,
-        panelBoxDecoration,
-        railDecoration,
-        railPadding,
-        handleColor,
-        handleWidth,
-        handleHitTestWidth,
-        handleIcon,
-        handleIconColor,
-        handleIconSize,
-        handleIconAlignment,
-        handleHoverColor,
-        handleActiveColor,
-        sizeDuration,
-        fadeDuration,
-      ];
+    headerPadding,
+    headerDecoration,
+    titleStyle,
+    iconColor,
+    iconSize,
+    panelBoxDecoration,
+    railDecoration,
+    railPadding,
+    handleColor,
+    handleWidth,
+    handleHitTestWidth,
+    handleIcon,
+    handleIconColor,
+    handleIconSize,
+    handleIconAlignment,
+    handleHoverColor,
+    handleActiveColor,
+    sizeDuration,
+    fadeDuration,
+  ];
 }
 
 /// An inherited widget that provides [PanelLayoutConfig] to its descendants.
@@ -140,8 +139,8 @@ class PanelConfigurationScope extends InheritedWidget {
   final PanelLayoutConfig config;
 
   static PanelLayoutConfig of(BuildContext context) {
-    final PanelConfigurationScope? result =
-        context.dependOnInheritedWidgetOfExactType<PanelConfigurationScope>();
+    final PanelConfigurationScope? result = context
+        .dependOnInheritedWidgetOfExactType<PanelConfigurationScope>();
     return result?.config ?? const PanelLayoutConfig();
   }
 

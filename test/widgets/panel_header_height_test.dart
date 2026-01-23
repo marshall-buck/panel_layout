@@ -4,38 +4,43 @@ import 'package:panel_layout/panel_layout.dart';
 
 void main() {
   group('Panel Header Height Logic', () {
-    testWidgets('calculates height dynamically from iconSize and config padding', (tester) async {
-      const testIconSize = 24.0;
-      const testPadding = 10.0;
-      const expectedHeight = testIconSize + (testPadding * 2); // 44.0
-      const panelId = PanelId('p1');
+    testWidgets(
+      'calculates height dynamically from iconSize and config padding',
+      (tester) async {
+        const testIconSize = 24.0;
+        const testPadding = 10.0;
+        const expectedHeight = testIconSize + (testPadding * 2); // 44.0
+        const panelId = PanelId('p1');
 
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: PanelLayout(
-            config: const PanelLayoutConfig(
-              iconSize: testIconSize,
-              headerPadding: testPadding,
-            ),
-            children: [
-              InlinePanel(
-                id: panelId,
-                width: 200,
-                title: 'Title',
-                icon: const SizedBox(),
-                child: Container(),
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: PanelLayout(
+              config: const PanelLayoutConfig(
+                iconSize: testIconSize,
+                headerPadding: testPadding,
               ),
-            ],
+              children: [
+                InlinePanel(
+                  id: panelId,
+                  width: 200,
+                  title: 'Title',
+                  icon: const SizedBox(),
+                  child: Container(),
+                ),
+              ],
+            ),
           ),
-        ),
-      );
+        );
 
-      final headerFinder = find.byKey(Key('panel_header_${panelId.value}'));
-      expect(tester.getSize(headerFinder).height, expectedHeight);
-    });
+        final headerFinder = find.byKey(Key('panel_header_${panelId.value}'));
+        expect(tester.getSize(headerFinder).height, expectedHeight);
+      },
+    );
 
-    testWidgets('panel headerPadding overrides config headerPadding', (tester) async {
+    testWidgets('panel headerPadding overrides config headerPadding', (
+      tester,
+    ) async {
       const testIconSize = 24.0;
       const configPadding = 5.0;
       const panelPadding = 15.0;
@@ -76,10 +81,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: PanelLayout(
-            config: const PanelLayoutConfig(
-              iconSize: 24,
-              headerPadding: 8,
-            ),
+            config: const PanelLayoutConfig(iconSize: 24, headerPadding: 8),
             children: [
               InlinePanel(
                 id: panelId,

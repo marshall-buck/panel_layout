@@ -11,7 +11,8 @@ void main() {
   ) async {
     final id = PanelId('test');
     const testIconSize = 34.0;
-    const expectedCollapsedSize = testIconSize + kDefaultRailPadding; // 34 + 16 = 50
+    const expectedCollapsedSize =
+        testIconSize + kDefaultRailPadding; // 34 + 16 = 50
 
     await tester.pumpWidget(
       Directionality(
@@ -85,10 +86,9 @@ void main() {
 
     // Find the Transform widget that is an ancestor of the rail icon text
     // There is only one Transform inside PanelToggleButton
-    final transformFinder = find.ancestor(
-      of: railIconFinder,
-      matching: find.byType(Transform),
-    ).first;
+    final transformFinder = find
+        .ancestor(of: railIconFinder, matching: find.byType(Transform))
+        .first;
 
     expect(transformFinder, findsOneWidget);
 
@@ -97,9 +97,7 @@ void main() {
     double angle = math.atan2(matrix.entry(1, 0), matrix.entry(0, 0));
     expect(angle, 0.0);
 
-    final controller = PanelLayout.of(
-      tester.element(railIconFinder),
-    );
+    final controller = PanelLayout.of(tester.element(railIconFinder));
     controller.setCollapsed(id, true);
     await tester.pumpAndSettle();
 
@@ -166,14 +164,14 @@ void main() {
   ) async {
     final id = PanelId('vertical_test');
     const testIconSize = 24.0;
-    const expectedCollapsedSize = testIconSize + kDefaultRailPadding; // 24 + 16 = 40
+    const expectedCollapsedSize =
+        testIconSize + kDefaultRailPadding; // 24 + 16 = 40
     const expectedHeaderHeight = testIconSize + (kDefaultHeaderPadding * 2);
 
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: PanelLayout(
-          
           children: [
             InlinePanel(
               id: id,
@@ -193,10 +191,16 @@ void main() {
     );
 
     // Header (expectedHeaderHeight) pushes content down.
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, expectedHeaderHeight);
+    expect(
+      tester.getTopLeft(find.byKey(const Key('content'))).dy,
+      expectedHeaderHeight,
+    );
     // Height is panel height (200) - header height (expectedHeaderHeight)
     // BasePanel is a Column [Header, Expanded(child)].
-    expect(tester.getSize(find.byKey(const Key('content'))).height, 200.0 - expectedHeaderHeight);
+    expect(
+      tester.getSize(find.byKey(const Key('content'))).height,
+      200.0 - expectedHeaderHeight,
+    );
 
     final controller = PanelLayout.of(
       tester.element(find.byKey(const Key('content'))),
@@ -207,7 +211,10 @@ void main() {
 
     expect(tester.getSize(find.byType(LayoutId)).height, expectedCollapsedSize);
     // Content should still be at top (offset by header)
-    expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, expectedHeaderHeight);
+    expect(
+      tester.getTopLeft(find.byKey(const Key('content'))).dy,
+      expectedHeaderHeight,
+    );
 
     // Verify icon is present (1 of them, since we reuse the header)
     expect(find.byKey(const Key('toggle_icon')), findsOneWidget);

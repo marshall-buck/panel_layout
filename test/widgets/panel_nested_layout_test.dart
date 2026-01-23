@@ -18,7 +18,6 @@ void main() {
                   id: const PanelId('sidebar'),
                   width: 200,
                   child: PanelLayout(
-                    
                     children: [
                       InlinePanel(
                         id: const PanelId('top'),

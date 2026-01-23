@@ -98,7 +98,8 @@ class AnimatedVerticalPanel extends StatelessWidget {
     final animatedSize = currentSize * visSlideFactor;
 
     // 3. Prepare Decoration
-    final decoration = config.panelBoxDecoration ?? layoutConfig.panelBoxDecoration;
+    final decoration =
+        config.panelBoxDecoration ?? layoutConfig.panelBoxDecoration;
 
     // 4. Content Opacity
     // Visibility: visFadeFactor (0->1)
@@ -121,7 +122,8 @@ class AnimatedVerticalPanel extends StatelessWidget {
             Container(
               key: Key('panel_header_${config.id.value}'),
               height: headerHeight,
-              decoration: config.headerDecoration ?? layoutConfig.headerDecoration,
+              decoration:
+                  config.headerDecoration ?? layoutConfig.headerDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: config.buildHeaderRow(context, layoutConfig),
             ),

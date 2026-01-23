@@ -12,7 +12,8 @@ void main() {
   testWidgets('Panel animates to collapsed size', (tester) async {
     final controller = PanelLayoutController();
     const testIconSize = 4.0;
-    const expectedCollapsedSize = testIconSize + kDefaultRailPadding; // 4 + 16 = 20
+    const expectedCollapsedSize =
+        testIconSize + kDefaultRailPadding; // 4 + 16 = 20
 
     await tester.pumpWidget(
       Directionality(

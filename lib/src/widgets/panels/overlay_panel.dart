@@ -16,6 +16,7 @@ class OverlayPanel extends BasePanel {
     super.anchorTo,
     super.width,
     super.height,
+
     /// Whether the overlay is initially visible.
     super.initialVisible = true,
     super.animationDuration,
@@ -72,10 +73,7 @@ class OverlayPanel extends BasePanel {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
-      children: [
-        if (header != null) header,
-        content,
-      ],
+      children: [if (header != null) header, content],
     );
   }
 }
