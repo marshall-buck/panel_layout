@@ -1,8 +1,9 @@
-## 0.5.8
+# 0.5.8
 
-*   **Breaking Change**: Removed `axis` parameter from `PanelLayout`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
-*   Added `ScopedTab` to example app to demonstrate nested, scoped configurations.
-*   Updated documentation to clarify `PanelLayoutConfig` scoping rules.
+* **Breaking Change**: Removed `axis` parameter from `PanelLayout`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
+* Added `ScopedTab` to example app to demonstrate nested, scoped configurations.
+* Updated documentation to clarify `PanelLayoutConfig` scoping rules.
+* **Internal Refactor**: Abstracted state management, resizing math, and layout strategies into dedicated, decoupled modules for better maintainability and testability.
 
 ## 0.5.7
 
