@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/panel_resize_handle.dart';
+import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
 
 void main() {
   group('PanelLayout Mixed Anchors', () {

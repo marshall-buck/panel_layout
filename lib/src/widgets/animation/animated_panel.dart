@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import '../models/panel_enums.dart';
-import '../state/panel_runtime_state.dart';
-import 'base_panel.dart';
+import '../../models/panel_enums.dart';
+import '../../state/panel_runtime_state.dart';
+import '../panels/base_panel.dart';
 import 'animated_vertical_panel.dart';
 import 'animated_horizontal_panel.dart';
 

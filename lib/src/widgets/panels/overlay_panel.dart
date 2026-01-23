@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import '../models/panel_enums.dart';
-import '../state/panel_scope.dart';
+import '../../models/panel_enums.dart';
+import '../../state/panel_scope.dart';
 import 'base_panel.dart';
 
 /// A panel that floats on top of the layout (Overlay).

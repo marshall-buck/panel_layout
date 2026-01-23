@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
-import '../constants.dart';
+import '../core/constants.dart';
 
 /// Configuration for the [PanelLayout] system.
 ///

@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import '../models/panel_id.dart';
-import '../models/panel_enums.dart';
-import '../layout/panel_layout_config.dart';
+import '../../models/panel_id.dart';
+import '../../models/panel_enums.dart';
+import '../../layout/panel_layout_config.dart';
 import 'inline_panel.dart';
-import 'panel_toggle_button.dart';
+import '../internal/panel_toggle_button.dart';
 
 /// An abstract configuration class for panels in a [PanelLayout].
 ///

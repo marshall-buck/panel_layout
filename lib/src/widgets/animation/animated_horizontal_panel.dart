@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import '../models/panel_enums.dart';
-import '../state/panel_runtime_state.dart';
-import '../layout/panel_layout_config.dart';
-import 'base_panel.dart';
-import 'inline_panel.dart';
-import 'panel_toggle_button.dart';
+import '../../models/panel_enums.dart';
+import '../../state/panel_runtime_state.dart';
+import '../../layout/panel_layout_config.dart';
+import '../panels/base_panel.dart';
+import '../panels/inline_panel.dart';
+import '../internal/panel_toggle_button.dart';
 
 /// A specialized animator for "Horizontal" panels (Left/Right anchored).
 ///

@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
-import '../models/panel_id.dart';
-import '../models/panel_enums.dart';
-import '../state/panel_scope.dart';
-import '../state/panel_data_scope.dart';
-import '../layout/panel_layout_config.dart';
+import '../../models/panel_id.dart';
+import '../../models/panel_enums.dart';
+import '../../state/panel_scope.dart';
+import '../../state/panel_data_scope.dart';
+import '../../layout/panel_layout_config.dart';
 
 import 'package:meta/meta.dart';
 

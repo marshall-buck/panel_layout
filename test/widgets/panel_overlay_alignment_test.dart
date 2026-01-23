@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animated_panel.dart';
+import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),

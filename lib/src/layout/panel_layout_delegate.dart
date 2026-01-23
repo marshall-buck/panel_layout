@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import '../debug_flag.dart';
+import '../core/debug_flag.dart';
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
 import '../widgets/widgets.dart';

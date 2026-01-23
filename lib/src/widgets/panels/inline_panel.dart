@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import '../models/panel_enums.dart';
-import '../state/panel_scope.dart';
+import '../../models/panel_enums.dart';
+import '../../state/panel_scope.dart';
 import 'base_panel.dart';
 
 /// A panel that participates in the linear layout (Row/Column).

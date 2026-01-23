@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-import '../layout/panel_layout_config.dart';
+import '../../layout/panel_layout_config.dart';
 
 /// A draggable handle widget used to resize adjacent panels.
 ///

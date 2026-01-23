@@ -2,8 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/panel_toggle_button.dart';
-import 'package:panel_layout/src/constants.dart';
+import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
+import 'package:panel_layout/src/core/constants.dart';
 
 void main() {
   testWidgets('Panel collapse animation respects collapsedSize', (

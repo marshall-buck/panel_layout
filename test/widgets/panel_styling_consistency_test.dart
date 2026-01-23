@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/panel_toggle_button.dart';
+import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
 
 void main() {
   testWidgets('Panel styling consistency between Expanded and Collapsed states', (

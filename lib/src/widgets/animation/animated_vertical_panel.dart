@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'dart:math' as math;
-import '../state/panel_runtime_state.dart';
-import '../layout/panel_layout_config.dart';
-import 'base_panel.dart';
+import '../../state/panel_runtime_state.dart';
+import '../../layout/panel_layout_config.dart';
+import '../panels/base_panel.dart';
 
 /// A specialized animator for Vertical (Top/Bottom) panels.
 ///

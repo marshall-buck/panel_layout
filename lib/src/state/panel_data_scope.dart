@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'panel_runtime_state.dart';
-import '../widgets/base_panel.dart';
+import '../widgets/panels/base_panel.dart';
 
 /// An inherited widget that exposes the runtime state and configuration of a specific panel.
 ///

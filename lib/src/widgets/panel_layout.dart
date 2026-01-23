@@ -10,8 +10,8 @@ import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../controllers/panel_layout_controller.dart';
 import 'widgets.dart';
-import 'animated_panel.dart';
-import 'panel_resize_handle.dart';
+import 'animation/animated_panel.dart';
+import 'internal/panel_resize_handle.dart';
 
 /// The root widget of the panel layout system.
 ///
@@ -282,9 +282,9 @@ class _PanelLayoutState extends State<PanelLayout>
       if (child is InlinePanel && child.anchor != null) {
         final childAxis =
             (child.anchor == PanelAnchor.left ||
-                    child.anchor == PanelAnchor.right)
-                ? Axis.horizontal
-                : Axis.vertical;
+                child.anchor == PanelAnchor.right)
+            ? Axis.horizontal
+            : Axis.vertical;
 
         if (axis == null) {
           axis = childAxis;
@@ -461,8 +461,9 @@ class _PanelLayoutState extends State<PanelLayout>
         if (prev.collapsed) return;
 
         final minSize = prevConfig.minSize ?? 0.0;
-        final effectiveMin =
-            minSize < prevData.collapsedSize ? prevData.collapsedSize : minSize;
+        final effectiveMin = minSize < prevData.collapsedSize
+            ? prevData.collapsedSize
+            : minSize;
 
         final newSize = (prev.size + delta).clamp(
           effectiveMin,
@@ -477,8 +478,9 @@ class _PanelLayoutState extends State<PanelLayout>
         if (next.collapsed) return;
 
         final minSize = nextConfig.minSize ?? 0.0;
-        final effectiveMin =
-            minSize < nextData.collapsedSize ? nextData.collapsedSize : minSize;
+        final effectiveMin = minSize < nextData.collapsedSize
+            ? nextData.collapsedSize
+            : minSize;
 
         final newSize = (next.size - delta).clamp(
           effectiveMin,

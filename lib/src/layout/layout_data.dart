@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import '../widgets/base_panel.dart';
+import '../widgets/panels/base_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
 
