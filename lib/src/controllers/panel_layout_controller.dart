@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 
@@ -13,7 +12,7 @@ import '../models/panel_id.dart';
 /// 3. Call methods like [toggleVisible] or [setCollapsed] in response to user events.
 ///
 /// Don't forget to [dispose] the controller when it is no longer needed.
-class PanelLayoutController extends ChangeNotifier {
+class PanelLayoutController {
   PanelLayoutStateInterface? _state;
 
   /// Attaches the controller to a [PanelLayout] state.
@@ -30,6 +29,11 @@ class PanelLayoutController extends ChangeNotifier {
   @internal
   void detach() {
     _state = null;
+  }
+
+  /// Disposes the controller.
+  void dispose() {
+    detach();
   }
 
   /// Toggles the visibility of the panel with the given [id].

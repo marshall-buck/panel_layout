@@ -26,13 +26,13 @@ The `build` method of `_PanelLayoutState` is roughly 100 lines long and handles 
 - **Location:** `lib/src/widgets/panel_layout.dart` (Method: `build`)
 - **Fix:** Extracted logic into helper methods: `_createLayoutData`, `_calculatePixelToFlexRatio`, `_buildPanelWidgets`, and `_buildResizeHandles`. The `build` method now orchestrates these smaller, single-responsibility functions.
 
-## 4. Ambiguous Controller Pattern
+## 4. Ambiguous Controller Pattern [FIXED]
 
 **Severity: Medium**
-`PanelLayoutController` extends `ChangeNotifier` but functions as a command dispatcher. It never calls `notifyListeners()`.
+`PanelLayoutController` extended `ChangeNotifier` but functioned as a command dispatcher and never called `notifyListeners()`.
 
 - **Location:** `lib/src/controllers/panel_layout_controller.dart`
-- **Smell:** Developers may attach listeners expecting state updates that will never trigger.
+- **Fix:** Removed `ChangeNotifier` extension. The class is now a pure command dispatcher, which aligns with its actual behavior and avoids misleading developers into attaching listeners. Added an explicit `dispose()` method.
 
 ## 5. Build-Phase Runtime Errors
 
