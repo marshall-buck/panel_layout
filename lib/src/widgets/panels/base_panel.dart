@@ -130,6 +130,14 @@ abstract class BasePanel extends StatelessWidget {
   /// Decoration for the header.
   final BoxDecoration? headerDecoration;
 
+  /// Whether the header icon should rotate when the panel state changes.
+  @protected
+  bool get shouldRotate;
+
+  /// The logical direction the panel closes towards.
+  @protected
+  PanelAnchor? get effectiveClosingDirection;
+
   /// Handles the action when the header icon is tapped.
   ///
   /// Implementations define whether this toggles collapse or visibility.
@@ -150,14 +158,11 @@ abstract class BasePanel extends StatelessWidget {
 
     // UX Logic for Icon Placement:
     // The icon should be placed on the "closing side" of the panel.
-    PanelAnchor? effectiveClosingDir = anchor;
-    if (this is InlinePanel) {
-      effectiveClosingDir = (this as InlinePanel).closingDirection ?? anchor;
-    }
+    final closingDir = effectiveClosingDirection ?? anchor;
 
     // If closes LEFT (<--), Icon should be on LEFT.
     // If closes RIGHT (-->), Icon should be on RIGHT.
-    final bool showIconOnLeft = effectiveClosingDir == PanelAnchor.left;
+    final bool showIconOnLeft = closingDir == PanelAnchor.left;
 
     return Row(
       children: [
@@ -168,12 +173,8 @@ abstract class BasePanel extends StatelessWidget {
             size: effectiveIconSize,
             color: iconColor ?? config.iconColor,
             onTap: () => onHeaderIconTap(context),
-            shouldRotate: (this is InlinePanel)
-                ? (this as InlinePanel).rotateIcon
-                : false,
-            closingDirection: (this is InlinePanel)
-                ? (this as InlinePanel).closingDirection
-                : null,
+            shouldRotate: shouldRotate,
+            closingDirection: effectiveClosingDirection,
             panelId: id,
           ),
           if (title != null) const SizedBox(width: 8),
@@ -197,12 +198,8 @@ abstract class BasePanel extends StatelessWidget {
             size: effectiveIconSize,
             color: iconColor ?? config.iconColor,
             onTap: () => onHeaderIconTap(context),
-            shouldRotate: (this is InlinePanel)
-                ? (this as InlinePanel).rotateIcon
-                : false,
-            closingDirection: (this is InlinePanel)
-                ? (this as InlinePanel).closingDirection
-                : null,
+            shouldRotate: shouldRotate,
+            closingDirection: effectiveClosingDirection,
             panelId: id,
           ),
         ],

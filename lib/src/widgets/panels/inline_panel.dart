@@ -102,6 +102,12 @@ class InlinePanel extends BasePanel {
   final bool showTitleInRail;
 
   @override
+  bool get shouldRotate => rotateIcon;
+
+  @override
+  PanelAnchor? get effectiveClosingDirection => closingDirection ?? anchor;
+
+  @override
   void onHeaderIconTap(BuildContext context) {
     PanelScope.of(context).toggleCollapsed(id);
   }

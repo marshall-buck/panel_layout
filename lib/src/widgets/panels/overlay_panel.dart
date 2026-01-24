@@ -60,6 +60,12 @@ class OverlayPanel extends BasePanel {
   final CrossAxisAlignment? crossAxisAlignment;
 
   @override
+  bool get shouldRotate => false;
+
+  @override
+  PanelAnchor? get effectiveClosingDirection => anchor;
+
+  @override
   void onHeaderIconTap(BuildContext context) {
     PanelScope.of(context).setVisible(id, false);
   }
