@@ -7,6 +7,8 @@ import '../layout_data.dart';
 import 'layout_context.dart';
 
 class InlineLayoutStrategy {
+  const InlineLayoutStrategy();
+
   /// Performs layout for inline panels and resize handles.
   ///
   /// Returns a map of [PanelId] to [Rect] representing the layout bounds of each panel.

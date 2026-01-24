@@ -6,6 +6,8 @@ import '../layout_data.dart';
 import 'layout_context.dart';
 
 class OverlayLayoutStrategy {
+  const OverlayLayoutStrategy();
+
   /// Performs layout for overlay panels.
   ///
   /// [inlineRects] provides the bounds of the already-laid-out inline panels,

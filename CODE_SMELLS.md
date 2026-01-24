@@ -28,7 +28,6 @@ The `build` method of `_PanelLayoutState` is roughly 100 lines long and handles 
 
 ## 4. Ambiguous Controller Pattern [FIXED]
 
-lets call the propthe issue i have is to the user
 **Severity: Medium**
 `PanelLayoutController` extended `ChangeNotifier` but functioned as a command dispatcher and never called `notifyListeners()`.
 
@@ -43,7 +42,7 @@ lets call the propthe issue i have is to the user
 - **Location:** `lib/src/widgets/panel_layout.dart` (Method: `_computeAxis`)
 - **Fix:** Moved validation logic to `initState` and `didUpdateWidget` (renamed to `_validateAndComputeAxis`). Conflicting configurations now throw a custom `AnchorException` during widget initialization (Fail Fast), providing detailed information about the conflicting panels.
 
-## 6. Naive State Reconciliation
+## 6. Naive State Reconciliation [FIXED]
 
 **Severity: Low**
 `PanelStateManager.reconcile` aggressively purges state for panels not present in the current build pass.
@@ -51,10 +50,10 @@ lets call the propthe issue i have is to the user
 - **Location:** `lib/src/state/panel_state_manager.dart`
 - **Smell:** This prevents state persistence for panels that are toggled via conditional logic in the parent widget.
 
-## 7. Redundant Strategy Instantiation
+## 7. Redundant Strategy Instantiation [FIXED]
 
 **Severity: Low**
 `PanelLayoutDelegate.performLayout` instantiates layout strategies on every single frame/layout pass.
 
 - **Location:** `lib/src/layout/panel_layout_delegate.dart`
-- **Smell:** Excessive object allocation in a performance-critical path.
+- **Fix:** Made `InlineLayoutStrategy` and `OverlayLayoutStrategy` constructors `const` (as they are stateless). Updated `PanelLayoutDelegate` to use `static const` instances of these strategies, eliminating object allocation during layout passes.

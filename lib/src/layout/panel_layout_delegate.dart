@@ -32,20 +32,21 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate
   /// The text direction (for RTL support).
   final TextDirection textDirection;
 
+  static const _inlineStrategy = InlineLayoutStrategy();
+  static const _overlayStrategy = OverlayLayoutStrategy();
+
   @override
   void performLayout(Size size) {
     panelLayoutLog('Delegate performLayout with ${panels.length} panels');
 
-    final inlineStrategy = InlineLayoutStrategy();
-    final inlineRects = inlineStrategy.layout(
+    final inlineRects = _inlineStrategy.layout(
       context: this,
       size: size,
       panels: panels,
       axis: axis,
     );
 
-    final overlayStrategy = OverlayLayoutStrategy();
-    overlayStrategy.layout(
+    _overlayStrategy.layout(
       context: this,
       size: size,
       panels: panels,
