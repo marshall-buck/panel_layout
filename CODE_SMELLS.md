@@ -18,13 +18,13 @@ The `PanelResizing` class uses a hardcoded sensitivity factor (`0.01`) to conver
 - **Location:** `lib/src/layout/panel_resizing.dart` (Method: `calculateResize`, Case 3)
 - **Fix:** Refactored `PanelLayout` to calculate a dynamic `pixelToFlexRatio` based on total available flexible space and total flex weight. This ratio is passed to `PanelResizing`, allowing for precise pixel-to-flex conversion and correct enforcement of `minSize`/`maxSize` constraints on flexible panels.
 
-## 3. Long Method / Responsibility Bloat in `PanelLayout`
+## 3. Long Method / Responsibility Bloat in `PanelLayout` [FIXED]
 
 **Severity: Medium**
 The `build` method of `_PanelLayoutState` is roughly 100 lines long and handles widget assembly, layout data preparation, resize handle generation, and sorting.
 
 - **Location:** `lib/src/widgets/panel_layout.dart` (Method: `build`)
-- **Smell:** Violates Single Responsibility Principle.
+- **Fix:** Extracted logic into helper methods: `_createLayoutData`, `_calculatePixelToFlexRatio`, `_buildPanelWidgets`, and `_buildResizeHandles`. The `build` method now orchestrates these smaller, single-responsibility functions.
 
 ## 4. Ambiguous Controller Pattern
 
