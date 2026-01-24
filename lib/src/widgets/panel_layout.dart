@@ -10,6 +10,7 @@ import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../layout/panel_resizing.dart';
 import '../controllers/panel_layout_controller.dart';
+import '../core/exceptions.dart';
 import 'widgets.dart';
 import 'animation/animated_panel.dart';
 import 'internal/panel_resize_handle.dart';
@@ -89,6 +90,7 @@ class _PanelLayoutState extends State<PanelLayout>
     with TickerProviderStateMixin
     implements PanelLayoutStateInterface {
   late final PanelStateManager _stateManager;
+  late Axis _cachedAxis;
 
   PanelLayoutController? _internalController;
   PanelLayoutController get _effectiveController =>
@@ -97,6 +99,7 @@ class _PanelLayoutState extends State<PanelLayout>
   @override
   void initState() {
     super.initState();
+    _cachedAxis = _validateAndComputeAxis(widget.children);
     _stateManager = PanelStateManager();
     _stateManager.addListener(_onStateChange);
     if (widget.controller == null) {
@@ -113,6 +116,7 @@ class _PanelLayoutState extends State<PanelLayout>
   @override
   void didUpdateWidget(PanelLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _cachedAxis = _validateAndComputeAxis(widget.children);
     if (widget.controller != oldWidget.controller) {
       if (oldWidget.controller == null) {
         _internalController?.detach();
@@ -176,8 +180,10 @@ class _PanelLayoutState extends State<PanelLayout>
   ///
   /// Validates that all [InlinePanel]s share the same axis.
   /// Defaults to [Axis.horizontal] if no inline panels are present.
-  Axis _computeAxis(List<BasePanel> children) {
+  Axis _validateAndComputeAxis(List<BasePanel> children) {
     Axis? axis;
+    PanelId? axisEstablishedBy;
+
     for (final child in children) {
       if (child is InlinePanel && child.anchor != null) {
         final childAxis =
@@ -188,11 +194,13 @@ class _PanelLayoutState extends State<PanelLayout>
 
         if (axis == null) {
           axis = childAxis;
+          axisEstablishedBy = child.id;
         } else if (axis != childAxis) {
-          throw FlutterError(
-            'PanelLayout contains InlinePanels with conflicting axes. '
-            'Found both Horizontal (Left/Right) and Vertical (Top/Bottom) anchors. '
-            'InlinePanels in a single PanelLayout must share the same axis.',
+          throw AnchorException(
+            firstPanelId: axisEstablishedBy!,
+            firstAxis: axis,
+            conflictingPanelId: child.id,
+            conflictingAxis: childAxis,
           );
         }
       }
@@ -203,7 +211,7 @@ class _PanelLayoutState extends State<PanelLayout>
   @override
   Widget build(BuildContext context) {
     final config = widget.config ?? const PanelLayoutConfig();
-    final axis = _computeAxis(widget.children);
+    final axis = _cachedAxis;
     final uniquePanelConfigs = <PanelId, BasePanel>{};
     for (final panel in widget.children) {
       uniquePanelConfigs[panel.id] = panel;

@@ -77,7 +77,9 @@ void main() {
       expect(find.text('Right'), findsOneWidget);
     });
 
-    testWidgets('Explicit Conflicting Anchors still throw', (tester) async {
+    testWidgets('Explicit Conflicting Anchors fails with AnchorException', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -100,7 +102,12 @@ void main() {
         ),
       );
 
-      expect(tester.takeException(), isNotNull);
+      final exception = tester.takeException();
+      expect(exception, isA<AnchorException>());
+      expect(
+        exception.toString(),
+        contains('PanelLayout contains InlinePanels with conflicting axes'),
+      );
     });
 
     testWidgets('Neutral panel respects width in Horizontal layout', (

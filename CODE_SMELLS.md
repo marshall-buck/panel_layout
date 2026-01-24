@@ -34,13 +34,13 @@ The `build` method of `_PanelLayoutState` is roughly 100 lines long and handles 
 - **Location:** `lib/src/controllers/panel_layout_controller.dart`
 - **Fix:** Removed `ChangeNotifier` extension. The class is now a pure command dispatcher, which aligns with its actual behavior and avoids misleading developers into attaching listeners. Added an explicit `dispose()` method.
 
-## 5. Build-Phase Runtime Errors
+## 5. Build-Phase Runtime Errors [FIXED]
 
 **Severity: Medium**
 `_computeAxis` throws a `FlutterError` during the build phase if layout anchors are mismatched.
 
 - **Location:** `lib/src/widgets/panel_layout.dart` (Method: `_computeAxis`)
-- **Smell:** Configuration errors should ideally be caught during static analysis or initialization, rather than crashing the UI build loop.
+- **Fix:** Moved validation logic to `initState` and `didUpdateWidget` (renamed to `_validateAndComputeAxis`). Conflicting configurations now throw a custom `AnchorException` during widget initialization (Fail Fast), providing detailed information about the conflicting panels.
 
 ## 6. Naive State Reconciliation
 
