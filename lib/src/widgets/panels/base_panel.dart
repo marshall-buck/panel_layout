@@ -38,6 +38,7 @@ abstract class BasePanel extends StatelessWidget {
     this.iconColor,
     this.panelBoxDecoration,
     this.headerDecoration,
+    this.clipContent = false,
     super.key,
   });
 
@@ -139,6 +140,12 @@ abstract class BasePanel extends StatelessWidget {
   /// Decoration for the header.
   final BoxDecoration? headerDecoration;
 
+  /// Whether to clip the content of the panel.
+  ///
+  /// If true, the panel content will be wrapped in a [ClipRect] to prevent
+  /// visual overflow when the panel is resized smaller than its content.
+  final bool clipContent;
+
   /// Whether the header icon should rotate when the panel state changes.
   @protected
   bool get shouldRotate;
@@ -164,6 +171,7 @@ abstract class BasePanel extends StatelessWidget {
   @internal
   Widget buildHeaderRow(BuildContext context, PanelLayoutConfig config) {
     final effectiveIconSize = iconSize ?? config.iconSize;
+    const double spacing = 8.0;
 
     // UX Logic for Icon Placement:
     // The icon should be placed on the "closing side" of the panel.
@@ -173,46 +181,68 @@ abstract class BasePanel extends StatelessWidget {
     // If closes RIGHT (-->), Icon should be on RIGHT.
     final bool showIconOnLeft = closingDir == PanelAnchor.left;
 
-    return Row(
-      children: [
-        // If anchored Left (closes left), show icon first (on the left edge)
-        if (showIconOnLeft && icon != null) ...[
-          PanelToggleButton(
-            icon: icon!,
-            size: effectiveIconSize,
-            color: iconColor ?? config.iconColor,
-            onTap: () => onHeaderIconTap(context),
-            shouldRotate: shouldRotate,
-            closingDirection: effectiveClosingDirection,
-            panelId: id,
-          ),
-          if (title != null) const SizedBox(width: 8),
-        ],
+    Widget? toggleButton;
+    if (icon != null) {
+      toggleButton = PanelToggleButton(
+        icon: icon!,
+        size: effectiveIconSize,
+        color: iconColor ?? config.iconColor,
+        onTap: () => onHeaderIconTap(context),
+        shouldRotate: shouldRotate,
+        closingDirection: effectiveClosingDirection,
+        panelId: id,
+      );
+    }
 
-        if (title != null)
-          Expanded(
-            child: Text(
-              title!,
-              style: titleStyle ?? config.titleStyle,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth;
+        // Calculate the minimum width required to show the full structure (Icon + Spacing)
+        // If we have a title, we need the spacing. If only an icon, no spacing needed.
+        final double requiredFixedSpace =
+            (toggleButton != null)
+                ? effectiveIconSize + (title != null ? spacing : 0.0)
+                : 0.0;
 
-        // If anchored Right/Top/Bottom, show icon last (on the right edge)
-        if (!showIconOnLeft && icon != null) ...[
-          if (title != null) const SizedBox(width: 8),
-          PanelToggleButton(
-            icon: icon!,
-            size: effectiveIconSize,
-            color: iconColor ?? config.iconColor,
-            onTap: () => onHeaderIconTap(context),
-            shouldRotate: shouldRotate,
-            closingDirection: effectiveClosingDirection,
-            panelId: id,
-          ),
-        ],
-      ],
+        // If available space is too small for the fixed parts (Icon + Gap),
+        // we switch to a fallback mode: Just show the Icon (clipped if needed), hide Title & Gap.
+        if (availableWidth < requiredFixedSpace) {
+          if (toggleButton != null) {
+            return Align(
+              alignment:
+                  showIconOnLeft ? Alignment.centerLeft : Alignment.centerRight,
+              child: ClipRect(child: toggleButton),
+            );
+          }
+          return const SizedBox();
+        }
+
+        return Row(
+          children: [
+            // If anchored Left (closes left), show icon first (on the left edge)
+            if (showIconOnLeft && toggleButton != null) ...[
+              toggleButton,
+              if (title != null) const SizedBox(width: spacing),
+            ],
+
+            if (title != null)
+              Expanded(
+                child: Text(
+                  title!,
+                  style: titleStyle ?? config.titleStyle,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+            // If anchored Right/Top/Bottom, show icon last (on the right edge)
+            if (!showIconOnLeft && toggleButton != null) ...[
+              if (title != null) const SizedBox(width: spacing),
+              toggleButton,
+            ],
+          ],
+        );
+      },
     );
   }
 

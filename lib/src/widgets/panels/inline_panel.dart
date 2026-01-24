@@ -52,6 +52,7 @@ class InlinePanel extends BasePanel {
     this.railPadding,
     this.rotateIcon = true,
     this.showTitleInRail = true,
+    super.clipContent = false,
     super.key,
   }) : assert(
          (width != null || height != null) ? flex == null : true,
@@ -124,7 +125,9 @@ class InlinePanel extends BasePanel {
       mainAxisSize: MainAxisSize.max,
       children: [
         if (header != null) header,
-        Expanded(child: content),
+        Expanded(
+          child: clipContent ? ClipRect(child: content) : content,
+        ),
       ],
     );
   }

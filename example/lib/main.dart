@@ -113,6 +113,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           maxSize: 400,
           headerHeight: 48,
           title: 'headerHeight: 48',
+          clipContent: true,
           // Icon used for both header and collapsed rail
           icon: const Icon(Icons.chevron_left),
           child: ListView.builder(
@@ -153,6 +154,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           anchor: PanelAnchor.right,
           width: 280,
           title: 'PROPERTIES',
+          clipContent: true,
 
           // Icon for toggle (collapse/expand)
           // ALWAYS use chevron_left. The system rotates it.
@@ -227,6 +229,7 @@ class VerticalSplitTab extends StatelessWidget {
           anchor: PanelAnchor.bottom,
           height: 150,
           title: 'TERMINAL',
+          clipContent: true,
           // Use a chevron. PanelToggleButton will rotate this:
           // - Open: Points Down (v)
           // - Collapsed: Points Up (^)
@@ -368,6 +371,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
                 anchor: PanelAnchor.right,
                 width: 250,
                 title: 'SIDEBAR',
+                clipContent: true,
                 icon: const Icon(Icons.chevron_left),
                 child: Column(
                   children: [
