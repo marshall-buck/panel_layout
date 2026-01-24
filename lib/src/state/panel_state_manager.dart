@@ -19,6 +19,9 @@ class PanelStateManager extends ChangeNotifier {
   final Map<PanelId, AnimationController> _animationControllers = {};
   final Map<PanelId, AnimationController> _collapseControllers = {};
 
+  /// Tracks which panels requested to preserve their layout state.
+  final Set<PanelId> _preservedIds = {};
+
   /// Read-only access to panel states.
   Map<PanelId, PanelRuntimeState> get panelStates =>
       Map.unmodifiable(_panelStates);
@@ -43,8 +46,20 @@ class PanelStateManager extends ChangeNotifier {
   ) {
     final currentIds = panels.map((p) => p.id).toSet();
 
+    // Update preservation preferences for current panels
+    for (final panel in panels) {
+      if (panel.preserveLayoutState) {
+        _preservedIds.add(panel.id);
+      } else {
+        _preservedIds.remove(panel.id);
+      }
+    }
+
     // Remove orphaned states and controllers
-    _panelStates.removeWhere((id, _) => !currentIds.contains(id));
+    // Only remove state if it's not preserved
+    _panelStates.removeWhere(
+      (id, _) => !currentIds.contains(id) && !_preservedIds.contains(id),
+    );
 
     _animationControllers.removeWhere((id, controller) {
       if (!currentIds.contains(id)) {
@@ -70,6 +85,11 @@ class PanelStateManager extends ChangeNotifier {
           visible: panel.initialVisible,
           collapsed: panel.initialCollapsed,
         );
+      }
+
+      // Controllers are always recreated (they need vsync and are ephemeral)
+      if (!_animationControllers.containsKey(panel.id)) {
+        final state = _panelStates[panel.id]!;
 
         // Priority: Panel Override > Config > Default Constant
         final fade = panel.fadeDuration ?? config.fadeDuration;
@@ -80,7 +100,7 @@ class PanelStateManager extends ChangeNotifier {
         final controller = AnimationController(
           vsync: vsync,
           duration: effectiveDuration,
-          value: panel.initialVisible ? 1.0 : 0.0,
+          value: state.visible ? 1.0 : 0.0,
         );
         controller.addListener(notifyListeners);
         _animationControllers[panel.id] = controller;
@@ -88,7 +108,7 @@ class PanelStateManager extends ChangeNotifier {
         final collapseController = AnimationController(
           vsync: vsync,
           duration: effectiveDuration,
-          value: panel.initialCollapsed ? 1.0 : 0.0,
+          value: state.collapsed ? 1.0 : 0.0,
         );
         collapseController.addListener(notifyListeners);
         _collapseControllers[panel.id] = collapseController;

@@ -28,6 +28,7 @@ The `build` method of `_PanelLayoutState` is roughly 100 lines long and handles 
 
 ## 4. Ambiguous Controller Pattern [FIXED]
 
+lets call the propthe issue i have is to the user
 **Severity: Medium**
 `PanelLayoutController` extended `ChangeNotifier` but functioned as a command dispatcher and never called `notifyListeners()`.
 

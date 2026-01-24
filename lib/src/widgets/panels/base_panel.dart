@@ -24,6 +24,7 @@ abstract class BasePanel extends StatelessWidget {
     this.height,
     this.initialVisible = true,
     required this.initialCollapsed,
+    this.preserveLayoutState = false,
     this.animationDuration,
     this.sizeDuration,
     this.fadeDuration,
@@ -72,6 +73,14 @@ abstract class BasePanel extends StatelessWidget {
 
   /// Whether the panel is initially collapsed (minimized) when the layout is first built.
   final bool initialCollapsed;
+
+  /// Whether to preserve the panel's runtime layout state (size, visibility, collapse)
+  /// when it is removed from the widget tree.
+  ///
+  /// If `true`, the panel will "remember" its user-adjusted size and state if it
+  /// is removed (e.g., via conditional building in the parent) and re-added later.
+  /// If `false` (default), the state is discarded when the panel is removed.
+  final bool preserveLayoutState;
 
   /// Optional override for the duration of size/visibility animations.
   /// If provided, this overrides the controller's total duration.

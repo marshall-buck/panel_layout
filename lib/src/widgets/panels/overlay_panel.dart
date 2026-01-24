@@ -19,6 +19,7 @@ class OverlayPanel extends BasePanel {
 
     /// Whether the overlay is initially visible.
     super.initialVisible = true,
+    super.preserveLayoutState = false,
     super.animationDuration,
     super.animationCurve,
     this.anchorLink,

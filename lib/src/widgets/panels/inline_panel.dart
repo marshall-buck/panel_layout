@@ -32,6 +32,7 @@ class InlinePanel extends BasePanel {
 
     /// Whether the panel is initially collapsed into a rail.
     super.initialCollapsed = false,
+    super.preserveLayoutState = false,
     super.animationDuration,
     super.animationCurve,
     super.title,
