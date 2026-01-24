@@ -59,9 +59,4 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate
     // In the engine, we'll re-create the delegate if the configuration or state changes.
     return true;
   }
-
-  // --- LayoutContext Implementation ---
-
-
-
 }

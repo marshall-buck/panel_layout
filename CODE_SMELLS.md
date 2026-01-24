@@ -10,14 +10,13 @@ The `BasePanel` class (an abstract base class) contained logic that explicitly c
 
 - **Fix:** Introduced abstract getters `shouldRotate` and `effectiveClosingDirection` in `BasePanel`, implemented by `InlinePanel` and `OverlayPanel`. This removed the need for type checks and casting in the base class.
 
-## 2. Magic Numbers & Unit Mixing in Resizing Logic
+## 2. Magic Numbers & Unit Mixing in Resizing Logic [FIXED]
 
 **Severity: High**
 The `PanelResizing` class uses a hardcoded sensitivity factor (`0.01`) to convert pixel deltas into flex weight changes.
 
 - **Location:** `lib/src/layout/panel_resizing.dart` (Method: `calculateResize`, Case 3)
-- **Smell:** Mixing units (pixels vs. unitless flex) with arbitrary constants leads to inconsistent resizing behavior across different screen densities and aspect ratios.
-- **Secondary Issue:** Flex resizing ignores `minSize` and `maxSize` constraints.
+- **Fix:** Refactored `PanelLayout` to calculate a dynamic `pixelToFlexRatio` based on total available flexible space and total flex weight. This ratio is passed to `PanelResizing`, allowing for precise pixel-to-flex conversion and correct enforcement of `minSize`/`maxSize` constraints on flexible panels.
 
 ## 3. Long Method / Responsibility Bloat in `PanelLayout`
 

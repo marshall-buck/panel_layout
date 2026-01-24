@@ -209,107 +209,156 @@ class _PanelLayoutState extends State<PanelLayout>
       uniquePanelConfigs[panel.id] = panel;
     }
 
-    // Prepare data for the layout delegate
-    final layoutData = uniquePanelConfigs.values.map((panelConfig) {
-      final state = _stateManager.getState(panelConfig.id)!;
-      final anim = _stateManager.getAnimationController(panelConfig.id)!;
-      final collapseAnim = _stateManager.getCollapseController(panelConfig.id)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Prepare data for the layout delegate
+        final layoutData = uniquePanelConfigs.values.map((panelConfig) {
+          final state = _stateManager.getState(panelConfig.id)!;
+          final anim = _stateManager.getAnimationController(panelConfig.id)!;
+          final collapseAnim =
+              _stateManager.getCollapseController(panelConfig.id)!;
 
-      double collapsedSize = 0.0;
-      if (panelConfig is InlinePanel) {
-        final iconSize = panelConfig.iconSize ?? config.iconSize;
-        collapsedSize =
-            iconSize + (panelConfig.railPadding ?? config.railPadding);
-      }
+          double collapsedSize = 0.0;
+          if (panelConfig is InlinePanel) {
+            final iconSize = panelConfig.iconSize ?? config.iconSize;
+            collapsedSize =
+                iconSize + (panelConfig.railPadding ?? config.railPadding);
+          }
 
-      return PanelLayoutData(
-        config: panelConfig,
-        state: state,
-        visualFactor: anim.value,
-        collapseFactor: collapseAnim.value,
-        collapsedSize: collapsedSize,
-      );
-    }).toList();
-
-    final dockedPanels = layoutData
-        .where((d) => d.config is InlinePanel)
-        .toList();
-
-    final children = <Widget>[];
-
-    // Add Panel Widgets
-    for (final panel in uniquePanelConfigs.values) {
-      final state = _stateManager.getState(panel.id)!;
-      final factor = _stateManager.getAnimationController(panel.id)!.value;
-
-      Widget panelWidget = AnimatedPanel(
-        config: panel,
-        state: state,
-        factor: factor,
-        collapseFactor: _stateManager.getCollapseController(panel.id)!.value,
-      );
-
-      // If anchored to external link, wrap in Follower
-      if (panel is OverlayPanel && panel.anchorLink != null) {
-        panelWidget = CompositedTransformFollower(
-          link: panel.anchorLink!,
-          showWhenUnlinked: false,
-          child: panelWidget,
-        );
-      }
-
-      children.add(
-        LayoutId(
-          id: panel.id,
-          child: PanelDataScope(
+          return PanelLayoutData(
+            config: panelConfig,
             state: state,
+            visualFactor: anim.value,
+            collapseFactor: collapseAnim.value,
+            collapsedSize: collapsedSize,
+          );
+        }).toList();
+
+        // Calculate Pixel-to-Flex Ratio
+        final totalSpace = axis == Axis.horizontal
+            ? constraints.maxWidth
+            : constraints.maxHeight;
+
+        double usedPixelSpace = 0.0;
+        double totalFlex = 0.0;
+
+        for (final data in layoutData) {
+          if (data.config is! InlinePanel) continue;
+          final config = data.config as InlinePanel;
+
+          if (!data.state.visible) continue;
+
+          if (data.state.collapsed) {
+            usedPixelSpace += data.collapsedSize;
+          } else if (config.flex == null) {
+            // Fixed panel
+            usedPixelSpace += data.state.size;
+          } else {
+            // Flexible panel
+            totalFlex += data.state.size;
+          }
+        }
+
+        // Add Resize Handles to used space
+        // There are (N - 1) handles between N docked panels.
+        // We only count handles that are effectively visible.
+        final dockedPanels =
+            layoutData.where((d) => d.config is InlinePanel).toList();
+        int visibleHandleCount = 0;
+        for (var i = 0; i < dockedPanels.length - 1; i++) {
+          final prev = dockedPanels[i];
+          final next = dockedPanels[i + 1];
+          if ((prev.state.visible || prev.visualFactor > 0) &&
+              (next.state.visible || next.visualFactor > 0)) {
+            visibleHandleCount++;
+          }
+        }
+        usedPixelSpace += visibleHandleCount * config.handleHitTestWidth;
+
+        final flexibleSpace = totalSpace - usedPixelSpace;
+        final pixelToFlexRatio = (flexibleSpace > 0 && totalFlex > 0)
+            ? totalFlex / flexibleSpace
+            : 0.0;
+
+        final children = <Widget>[];
+
+        // Add Panel Widgets
+        for (final panel in uniquePanelConfigs.values) {
+          final state = _stateManager.getState(panel.id)!;
+          final factor = _stateManager.getAnimationController(panel.id)!.value;
+
+          Widget panelWidget = AnimatedPanel(
             config: panel,
-            child: panelWidget,
+            state: state,
+            factor: factor,
+            collapseFactor:
+                _stateManager.getCollapseController(panel.id)!.value,
+          );
+
+          // If anchored to external link, wrap in Follower
+          if (panel is OverlayPanel && panel.anchorLink != null) {
+            panelWidget = CompositedTransformFollower(
+              link: panel.anchorLink!,
+              showWhenUnlinked: false,
+              child: panelWidget,
+            );
+          }
+
+          children.add(
+            LayoutId(
+              id: panel.id,
+              child: PanelDataScope(
+                state: state,
+                config: panel,
+                child: panelWidget,
+              ),
+            ),
+          );
+        }
+
+        // Add Resize Handles
+        for (var i = 0; i < dockedPanels.length - 1; i++) {
+          final prev = dockedPanels[i];
+          final next = dockedPanels[i + 1];
+
+          // Handle visibility based on static state, but only remove if animation finished
+          if (!prev.state.visible || !next.state.visible) {
+            if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
+          }
+
+          final handleId = HandleLayoutId(prev.config.id, next.config.id);
+
+          children.add(
+            LayoutId(
+              id: handleId,
+              child: PanelResizeHandle(
+                axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
+                onDragUpdate: (delta) =>
+                    _handleResize(delta, prev, next, pixelToFlexRatio),
+                onDragStart: widget.onResizeStart,
+                onDragEnd: widget.onResizeEnd,
+              ),
+            ),
+          );
+        }
+
+        final sortedChildren = _sortChildren(children, uniquePanelConfigs);
+
+        return PanelScope(
+          controller: _effectiveController,
+          child: PanelConfigurationScope(
+            config: config,
+            child: CustomMultiChildLayout(
+              delegate: PanelLayoutDelegate(
+                panels: layoutData,
+                axis: axis,
+                textDirection: Directionality.of(context),
+              ),
+              children: sortedChildren,
+            ),
           ),
-        ),
-      );
-    }
-
-    // Add Resize Handles
-    for (var i = 0; i < dockedPanels.length - 1; i++) {
-      final prev = dockedPanels[i];
-      final next = dockedPanels[i + 1];
-
-      // Handle visibility based on static state, but only remove if animation finished
-      if (!prev.state.visible || !next.state.visible) {
-        if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
-      }
-
-      final handleId = HandleLayoutId(prev.config.id, next.config.id);
-
-      children.add(
-        LayoutId(
-          id: handleId,
-          child: PanelResizeHandle(
-            axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
-            onDragUpdate: (delta) => _handleResize(delta, prev, next),
-            onDragStart: widget.onResizeStart,
-            onDragEnd: widget.onResizeEnd,
-          ),
-        ),
-      );
-    }
-
-    final sortedChildren = _sortChildren(children, uniquePanelConfigs);
-
-    return PanelScope(
-      controller: _effectiveController,
-      child: PanelConfigurationScope(
-        config: config,
-        child: CustomMultiChildLayout(
-          delegate: PanelLayoutDelegate(
-            panels: layoutData,
-            axis: axis,
-            textDirection: Directionality.of(context),
-          ),
-          children: sortedChildren,
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -347,6 +396,7 @@ class _PanelLayoutState extends State<PanelLayout>
     double delta,
     PanelLayoutData prevData,
     PanelLayoutData nextData,
+    double pixelToFlexRatio,
   ) {
     setState(() {
       // Fetch the latest state to ensure we are accumulating deltas correctly
@@ -361,6 +411,7 @@ class _PanelLayoutState extends State<PanelLayout>
         nextConfig: nextData.config as InlinePanel,
         nextState: nextState,
         nextCollapsedSize: nextData.collapsedSize,
+        pixelToFlexRatio: pixelToFlexRatio,
       );
 
       for (final entry in changes.entries) {
