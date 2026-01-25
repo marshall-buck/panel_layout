@@ -59,6 +59,16 @@ class PanelResizing {
         prevConfig.maxSize ?? double.infinity,
       );
       changes[prevConfig.id] = newSize;
+
+      // Isolation: If Next is Flex, it must absorb the delta to prevent global shift
+      if (nextConfig.flex != null && pixelToFlexRatio > 0) {
+         final actualDelta = newSize - prevState.size;
+         final deltaFlex = actualDelta * pixelToFlexRatio;
+         // Flex panels can theoretically go to 0 or very small
+         final newFlex = (nextState.size - deltaFlex).clamp(0.0, double.infinity);
+         changes[nextConfig.id] = newFlex;
+      }
+
       return changes;
     }
 
@@ -76,6 +86,17 @@ class PanelResizing {
         nextConfig.maxSize ?? double.infinity,
       );
       changes[nextConfig.id] = newSize;
+
+      // Isolation: If Prev is Flex, it must absorb the delta to prevent global shift
+      if (prevConfig.flex != null && pixelToFlexRatio > 0) {
+        final actualDelta = nextState.size - newSize; // Positive if next shrank
+        final deltaFlex = actualDelta * pixelToFlexRatio;
+        // If next shrank (dragged right), actualDelta is positive, Prev grows.
+        // If next grew (dragged left), actualDelta is negative, Prev shrinks.
+        final newFlex = (prevState.size + deltaFlex).clamp(0.0, double.infinity);
+        changes[prevConfig.id] = newFlex;
+      }
+
       return changes;
     }
 

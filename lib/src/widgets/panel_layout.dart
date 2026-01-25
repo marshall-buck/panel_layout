@@ -96,6 +96,10 @@ class _PanelLayoutState extends State<PanelLayout>
   PanelLayoutController get _effectiveController =>
       widget.controller ?? _internalController!;
 
+  // Track previous frame's constraints/ratio for calculations
+  BoxConstraints? _lastConstraints;
+  double _lastPixelToFlexRatio = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -110,7 +114,162 @@ class _PanelLayoutState extends State<PanelLayout>
   }
 
   void _onStateChange() {
+    for (final panel in widget.children) {
+      if (panel is! InlinePanel) continue;
+      // We look for Fixed panels that are animating
+      if (panel.flex != null) continue;
+
+      final anim = _stateManager.getAnimationController(panel.id);
+      final collapseAnim = _stateManager.getCollapseController(panel.id);
+
+      final isAnimating =
+          (anim != null && anim.isAnimating) ||
+          (collapseAnim != null && collapseAnim.isAnimating);
+
+      final neighbor = _getStableNeighbor(panel);
+      if (neighbor == null || neighbor.flex == null) continue;
+
+      final neighborState = _stateManager.getState(neighbor.id);
+      if (neighborState == null) continue;
+
+      if (isAnimating) {
+        // LOCK: If not already locked, lock it to current pixel size
+        if (neighborState.fixedPixelSizeOverride == null) {
+          final currentFlex = neighborState.size;
+          if (_lastPixelToFlexRatio > 0) {
+            final currentPixels = currentFlex / _lastPixelToFlexRatio;
+            _stateManager.setFixedSizeOverride(neighbor.id, currentPixels);
+          }
+        }
+      } else {
+        // UNLOCK: If locked, calculate new flex and unlock
+        if (neighborState.fixedPixelSizeOverride != null) {
+          final override = neighborState.fixedPixelSizeOverride!;
+          final newFlex = _calculateNewFlexForUnlockedPanel(neighbor, override);
+          _stateManager.clearFixedSizeOverride(neighbor.id, newFlex);
+        }
+      }
+    }
     setState(() {});
+  }
+
+  InlinePanel? _getStableNeighbor(InlinePanel sourcePanel) {
+    final panels = widget.children.whereType<InlinePanel>().toList();
+    final index = panels.indexWhere((p) => p.id == sourcePanel.id);
+    if (index == -1) return null;
+
+    // Anchor Right/Bottom -> Stable is Right/Bottom (Next)
+    // Anchor Left/Top -> Stable is Left/Top (Prev)
+    final isAnchorEnd =
+        sourcePanel.anchor == PanelAnchor.right ||
+        sourcePanel.anchor == PanelAnchor.bottom;
+
+    if (isAnchorEnd) {
+      // Look for Next
+      if (index < panels.length - 1) return panels[index + 1];
+    } else {
+      // Look for Prev
+      if (index > 0) return panels[index - 1];
+    }
+    return null;
+  }
+
+  double _calculateNewFlexForUnlockedPanel(
+    InlinePanel targetPanel,
+    double targetPixels,
+  ) {
+    if (_lastConstraints == null) return targetPanel.flex ?? 1.0;
+
+    final config = widget.style ?? const PanelStyle();
+    final totalSpace = _cachedAxis == Axis.horizontal
+        ? _lastConstraints!.maxWidth
+        : _lastConstraints!.maxHeight;
+
+    double usedPixelSpace = 0.0;
+    double totalFlexOthers = 0.0;
+
+    // Create layout data to calculate space usage
+    // We can't use _createLayoutData directly because it relies on current state,
+    // and current state has the override! We need to simulate the state WITHOUT override for the target.
+
+    // We iterate children to simulate layout
+    final dockedPanels = widget.children.whereType<InlinePanel>().toList();
+
+    for (final panel in dockedPanels) {
+      final state = _stateManager.getState(panel.id);
+      if (state == null || !state.visible) continue;
+
+      double panelSize = 0.0;
+
+      if (panel.id == targetPanel.id) {
+        // This is the one we are unlocking. Treat as Flex (size 0 in pixel calc)
+        // We don't add to usedPixelSpace.
+        // We don't add to totalFlexOthers.
+      } else if (state.collapsed) {
+        final iconSize = panel.iconSize ?? config.iconSize;
+        panelSize = iconSize + (panel.railPadding ?? config.railPadding);
+        usedPixelSpace += panelSize;
+      } else if (panel.flex == null) {
+        // Fixed
+        panelSize =
+            state.size; // This is the post-animation size of the Fixed panel
+        usedPixelSpace += panelSize;
+      } else {
+        // Flex (Other)
+        // If this OTHER panel is also overridden, we should treat it as Fixed?
+        // For simplicity, assume only one interaction at a time.
+        // Or if it's overridden, it takes pixel space.
+        if (state.fixedPixelSizeOverride != null) {
+          usedPixelSpace += state.fixedPixelSizeOverride!;
+        } else {
+          totalFlexOthers += state.size;
+        }
+      }
+    }
+
+    // Add handles
+    int visibleHandleCount = 0;
+    for (var i = 0; i < dockedPanels.length - 1; i++) {
+      final prev = dockedPanels[i];
+      final next = dockedPanels[i + 1];
+      final prevState = _stateManager.getState(prev.id);
+      final nextState = _stateManager.getState(next.id);
+
+      if (prevState != null &&
+          nextState != null &&
+          prevState.visible &&
+          nextState.visible) {
+        // Simplified visibility check: if state says visible, we count it.
+        visibleHandleCount++;
+      }
+    }
+    usedPixelSpace += visibleHandleCount * config.handleHitTestWidth;
+
+    final flexibleSpace = totalSpace - usedPixelSpace;
+
+    if (totalFlexOthers <= 0) {
+      // No other flex panels. Target takes all space.
+      // We can return current flex, or 1.0.
+      final currentState = _stateManager.getState(targetPanel.id);
+      return currentState?.size ?? targetPanel.flex ?? 1.0;
+    }
+
+    if (flexibleSpace <= targetPixels) {
+      // Not enough space to hold targetPixels?
+      // Or targetPixels takes ALL space.
+      // Return a large flex?
+      return (targetPanel.flex ?? 1.0) * 2; // Arbitrary expansion
+    }
+
+    // Equation: F_target = (pixels * F_others) / (Available - pixels)
+    final numerator = targetPixels * totalFlexOthers;
+    final denominator = flexibleSpace - targetPixels;
+
+    if (denominator <= 0.1) {
+      return 100.0; // Avoid div by zero, return large flex
+    }
+
+    return numerator / denominator;
   }
 
   @override
@@ -219,6 +378,8 @@ class _PanelLayoutState extends State<PanelLayout>
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        _lastConstraints = constraints;
+
         // 1. Prepare data for the layout delegate
         final layoutData = _createLayoutData(uniquePanelConfigs, config);
 
@@ -229,6 +390,7 @@ class _PanelLayoutState extends State<PanelLayout>
           axis: axis,
           config: config,
         );
+        _lastPixelToFlexRatio = pixelToFlexRatio;
 
         // 3. Build Layout Children
         final children = <Widget>[

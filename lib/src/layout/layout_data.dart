@@ -45,7 +45,7 @@ class PanelLayoutData {
   double get effectiveSize {
     // If factor is 0, we take 0 space.
     // If factor is 1, we take full size.
-    final baseSize = state.size;
+    final baseSize = state.fixedPixelSizeOverride ?? state.size;
 
     // Interpolate between full size and collapsed size based on collapseFactor
     final currentSize = baseSize + (collapsedSize - baseSize) * collapseFactor;

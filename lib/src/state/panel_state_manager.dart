@@ -149,6 +149,28 @@ class PanelStateManager extends ChangeNotifier {
     }
   }
 
+  void setFixedSizeOverride(PanelId id, double size) {
+    final state = _panelStates[id];
+    if (state != null) {
+      _panelStates[id] = state.copyWith(fixedPixelSizeOverride: size);
+      notifyListeners();
+    }
+  }
+
+  void clearFixedSizeOverride(PanelId id, double newSize) {
+    final state = _panelStates[id];
+    if (state != null) {
+      // Reconstruct to force null override
+      _panelStates[id] = PanelRuntimeState(
+        size: newSize,
+        visible: state.visible,
+        collapsed: state.collapsed,
+        fixedPixelSizeOverride: null,
+      );
+      notifyListeners();
+    }
+  }
+
   void _animatePanel(PanelId id, bool visible) {
     final controller = _animationControllers[id];
     if (controller != null) {

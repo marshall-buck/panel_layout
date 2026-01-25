@@ -35,8 +35,9 @@ class InlineLayoutStrategy {
     // Pass 1: Measure Fixed and Content
     for (final p in inlineIds) {
       final config = p.config as InlinePanel;
+      final override = p.state.fixedPixelSizeOverride;
 
-      if (config.flex != null) {
+      if (config.flex != null && override == null) {
         // Flexible: Sum up animated weight
         final animatedWeight = p.effectiveSize;
         if (animatedWeight > 0) {
@@ -70,9 +71,9 @@ class InlineLayoutStrategy {
         }
 
         // Fixed or Content?
-        final isFixed = isHorizontal
+        final isFixed = (isHorizontal
             ? config.width != null
-            : config.height != null;
+            : config.height != null) || override != null;
 
         final BoxConstraints constraints;
 
