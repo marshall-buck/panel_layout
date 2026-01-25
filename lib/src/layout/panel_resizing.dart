@@ -6,6 +6,25 @@ import '../widgets/panels/inline_panel.dart';
 /// Encapsulates the logic for resizing panels.
 @internal
 class PanelResizing {
+  /// Determines if two adjacent panels can be resized relative to each other.
+  static bool canResize(InlinePanel prev, InlinePanel next) {
+    // Case 1: Prev is fixed and resizable
+    if (prev.flex == null && prev.resizable) return true;
+
+    // Case 2: Next is fixed and resizable
+    if (next.flex == null && next.resizable) return true;
+
+    // Case 3: Both are flexible and both are resizable
+    if (prev.flex != null &&
+        next.flex != null &&
+        prev.resizable &&
+        next.resizable) {
+      return true;
+    }
+
+    return false;
+  }
+
   /// Calculates the new sizes for two adjacent panels based on a drag [delta].
   ///
   /// Returns a map of [PanelId] to the new size (width, height, or flex).

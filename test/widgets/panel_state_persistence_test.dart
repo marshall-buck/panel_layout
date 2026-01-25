@@ -5,8 +5,8 @@ import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
 import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
-      (w) => w is AnimatedPanel && w.config.id == PanelId(id),
-    );
+  (w) => w is AnimatedPanel && w.config.id == PanelId(id),
+);
 
 void main() {
   group('Panel State Persistence', () {

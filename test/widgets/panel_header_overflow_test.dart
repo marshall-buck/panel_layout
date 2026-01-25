@@ -3,10 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 
 void main() {
-  testWidgets('Header row handles extreme narrow constraints without overflow', (WidgetTester tester) async {
+  testWidgets('Header row handles extreme narrow constraints without overflow', (
+    WidgetTester tester,
+  ) async {
     // We create a panel and force its header to be extremely narrow (e.g., 10 pixels).
     // The icon is usually 24px, so this will trigger the clipping logic and hide the title.
-    
+
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -33,18 +35,23 @@ void main() {
     // If an overflow occurred, Flutter would have thrown an assertion during the pump.
     // We check that the Text widget is NOT found or is not visible because it should be hidden by our logic.
     // In our implementation, we return an Align with a ClipRect(toggleButton) when width < requiredFixedSpace.
-    
-    expect(find.text('This is a long title that should be hidden'), findsNothing);
-    
+
+    expect(
+      find.text('This is a long title that should be hidden'),
+      findsNothing,
+    );
+
     // Check that we find the ClipRect which contains the toggle button
     expect(find.byType(ClipRect), findsWidgets);
-    
-    // No overflow errors should be in the logs. 
+
+    // No overflow errors should be in the logs.
     // tester.takeException() returns the last exception caught by the tester.
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Header row shows title when enough space is available', (WidgetTester tester) async {
+  testWidgets('Header row shows title when enough space is available', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,

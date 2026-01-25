@@ -399,6 +399,10 @@ class _PanelLayoutState extends State<PanelLayout>
           id: handleId,
           child: PanelResizeHandle(
             axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
+            resizable: PanelResizing.canResize(
+              prev.config as InlinePanel,
+              next.config as InlinePanel,
+            ),
             onDragUpdate: (delta) =>
                 _handleResize(delta, prev, next, pixelToFlexRatio),
             onDragStart: widget.onResizeStart,

@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 
 void main() {
-  testWidgets('InlinePanel applies ClipRect when clipContent is true', (WidgetTester tester) async {
+  testWidgets('InlinePanel applies ClipRect when clipContent is true', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -12,7 +14,11 @@ void main() {
             InlinePanel(
               id: const PanelId('panel1'),
               clipContent: true,
-              child: const SizedBox(width: 100, height: 100, child: Text('Content')),
+              child: const SizedBox(
+                width: 100,
+                height: 100,
+                child: Text('Content'),
+              ),
             ),
           ],
         ),
@@ -23,7 +29,9 @@ void main() {
     expect(find.byType(ClipRect), findsOneWidget);
   });
 
-  testWidgets('InlinePanel does not apply ClipRect when clipContent is false', (WidgetTester tester) async {
+  testWidgets('InlinePanel does not apply ClipRect when clipContent is false', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -32,7 +40,11 @@ void main() {
             InlinePanel(
               id: const PanelId('panel1'),
               clipContent: false,
-              child: const SizedBox(width: 100, height: 100, child: Text('Content')),
+              child: const SizedBox(
+                width: 100,
+                height: 100,
+                child: Text('Content'),
+              ),
             ),
           ],
         ),
@@ -51,7 +63,9 @@ void main() {
     );
   });
 
-  testWidgets('OverlayPanel applies ClipRect when clipContent is true', (WidgetTester tester) async {
+  testWidgets('OverlayPanel applies ClipRect when clipContent is true', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -60,7 +74,11 @@ void main() {
             OverlayPanel(
               id: const PanelId('overlay1'),
               clipContent: true,
-              child: const SizedBox(width: 100, height: 100, child: Text('Content')),
+              child: const SizedBox(
+                width: 100,
+                height: 100,
+                child: Text('Content'),
+              ),
             ),
           ],
         ),

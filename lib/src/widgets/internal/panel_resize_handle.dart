@@ -15,6 +15,7 @@ class PanelResizeHandle extends StatelessWidget {
   const PanelResizeHandle({
     required this.onDragUpdate,
     this.axis = Axis.vertical,
+    this.resizable = true,
     this.onDragStart,
     this.onDragEnd,
     super.key,
@@ -25,6 +26,9 @@ class PanelResizeHandle extends StatelessWidget {
 
   /// The axis of the layout (direction of the separator).
   final Axis axis;
+
+  /// Whether the handle is currently active for resizing.
+  final bool resizable;
 
   /// Optional callback called when dragging starts.
   final VoidCallback? onDragStart;
@@ -38,15 +42,19 @@ class PanelResizeHandle extends StatelessWidget {
     final isVertical = axis == Axis.vertical;
 
     return MouseRegion(
-      cursor: isVertical
-          ? SystemMouseCursors.resizeColumn
-          : SystemMouseCursors.resizeRow,
+      cursor: resizable
+          ? (isVertical
+                ? SystemMouseCursors.resizeColumn
+                : SystemMouseCursors.resizeRow)
+          : MouseCursor.defer,
       child: GestureDetector(
-        onPanStart: (_) => onDragStart?.call(),
-        onPanUpdate: (details) {
-          onDragUpdate(isVertical ? details.delta.dx : details.delta.dy);
-        },
-        onPanEnd: (_) => onDragEnd?.call(),
+        onPanStart: resizable ? (_) => onDragStart?.call() : null,
+        onPanUpdate: resizable
+            ? (details) {
+                onDragUpdate(isVertical ? details.delta.dx : details.delta.dy);
+              }
+            : null,
+        onPanEnd: resizable ? (_) => onDragEnd?.call() : null,
         behavior: HitTestBehavior.translucent,
         child: Container(
           // Hit target size (larger than visible line)
@@ -63,7 +71,7 @@ class PanelResizeHandle extends StatelessWidget {
                 decoration: BoxDecoration(color: config.handleColor),
               ),
               // Icon/Grip
-              if (config.handleIcon != null)
+              if (resizable && config.handleIcon != null)
                 Align(
                   alignment: config.handleIconAlignment,
                   child: Icon(

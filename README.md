@@ -20,7 +20,7 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 
 ```yaml
 dependencies:
-  panel_layout: ^0.5.7
+  panel_layout: latest
 ```
 
 ## Usage Guide
