@@ -7,14 +7,14 @@ import '../core/constants.dart';
 /// This class defines the visual styling and behavior defaults for all panels
 /// and resize handles within the layout.
 ///
-/// Provide this to the [PanelLayout.config] parameter.
+/// Provide this to the [PanelLayout.style] parameter.
 @immutable
-class PanelLayoutConfig extends Equatable {
-  const PanelLayoutConfig({
+class PanelStyle extends Equatable {
+  const PanelStyle({
     // Panel Header & Content
     this.headerPadding = kDefaultHeaderPadding,
     this.headerDecoration,
-    this.titleStyle,
+    this.titleTextStyle,
     this.iconColor,
     this.iconSize = kDefaultIconSize,
     this.panelBoxDecoration,
@@ -48,7 +48,7 @@ class PanelLayoutConfig extends Equatable {
   final BoxDecoration? headerDecoration;
 
   /// The text style for the panel title.
-  final TextStyle? titleStyle;
+  final TextStyle? titleTextStyle;
 
   /// The default color of the panel icon.
   final Color? iconColor;
@@ -108,7 +108,7 @@ class PanelLayoutConfig extends Equatable {
   List<Object?> get props => [
     headerPadding,
     headerDecoration,
-    titleStyle,
+    titleTextStyle,
     iconColor,
     iconSize,
     panelBoxDecoration,
@@ -128,23 +128,23 @@ class PanelLayoutConfig extends Equatable {
   ];
 }
 
-/// An inherited widget that provides [PanelLayoutConfig] to its descendants.
+/// An inherited widget that provides [PanelStyle] to its descendants.
 class PanelConfigurationScope extends InheritedWidget {
   const PanelConfigurationScope({
-    required this.config,
+    required this.style,
     required super.child,
     super.key,
   });
 
-  final PanelLayoutConfig config;
+  final PanelStyle style;
 
-  static PanelLayoutConfig of(BuildContext context) {
+  static PanelStyle of(BuildContext context) {
     final PanelConfigurationScope? result = context
         .dependOnInheritedWidgetOfExactType<PanelConfigurationScope>();
-    return result?.config ?? const PanelLayoutConfig();
+    return result?.style ?? const PanelStyle();
   }
 
   @override
   bool updateShouldNotify(PanelConfigurationScope oldWidget) =>
-      config != oldWidget.config;
+      style != oldWidget.style;
 }

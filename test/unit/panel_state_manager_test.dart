@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/src/layout/panel_layout_config.dart';
+import 'package:panel_layout/src/layout/panel_style.dart';
 import 'package:panel_layout/src/models/panel_id.dart';
 import 'package:panel_layout/src/state/panel_state_manager.dart';
 import 'package:panel_layout/src/widgets/panels/inline_panel.dart';
@@ -28,7 +28,7 @@ void main() {
       );
       final panel2 = InlinePanel(id: PanelId('2'), flex: 1, child: Container());
 
-      manager.reconcile([panel1, panel2], const PanelLayoutConfig(), vsync);
+      manager.reconcile([panel1, panel2], const PanelStyle(), vsync);
 
       expect(manager.getState(PanelId('1')), isNotNull);
       expect(manager.getState(PanelId('2')), isNotNull);
@@ -38,16 +38,16 @@ void main() {
     test('reconcile removes orphaned panels', () {
       final panel1 = InlinePanel(id: PanelId('1'), child: Container());
 
-      manager.reconcile([panel1], const PanelLayoutConfig(), vsync);
+      manager.reconcile([panel1], const PanelStyle(), vsync);
       expect(manager.getState(PanelId('1')), isNotNull);
 
-      manager.reconcile([], const PanelLayoutConfig(), vsync);
+      manager.reconcile([], const PanelStyle(), vsync);
       expect(manager.getState(PanelId('1')), isNull);
     });
 
     test('setVisible updates state and notifies listeners', () {
       final panel1 = InlinePanel(id: PanelId('1'), child: Container());
-      manager.reconcile([panel1], const PanelLayoutConfig(), vsync);
+      manager.reconcile([panel1], const PanelStyle(), vsync);
 
       bool notified = false;
       manager.addListener(() => notified = true);
@@ -64,7 +64,7 @@ void main() {
 
     test('setCollapsed updates state and notifies listeners', () {
       final panel1 = InlinePanel(id: PanelId('1'), child: Container());
-      manager.reconcile([panel1], const PanelLayoutConfig(), vsync);
+      manager.reconcile([panel1], const PanelStyle(), vsync);
 
       bool notified = false;
       manager.addListener(() => notified = true);
@@ -85,7 +85,7 @@ void main() {
         width: 100,
         child: Container(),
       );
-      manager.reconcile([panel1], const PanelLayoutConfig(), vsync);
+      manager.reconcile([panel1], const PanelStyle(), vsync);
 
       bool notified = false;
       manager.addListener(() => notified = true);

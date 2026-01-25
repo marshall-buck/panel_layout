@@ -26,10 +26,10 @@ void main() {
       expect(id1.hashCode, id2.hashCode);
     });
 
-    test('PanelLayoutConfig equality', () {
-      const c1 = PanelLayoutConfig(headerPadding: 10);
-      const c2 = PanelLayoutConfig(headerPadding: 10);
-      const c3 = PanelLayoutConfig(headerPadding: 20);
+    test('PanelStyle equality', () {
+      const c1 = PanelStyle(headerPadding: 10);
+      const c2 = PanelStyle(headerPadding: 10);
+      const c3 = PanelStyle(headerPadding: 20);
 
       expect(c1, c2);
       expect(c1, isNot(c3));

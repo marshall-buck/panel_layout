@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
 }
 
 // Global Configuration for the example app
-final kAppPanelConfig = PanelLayoutConfig(
+final kAppPanelStyle = PanelStyle(
   headerPadding: 8.0,
-  titleStyle: const TextStyle(
+  titleTextStyle: const TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w600,
     color: Colors.black87,
@@ -101,7 +101,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
   Widget build(BuildContext context) {
     return PanelLayout(
       controller: _controller,
-      config: kAppPanelConfig, // Apply global config
+      style: kAppPanelStyle, // Apply global config
       children: [
         // LEFT PANEL: Explorer
         // Standard usage. Inline, resizable.
@@ -193,7 +193,7 @@ class VerticalSplitTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PanelLayout(
-      config: kAppPanelConfig,
+      style: kAppPanelStyle,
       children: [
         // TOP PANEL: Header / Toolbar
         // 6. Non-resizable panel
@@ -280,7 +280,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
     // Manages the Top Bar, the Content Area, and Global Overlays.
     return PanelLayout(
       controller: _rootController,
-      config: kAppPanelConfig,
+      style: kAppPanelStyle,
       children: [
         // 1. Top Panel (Inline, Fixed Height)
         InlinePanel(
@@ -305,7 +305,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
           flex: 1,
           child: PanelLayout(
             controller: _innerController,
-            config: kAppPanelConfig,
+            style: kAppPanelStyle,
             children: [
               // 2a. Z-Order Demo: Popover Overlay (Inner Scope)
               // Anchored to 'right_sidebar' within this inner layout.
@@ -443,7 +443,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
 
 // -----------------------------------------------------------------------------
 // Tab 4: Scoped Configuration
-// Demonstrates: Nested Layouts with different PanelLayoutConfig (InheritedWidget)
+// Demonstrates: Nested Layouts with different PanelStyle (InheritedWidget)
 // -----------------------------------------------------------------------------
 class ScopedTab extends StatelessWidget {
   const ScopedTab({super.key});
@@ -451,13 +451,13 @@ class ScopedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PanelLayout(
-      // Outer Layout Config: Dark Theme
-      config: PanelLayoutConfig(
+      // Outer Layout Style: Dark Theme
+      style: PanelStyle(
         headerDecoration: const BoxDecoration(
           color: Color(0xFF212121),
           border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
         ),
-        titleStyle: const TextStyle(
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
@@ -483,14 +483,14 @@ class ScopedTab extends StatelessWidget {
           id: const PanelId('center_container'),
           flex: 1,
           child: PanelLayout(
-            // Inner Layout Config: Light/Blue Theme
-            // This overrides the outer config for all children in this subtree.
-            config: PanelLayoutConfig(
+            // Inner Layout Style: Light/Blue Theme
+            // This overrides the outer style for all children in this subtree.
+            style: PanelStyle(
               headerDecoration: BoxDecoration(
                 color: Colors.blue[100],
                 border: Border(bottom: BorderSide(color: Colors.blue[300]!)),
               ),
-              titleStyle: TextStyle(
+              titleTextStyle: TextStyle(
                 color: Colors.blue[900],
                 fontWeight: FontWeight.w600,
               ),

@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
 import '../widgets/panels/inline_panel.dart';
-import '../layout/panel_layout_config.dart';
+import '../layout/panel_style.dart';
 import 'panel_runtime_state.dart';
 
 /// Manages the runtime state and animations of panels.
@@ -41,7 +41,7 @@ class PanelStateManager extends ChangeNotifier {
   /// Adds missing states and removes orphaned ones.
   void reconcile(
     List<BasePanel> panels,
-    PanelLayoutConfig config,
+    PanelStyle config,
     TickerProvider vsync,
   ) {
     final currentIds = panels.map((p) => p.id).toSet();

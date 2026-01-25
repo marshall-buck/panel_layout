@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../../models/panel_id.dart';
 import '../../models/panel_enums.dart';
-import '../../layout/panel_layout_config.dart';
+import '../../layout/panel_style.dart';
 import 'inline_panel.dart';
 import '../internal/panel_toggle_button.dart';
 
@@ -88,11 +88,11 @@ abstract class BasePanel extends StatelessWidget {
   final Duration? animationDuration;
 
   /// Optional override for the duration of the size change (slide) animation.
-  /// If null, defaults to [PanelLayoutConfig.sizeDuration].
+  /// If null, defaults to [PanelStyle.sizeDuration].
   final Duration? sizeDuration;
 
   /// Optional override for the duration of the opacity change (fade) animation.
-  /// If null, defaults to [PanelLayoutConfig.fadeDuration].
+  /// If null, defaults to [PanelStyle.fadeDuration].
   final Duration? fadeDuration;
 
   /// Optional override for the curve of size/visibility animations.
@@ -109,12 +109,12 @@ abstract class BasePanel extends StatelessWidget {
   /// The height of the panel header.
   ///
   /// If null, the height is automatically calculated using [headerPadding]
-  /// (or [PanelLayoutConfig.headerPadding]) and the icon size.
+  /// (or [PanelStyle.headerPadding]) and the icon size.
   final double? headerHeight;
 
   /// Vertical padding for the header.
   ///
-  /// If null, defaults to [PanelLayoutConfig.headerPadding].
+  /// If null, defaults to [PanelStyle.headerPadding].
   final double? headerPadding;
 
   /// The primary icon for the panel.
@@ -134,7 +134,7 @@ abstract class BasePanel extends StatelessWidget {
 
   /// Decoration for the panel container (background, border, shadow).
   ///
-  /// If null, defaults to [PanelLayoutConfig.panelBoxDecoration].
+  /// If null, defaults to [PanelStyle.panelBoxDecoration].
   final BoxDecoration? panelBoxDecoration;
 
   /// Decoration for the header.
@@ -169,7 +169,7 @@ abstract class BasePanel extends StatelessWidget {
   /// Used by [BasePanel] for the expanded state and by [AnimatedPanel]
   /// for the rail state (when [InlinePanel.showTitleInRail] is true).
   @internal
-  Widget buildHeaderRow(BuildContext context, PanelLayoutConfig config) {
+  Widget buildHeaderRow(BuildContext context, PanelStyle config) {
     final effectiveIconSize = iconSize ?? config.iconSize;
     const double spacing = 8.0;
 
@@ -199,18 +199,18 @@ abstract class BasePanel extends StatelessWidget {
         final availableWidth = constraints.maxWidth;
         // Calculate the minimum width required to show the full structure (Icon + Spacing)
         // If we have a title, we need the spacing. If only an icon, no spacing needed.
-        final double requiredFixedSpace =
-            (toggleButton != null)
-                ? effectiveIconSize + (title != null ? spacing : 0.0)
-                : 0.0;
+        final double requiredFixedSpace = (toggleButton != null)
+            ? effectiveIconSize + (title != null ? spacing : 0.0)
+            : 0.0;
 
         // If available space is too small for the fixed parts (Icon + Gap),
         // we switch to a fallback mode: Just show the Icon (clipped if needed), hide Title & Gap.
         if (availableWidth < requiredFixedSpace) {
           if (toggleButton != null) {
             return Align(
-              alignment:
-                  showIconOnLeft ? Alignment.centerLeft : Alignment.centerRight,
+              alignment: showIconOnLeft
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
               child: ClipRect(child: toggleButton),
             );
           }
@@ -229,7 +229,7 @@ abstract class BasePanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   title!,
-                  style: titleStyle ?? config.titleStyle,
+                  style: titleStyle ?? config.titleTextStyle,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                 ),

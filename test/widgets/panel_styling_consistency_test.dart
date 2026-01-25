@@ -16,7 +16,7 @@ void main() {
       MaterialApp(
         home: PanelLayout(
           controller: controller,
-          config: const PanelLayoutConfig(
+          style: const PanelStyle(
             headerDecoration: BoxDecoration(color: Colors.white), // Default
           ),
           children: [

@@ -16,7 +16,7 @@ void main() {
           Directionality(
             textDirection: TextDirection.ltr,
             child: PanelLayout(
-              config: const PanelLayoutConfig(
+              style: const PanelStyle(
                 iconSize: testIconSize,
                 headerPadding: testPadding,
               ),
@@ -51,7 +51,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: PanelLayout(
-            config: const PanelLayoutConfig(
+            style: const PanelStyle(
               iconSize: testIconSize,
               headerPadding: configPadding,
             ),
@@ -81,7 +81,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: PanelLayout(
-            config: const PanelLayoutConfig(iconSize: 24, headerPadding: 8),
+            style: const PanelStyle(iconSize: 24, headerPadding: 8),
             children: [
               InlinePanel(
                 id: panelId,

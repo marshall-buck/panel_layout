@@ -66,14 +66,14 @@ void main() {
       expect(scope.state.collapsed, isTrue);
     });
 
-    testWidgets('PanelLayoutConfig styling is applied', (tester) async {
+    testWidgets('PanelStyle styling is applied', (tester) async {
       const headerColor = Color(0xFFFF0000);
       const panelColor = Color(0xFF00FF00);
 
       await tester.pumpWidget(
         MaterialApp(
           home: PanelLayout(
-            config: const PanelLayoutConfig(
+            style: const PanelStyle(
               headerDecoration: BoxDecoration(color: headerColor),
               panelBoxDecoration: BoxDecoration(color: panelColor),
               headerPadding: 13.0,

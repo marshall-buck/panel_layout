@@ -7,7 +7,7 @@ A modern, declarative, widget-centric panel layout system for Flutter.
 ## Key Features
 
 - **Declarative API**: Define your layout by simply listing your panels as children of `PanelLayout`.
-- **Centralized Configuration**: Type-safe `PanelLayoutConfig` for global styling and behavior (animations, resize handles).
+- **Centralized Configuration**: Type-safe `PanelStyle` for global styling and behavior (animations, resize handles).
 - **Type-Safe Panels**:
   - **`InlinePanel`**: Tiled panels that participate in the flow (Row/Column). Supports resizing and "Mini Variants" (collapsing to a rail).
   - **`OverlayPanel`**: Floating panels anchored to edges or specific widget IDs. Ideal for dialogs and popovers.
@@ -32,7 +32,7 @@ The `PanelLayout` widget is the entry point. It infers the layout direction from
 ```dart
 PanelLayout(
   // 1. Global Configuration (Optional)
-  config: PanelLayoutConfig(
+  style: PanelStyle(
     // Styling
     headerPadding: 8.0,
     headerDecoration: BoxDecoration(color: Colors.grey[200]),
@@ -151,7 +151,7 @@ InlinePanel(
 `panel_layout` uses a strict hierarchy for resolving styles. You can override styles at any level:
 
 1. **Panel Instance**: `InlinePanel(headerPadding: 20)` (Highest Priority)
-2. **Global Config**: `PanelLayout(config: PanelLayoutConfig(headerPadding: 10))`
+2. **Global Config**: `PanelLayout(style: PanelStyle(headerPadding: 10))`
 3. **Library Defaults**: `8.0`
 
 ### Accessing State in Children
@@ -172,11 +172,11 @@ Widget build(BuildContext context) {
 
 ### Scoped Configuration
 
-Since `PanelLayoutConfig` is an `InheritedWidget`, you can nest layouts to create scoped themes.
+Since `PanelStyle` is an `InheritedWidget`, you can nest layouts to create scoped themes.
 
 ```dart
 PanelLayout(
-  config: DarkThemeConfig, // Outer layout is Dark
+  style: DarkThemeConfig, // Outer layout is Dark
   children: [
     InlinePanel(
       id: PanelId('sidebar'), // Uses Dark Theme
@@ -185,7 +185,7 @@ PanelLayout(
     InlinePanel(
       flex: 1,
       child: PanelLayout(
-        config: LightThemeConfig, // Inner layout is Light
+        style: LightThemeConfig, // Inner layout is Light
         children: [
           // These panels use Light Theme
         ],

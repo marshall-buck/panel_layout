@@ -2,16 +2,18 @@
 
 * **Breaking Change**: Removed `axis` parameter from `PanelLayout`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
 * Added `ScopedTab` to example app to demonstrate nested, scoped configurations.
-* Added `clipContent` to BasePanelWhat.
-* Updated documentation to clarify `PanelLayoutConfig` scoping rules.
+* Added `clipContent` to BasePanel.
+* Updated documentation to clarify `PanelStyle` scoping rules.
 * **Internal Refactor**: Abstracted state management, resizing math, and layout strategies into dedicated, decoupled modules for better maintainability and testability.
 
 ## 0.5.7
 
+* **Breaking Change**: Renamed `PanelLayoutConfig` to `PanelStyle`.
+* **API Change**: `PanelLayout` now accepts a `style` parameter (of type `PanelStyle`) instead of `config`.
 * **Breaking Change**: Removed `PanelTheme` and `ResizeHandleTheme` widgets.
-* **New Feature**: Introduced `PanelLayoutConfig` for centralized, type-safe configuration of layout styling and behavior.
-* **API Change**: `PanelLayout` now accepts a `config` parameter (of type `PanelLayoutConfig`) to set global defaults for headers, decorations, resize handles, and animations.
-* **Improvement**: `BasePanel` properties (like `headerPadding`, `iconSize`) now fall back to values in `PanelLayoutConfig` instead of hardcoded constants or separate themes.
+* **New Feature**: Introduced `PanelStyle` for centralized, type-safe configuration of layout styling and behavior.
+* **API Change**: `PanelLayout` now accepts a `style` parameter (of type `PanelStyle`) to set global defaults for headers, decorations, resize handles, and animations.
+* **Improvement**: `BasePanel` properties (like `headerPadding`, `iconSize`) now fall back to values in `PanelStyle` instead of hardcoded constants or separate themes.
 
 ## 0.5.6
 

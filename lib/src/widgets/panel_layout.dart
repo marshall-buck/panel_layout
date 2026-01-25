@@ -5,7 +5,7 @@ import '../models/panel_id.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_data_scope.dart';
 import '../state/panel_state_manager.dart';
-import '../layout/panel_layout_config.dart';
+import '../layout/panel_style.dart';
 import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../layout/panel_resizing.dart';
@@ -50,7 +50,7 @@ class PanelLayout extends StatefulWidget {
   const PanelLayout({
     required this.children,
     this.controller,
-    this.config,
+    this.style,
     this.onResizeStart,
     this.onResizeEnd,
     super.key,
@@ -69,7 +69,7 @@ class PanelLayout extends StatefulWidget {
   final PanelLayoutController? controller;
 
   /// The configuration for styling and behavior.
-  final PanelLayoutConfig? config;
+  final PanelStyle? style;
 
   /// Optional callback called when a user begins dragging a resize handle.
   final VoidCallback? onResizeStart;
@@ -172,7 +172,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
   /// Ensures internal state maps match the current list of children.
   void _reconcileState() {
-    final config = widget.config ?? const PanelLayoutConfig();
+    final config = widget.style ?? const PanelStyle();
     _stateManager.reconcile(widget.children, config, this);
   }
 
@@ -210,7 +210,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
   @override
   Widget build(BuildContext context) {
-    final config = widget.config ?? const PanelLayoutConfig();
+    final config = widget.style ?? const PanelStyle();
     final axis = _cachedAxis;
     final uniquePanelConfigs = <PanelId, BasePanel>{};
     for (final panel in widget.children) {
@@ -245,7 +245,7 @@ class _PanelLayoutState extends State<PanelLayout>
         return PanelScope(
           controller: _effectiveController,
           child: PanelConfigurationScope(
-            config: config,
+            style: config,
             child: CustomMultiChildLayout(
               delegate: PanelLayoutDelegate(
                 panels: layoutData,
@@ -262,7 +262,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
   List<PanelLayoutData> _createLayoutData(
     Map<PanelId, BasePanel> uniquePanelConfigs,
-    PanelLayoutConfig config,
+    PanelStyle config,
   ) {
     return uniquePanelConfigs.values.map((panelConfig) {
       final state = _stateManager.getState(panelConfig.id)!;
@@ -290,10 +290,11 @@ class _PanelLayoutState extends State<PanelLayout>
     required List<PanelLayoutData> layoutData,
     required BoxConstraints constraints,
     required Axis axis,
-    required PanelLayoutConfig config,
+    required PanelStyle config,
   }) {
-    final totalSpace =
-        axis == Axis.horizontal ? constraints.maxWidth : constraints.maxHeight;
+    final totalSpace = axis == Axis.horizontal
+        ? constraints.maxWidth
+        : constraints.maxHeight;
 
     double usedPixelSpace = 0.0;
     double totalFlex = 0.0;
@@ -316,8 +317,9 @@ class _PanelLayoutState extends State<PanelLayout>
     }
 
     // Add Resize Handles to used space
-    final dockedPanels =
-        layoutData.where((d) => d.config is InlinePanel).toList();
+    final dockedPanels = layoutData
+        .where((d) => d.config is InlinePanel)
+        .toList();
     int visibleHandleCount = 0;
     for (var i = 0; i < dockedPanels.length - 1; i++) {
       final prev = dockedPanels[i];
@@ -377,8 +379,9 @@ class _PanelLayoutState extends State<PanelLayout>
     required double pixelToFlexRatio,
   }) {
     final widgets = <Widget>[];
-    final dockedPanels =
-        layoutData.where((d) => d.config is InlinePanel).toList();
+    final dockedPanels = layoutData
+        .where((d) => d.config is InlinePanel)
+        .toList();
 
     for (var i = 0; i < dockedPanels.length - 1; i++) {
       final prev = dockedPanels[i];
