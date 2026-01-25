@@ -14,7 +14,7 @@
 * Added `clipContent` to BasePanel.
 * Updated documentation to clarify `PanelStyle` scoping rules.
 * **Internal Refactor**: Abstracted state management, resizing math, and layout strategies into dedicated, decoupled modules for better maintainability and testability.
-* **Bug Fix** Resize handle no longer shows when panle is not resizable.
+* **Bug Fix** Resize handle no longer shows when panel is not resizable.
 
 ## 0.5.7
 
