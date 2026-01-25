@@ -1,10 +1,20 @@
-# 0.5.8
+# 0.5.9
+
+* **New Feature**: Introduced `UserContent` class.
+  * An abstract base class for defining content-only panels that fill available space (`flex: 1`).
+  * Designed to be extended by users to create specialized content regions without headers or default decorations.
+  * Adjacent `UserContent` panels do not generate resize handles between them.
+* **New Feature**: Added `onResizeStart` and `onResizeEnd` callbacks to `PanelLayout` to track user resize interactions.
+* **Behavior Change**: Adjacent `UserContent` panels no longer show a resize handle, allowing for seamless content regions.
+
+## 0.5.8
 
 * **Breaking Change**: Removed `axis` parameter from `PanelLayout`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
 * Added `ScopedTab` to example app to demonstrate nested, scoped configurations.
 * Added `clipContent` to BasePanel.
 * Updated documentation to clarify `PanelStyle` scoping rules.
 * **Internal Refactor**: Abstracted state management, resizing math, and layout strategies into dedicated, decoupled modules for better maintainability and testability.
+* **Bug Fix** Resize handle no longer shows when panle is not resizable.
 
 ## 0.5.7
 

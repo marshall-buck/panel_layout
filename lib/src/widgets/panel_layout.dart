@@ -392,6 +392,11 @@ class _PanelLayoutState extends State<PanelLayout>
         if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
       }
 
+      // Skip resize handle between two UserContent panels
+      if (prev.config is UserContent && next.config is UserContent) {
+        continue;
+      }
+
       final handleId = HandleLayoutId(prev.config.id, next.config.id);
 
       widgets.add(

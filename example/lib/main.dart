@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panel_layout/panel_layout.dart';
+import 'user_content_tab.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,16 +51,18 @@ class ExampleHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Panel Layout Gallery'),
           bottom: const TabBar(
+            isScrollable: true,
             tabs: [
               Tab(text: 'Classic IDE', icon: Icon(Icons.grid_view)),
               Tab(text: 'Vertical Split', icon: Icon(Icons.splitscreen)),
               Tab(text: 'Overlays', icon: Icon(Icons.layers)),
               Tab(text: 'Scoped', icon: Icon(Icons.format_paint)),
+              Tab(text: 'User Content', icon: Icon(Icons.code)),
             ],
           ),
         ),
@@ -70,6 +73,7 @@ class ExampleHome extends StatelessWidget {
             VerticalSplitTab(),
             OverlaysTab(),
             ScopedTab(),
+            UserContentTab(),
           ],
         ),
       ),

@@ -58,7 +58,7 @@ PanelLayout(
 
 ### 2. The Building Blocks: InlinePanel
 
-`InlinePanel`s are tiles that fill the layout. They can be fixed-size, flexible, or content-sized.
+`InlinePanel`s are tiles that change the layout. They can be fixed-size, flexible, or content-sized.
 
 ```dart
 InlinePanel(
@@ -88,7 +88,34 @@ InlinePanel(
 )
 ```
 
-### 3. Floating Content: OverlayPanel
+### 3. Specialized Panels: UserContent
+
+For content regions that should fill the remaining space (`flex: 1`) without headers, decorations, or resize handles between them, extend the `UserContent` class.
+
+```dart
+class MyEditorPanel extends UserContent {
+  const MyEditorPanel({super.key, required super.id});
+
+  @override
+  Widget buildContent(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Center(child: Text("Editor")),
+    );
+  }
+}
+
+// Usage in PanelLayout
+PanelLayout(
+  children: [
+    InlinePanel(...), // Sidebar
+    MyEditorPanel(id: PanelId('editor')), // Fills space
+    MyPreviewPanel(id: PanelId('preview')), // Fills space, no resize handle between editors
+  ],
+)
+```
+
+### 4. Floating Content: OverlayPanel
 
 `OverlayPanel`s float on top of the layout. They are removed from the flow but can be anchored to specific points.
 
