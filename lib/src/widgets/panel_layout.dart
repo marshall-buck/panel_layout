@@ -9,8 +9,8 @@ import '../layout/panel_style.dart';
 import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../layout/panel_resizing.dart';
+import '../layout/panel_layout_engine.dart';
 import '../controllers/panel_layout_controller.dart';
-import '../core/exceptions.dart';
 import 'widgets.dart';
 import 'animation/animated_panel.dart';
 import 'internal/panel_resize_handle.dart';
@@ -91,6 +91,7 @@ class _PanelLayoutState extends State<PanelLayout>
     implements PanelLayoutStateInterface {
   late final PanelStateManager _stateManager;
   late Axis _cachedAxis;
+  static const _engine = PanelLayoutEngine();
 
   PanelLayoutController? _internalController;
   PanelLayoutController get _effectiveController =>
@@ -98,12 +99,12 @@ class _PanelLayoutState extends State<PanelLayout>
 
   // Track previous frame's constraints/ratio for calculations
   BoxConstraints? _lastConstraints;
-  double _lastPixelToFlexRatio = 0.0;
+  bool _wasAnimating = false;
 
   @override
   void initState() {
     super.initState();
-    _cachedAxis = _validateAndComputeAxis(widget.children);
+    _cachedAxis = _engine.validateAndComputeAxis(widget.children);
     _stateManager = PanelStateManager();
     _stateManager.addListener(_onStateChange);
     if (widget.controller == null) {
@@ -114,10 +115,16 @@ class _PanelLayoutState extends State<PanelLayout>
   }
 
   void _onStateChange() {
+    // Avoid rebuilding the entire tree on every animation tick.
+    // Instead, we only update state. The Delegate listens to stateManager and relayouts.
+    // The AnimatedPanels listen to stateManager and repaint.
+
+    if (_lastConstraints == null) return;
+
+    bool isAnyAnimating = false;
+
     for (final panel in widget.children) {
       if (panel is! InlinePanel) continue;
-      // We look for Fixed panels that are animating
-      if (panel.flex != null) continue;
 
       final anim = _stateManager.getAnimationController(panel.id);
       final collapseAnim = _stateManager.getCollapseController(panel.id);
@@ -125,6 +132,11 @@ class _PanelLayoutState extends State<PanelLayout>
       final isAnimating =
           (anim != null && anim.isAnimating) ||
           (collapseAnim != null && collapseAnim.isAnimating);
+
+      if (isAnimating) isAnyAnimating = true;
+
+      // We look for Fixed panels that are animating for stability locking
+      if (panel.flex != null) continue;
 
       final neighbor = _getStableNeighbor(panel);
       if (neighbor == null || neighbor.flex == null) continue;
@@ -136,8 +148,22 @@ class _PanelLayoutState extends State<PanelLayout>
         // LOCK: If not already locked, lock it to current pixel size
         if (neighborState.fixedPixelSizeOverride == null) {
           final currentFlex = neighborState.size;
-          if (_lastPixelToFlexRatio > 0) {
-            final currentPixels = currentFlex / _lastPixelToFlexRatio;
+
+          // Calculate FRESH ratio
+          final layoutData = _engine.createLayoutData(
+            uniquePanelConfigs: {for (var p in widget.children) p.id: p},
+            config: widget.style ?? const PanelStyle(),
+            stateManager: _stateManager,
+          );
+          final ratio = _engine.calculatePixelToFlexRatio(
+            layoutData: layoutData,
+            constraints: _lastConstraints!,
+            axis: _cachedAxis,
+            config: widget.style ?? const PanelStyle(),
+          );
+
+          if (ratio > 0) {
+            final currentPixels = currentFlex / ratio;
             _stateManager.setFixedSizeOverride(neighbor.id, currentPixels);
           }
         }
@@ -145,12 +171,33 @@ class _PanelLayoutState extends State<PanelLayout>
         // UNLOCK: If locked, calculate new flex and unlock
         if (neighborState.fixedPixelSizeOverride != null) {
           final override = neighborState.fixedPixelSizeOverride!;
-          final newFlex = _calculateNewFlexForUnlockedPanel(neighbor, override);
+
+          final layoutData = _engine.createLayoutData(
+            uniquePanelConfigs: {for (var p in widget.children) p.id: p},
+            config: widget.style ?? const PanelStyle(),
+            stateManager: _stateManager,
+          );
+
+          final newFlex = _engine.calculateNewFlexForUnlockedPanel(
+            layoutData: layoutData,
+            targetPanelId: neighbor.id,
+            targetPixels: override,
+            constraints: _lastConstraints!,
+            axis: _cachedAxis,
+            config: widget.style ?? const PanelStyle(),
+          );
+
           _stateManager.clearFixedSizeOverride(neighbor.id, newFlex);
         }
       }
     }
-    setState(() {});
+
+    // Check if animation just finished
+    if (_wasAnimating && !isAnyAnimating) {
+      // Animation finished. Rebuild to clean up (e.g. remove handles for hidden panels).
+      setState(() {});
+    }
+    _wasAnimating = isAnyAnimating;
   }
 
   InlinePanel? _getStableNeighbor(InlinePanel sourcePanel) {
@@ -174,108 +221,10 @@ class _PanelLayoutState extends State<PanelLayout>
     return null;
   }
 
-  double _calculateNewFlexForUnlockedPanel(
-    InlinePanel targetPanel,
-    double targetPixels,
-  ) {
-    if (_lastConstraints == null) return targetPanel.flex ?? 1.0;
-
-    final config = widget.style ?? const PanelStyle();
-    final totalSpace = _cachedAxis == Axis.horizontal
-        ? _lastConstraints!.maxWidth
-        : _lastConstraints!.maxHeight;
-
-    double usedPixelSpace = 0.0;
-    double totalFlexOthers = 0.0;
-
-    // Create layout data to calculate space usage
-    // We can't use _createLayoutData directly because it relies on current state,
-    // and current state has the override! We need to simulate the state WITHOUT override for the target.
-
-    // We iterate children to simulate layout
-    final dockedPanels = widget.children.whereType<InlinePanel>().toList();
-
-    for (final panel in dockedPanels) {
-      final state = _stateManager.getState(panel.id);
-      if (state == null || !state.visible) continue;
-
-      double panelSize = 0.0;
-
-      if (panel.id == targetPanel.id) {
-        // This is the one we are unlocking. Treat as Flex (size 0 in pixel calc)
-        // We don't add to usedPixelSpace.
-        // We don't add to totalFlexOthers.
-      } else if (state.collapsed) {
-        final iconSize = panel.iconSize ?? config.iconSize;
-        panelSize = iconSize + (panel.railPadding ?? config.railPadding);
-        usedPixelSpace += panelSize;
-      } else if (panel.flex == null) {
-        // Fixed
-        panelSize =
-            state.size; // This is the post-animation size of the Fixed panel
-        usedPixelSpace += panelSize;
-      } else {
-        // Flex (Other)
-        // If this OTHER panel is also overridden, we should treat it as Fixed?
-        // For simplicity, assume only one interaction at a time.
-        // Or if it's overridden, it takes pixel space.
-        if (state.fixedPixelSizeOverride != null) {
-          usedPixelSpace += state.fixedPixelSizeOverride!;
-        } else {
-          totalFlexOthers += state.size;
-        }
-      }
-    }
-
-    // Add handles
-    int visibleHandleCount = 0;
-    for (var i = 0; i < dockedPanels.length - 1; i++) {
-      final prev = dockedPanels[i];
-      final next = dockedPanels[i + 1];
-      final prevState = _stateManager.getState(prev.id);
-      final nextState = _stateManager.getState(next.id);
-
-      if (prevState != null &&
-          nextState != null &&
-          prevState.visible &&
-          nextState.visible) {
-        // Simplified visibility check: if state says visible, we count it.
-        visibleHandleCount++;
-      }
-    }
-    usedPixelSpace += visibleHandleCount * config.handleHitTestWidth;
-
-    final flexibleSpace = totalSpace - usedPixelSpace;
-
-    if (totalFlexOthers <= 0) {
-      // No other flex panels. Target takes all space.
-      // We can return current flex, or 1.0.
-      final currentState = _stateManager.getState(targetPanel.id);
-      return currentState?.size ?? targetPanel.flex ?? 1.0;
-    }
-
-    if (flexibleSpace <= targetPixels) {
-      // Not enough space to hold targetPixels?
-      // Or targetPixels takes ALL space.
-      // Return a large flex?
-      return (targetPanel.flex ?? 1.0) * 2; // Arbitrary expansion
-    }
-
-    // Equation: F_target = (pixels * F_others) / (Available - pixels)
-    final numerator = targetPixels * totalFlexOthers;
-    final denominator = flexibleSpace - targetPixels;
-
-    if (denominator <= 0.1) {
-      return 100.0; // Avoid div by zero, return large flex
-    }
-
-    return numerator / denominator;
-  }
-
   @override
   void didUpdateWidget(PanelLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _cachedAxis = _validateAndComputeAxis(widget.children);
+    _cachedAxis = _engine.validateAndComputeAxis(widget.children);
     if (widget.controller != oldWidget.controller) {
       if (oldWidget.controller == null) {
         _internalController?.detach();
@@ -335,38 +284,6 @@ class _PanelLayoutState extends State<PanelLayout>
     _stateManager.reconcile(widget.children, config, this);
   }
 
-  /// Infers the axis from the first [InlinePanel] found in [children].
-  ///
-  /// Validates that all [InlinePanel]s share the same axis.
-  /// Defaults to [Axis.horizontal] if no inline panels are present.
-  Axis _validateAndComputeAxis(List<BasePanel> children) {
-    Axis? axis;
-    PanelId? axisEstablishedBy;
-
-    for (final child in children) {
-      if (child is InlinePanel && child.anchor != null) {
-        final childAxis =
-            (child.anchor == PanelAnchor.left ||
-                child.anchor == PanelAnchor.right)
-            ? Axis.horizontal
-            : Axis.vertical;
-
-        if (axis == null) {
-          axis = childAxis;
-          axisEstablishedBy = child.id;
-        } else if (axis != childAxis) {
-          throw AnchorException(
-            firstPanelId: axisEstablishedBy!,
-            firstAxis: axis,
-            conflictingPanelId: child.id,
-            conflictingAxis: childAxis,
-          );
-        }
-      }
-    }
-    return axis ?? Axis.horizontal;
-  }
-
   @override
   Widget build(BuildContext context) {
     final config = widget.style ?? const PanelStyle();
@@ -381,16 +298,19 @@ class _PanelLayoutState extends State<PanelLayout>
         _lastConstraints = constraints;
 
         // 1. Prepare data for the layout delegate
-        final layoutData = _createLayoutData(uniquePanelConfigs, config);
+        final layoutData = _engine.createLayoutData(
+          uniquePanelConfigs: uniquePanelConfigs,
+          config: config,
+          stateManager: _stateManager,
+        );
 
         // 2. Calculate Pixel-to-Flex Ratio
-        final pixelToFlexRatio = _calculatePixelToFlexRatio(
+        final pixelToFlexRatio = _engine.calculatePixelToFlexRatio(
           layoutData: layoutData,
           constraints: constraints,
           axis: axis,
           config: config,
         );
-        _lastPixelToFlexRatio = pixelToFlexRatio;
 
         // 3. Build Layout Children
         final children = <Widget>[
@@ -402,7 +322,10 @@ class _PanelLayoutState extends State<PanelLayout>
           ),
         ];
 
-        final sortedChildren = _sortChildren(children, uniquePanelConfigs);
+        final sortedChildren = _engine.sortChildren(
+          unsorted: children,
+          configs: uniquePanelConfigs,
+        );
 
         return PanelScope(
           controller: _effectiveController,
@@ -410,7 +333,10 @@ class _PanelLayoutState extends State<PanelLayout>
             style: config,
             child: CustomMultiChildLayout(
               delegate: PanelLayoutDelegate(
-                panels: layoutData,
+                stateManager: _stateManager,
+                configs: uniquePanelConfigs,
+                style: config,
+                engine: _engine,
                 axis: axis,
                 textDirection: Directionality.of(context),
               ),
@@ -422,115 +348,44 @@ class _PanelLayoutState extends State<PanelLayout>
     );
   }
 
-  List<PanelLayoutData> _createLayoutData(
-    Map<PanelId, BasePanel> uniquePanelConfigs,
-    PanelStyle config,
-  ) {
-    return uniquePanelConfigs.values.map((panelConfig) {
-      final state = _stateManager.getState(panelConfig.id)!;
-      final anim = _stateManager.getAnimationController(panelConfig.id)!;
-      final collapseAnim = _stateManager.getCollapseController(panelConfig.id)!;
-
-      double collapsedSize = 0.0;
-      if (panelConfig is InlinePanel) {
-        final iconSize = panelConfig.iconSize ?? config.iconSize;
-        collapsedSize =
-            iconSize + (panelConfig.railPadding ?? config.railPadding);
-      }
-
-      return PanelLayoutData(
-        config: panelConfig,
-        state: state,
-        visualFactor: anim.value,
-        collapseFactor: collapseAnim.value,
-        collapsedSize: collapsedSize,
-      );
-    }).toList();
-  }
-
-  double _calculatePixelToFlexRatio({
-    required List<PanelLayoutData> layoutData,
-    required BoxConstraints constraints,
-    required Axis axis,
-    required PanelStyle config,
-  }) {
-    final totalSpace = axis == Axis.horizontal
-        ? constraints.maxWidth
-        : constraints.maxHeight;
-
-    double usedPixelSpace = 0.0;
-    double totalFlex = 0.0;
-
-    for (final data in layoutData) {
-      if (data.config is! InlinePanel) continue;
-      final config = data.config as InlinePanel;
-
-      if (!data.state.visible) continue;
-
-      if (data.state.collapsed) {
-        usedPixelSpace += data.collapsedSize;
-      } else if (config.flex == null) {
-        // Fixed panel
-        usedPixelSpace += data.state.size;
-      } else {
-        // Flexible panel
-        totalFlex += data.state.size;
-      }
-    }
-
-    // Add Resize Handles to used space
-    final dockedPanels = layoutData
-        .where((d) => d.config is InlinePanel)
-        .toList();
-    int visibleHandleCount = 0;
-    for (var i = 0; i < dockedPanels.length - 1; i++) {
-      final prev = dockedPanels[i];
-      final next = dockedPanels[i + 1];
-      if ((prev.state.visible || prev.visualFactor > 0) &&
-          (next.state.visible || next.visualFactor > 0)) {
-        visibleHandleCount++;
-      }
-    }
-    usedPixelSpace += visibleHandleCount * config.handleHitTestWidth;
-
-    final flexibleSpace = totalSpace - usedPixelSpace;
-    return (flexibleSpace > 0 && totalFlex > 0)
-        ? totalFlex / flexibleSpace
-        : 0.0;
-  }
-
   List<Widget> _buildPanelWidgets(Map<PanelId, BasePanel> uniquePanelConfigs) {
     final widgets = <Widget>[];
     for (final panel in uniquePanelConfigs.values) {
-      final state = _stateManager.getState(panel.id)!;
-      final factor = _stateManager.getAnimationController(panel.id)!.value;
+      // Wrap in ListenableBuilder to isolate updates from parent rebuilds
+      final childWidget = ListenableBuilder(
+        listenable: _stateManager,
+        builder: (context, _) {
+          final state = _stateManager.getState(panel.id)!;
+          final factor = _stateManager.getAnimationController(panel.id)!.value;
+          final collapseFactor = _stateManager
+              .getCollapseController(panel.id)!
+              .value;
 
-      Widget panelWidget = AnimatedPanel(
-        config: panel,
-        state: state,
-        factor: factor,
-        collapseFactor: _stateManager.getCollapseController(panel.id)!.value,
-      );
+          Widget panelWidget = AnimatedPanel(
+            config: panel,
+            state: state,
+            factor: factor,
+            collapseFactor: collapseFactor,
+          );
 
-      // If anchored to external link, wrap in Follower
-      if (panel is OverlayPanel && panel.anchorLink != null) {
-        panelWidget = CompositedTransformFollower(
-          link: panel.anchorLink!,
-          showWhenUnlinked: false,
-          child: panelWidget,
-        );
-      }
+          // If anchored to external link, wrap in Follower
+          if (panel is OverlayPanel && panel.anchorLink != null) {
+            panelWidget = CompositedTransformFollower(
+              link: panel.anchorLink!,
+              showWhenUnlinked: false,
+              child: panelWidget,
+            );
+          }
 
-      widgets.add(
-        LayoutId(
-          id: panel.id,
-          child: PanelDataScope(
+          return PanelDataScope(
             state: state,
             config: panel,
             child: panelWidget,
-          ),
-        ),
+          );
+        },
       );
+
+      widgets.add(LayoutId(id: panel.id, child: childWidget));
     }
     return widgets;
   }
@@ -581,61 +436,46 @@ class _PanelLayoutState extends State<PanelLayout>
     return widgets;
   }
 
-  /// Sorts children to ensure correct painting order (z-index).
-  List<Widget> _sortChildren(
-    List<Widget> unsorted,
-    Map<PanelId, BasePanel> configs,
-  ) {
-    final List<Widget> sorted = List.from(unsorted);
-    sorted.sort((a, b) {
-      final idA = (a as LayoutId).id;
-      final idB = (b as LayoutId).id;
-
-      int zA = 0;
-      if (idA is PanelId) {
-        final config = configs[idA];
-        if (config is OverlayPanel) zA = config.zIndex;
-      }
-
-      int zB = 0;
-      if (idB is PanelId) {
-        final config = configs[idB];
-        if (config is OverlayPanel) zB = config.zIndex;
-      }
-
-      if (zA != zB) return zA.compareTo(zB);
-
-      return unsorted.indexOf(a).compareTo(unsorted.indexOf(b));
-    });
-
-    return sorted;
-  }
-
   void _handleResize(
     double delta,
     PanelLayoutData prevData,
     PanelLayoutData nextData,
     double pixelToFlexRatio,
   ) {
-    setState(() {
-      // Fetch the latest state to ensure we are accumulating deltas correctly
-      final prevState = _stateManager.getState(prevData.config.id)!;
-      final nextState = _stateManager.getState(nextData.config.id)!;
+    // Calculate fresh ratio and data since we don't rebuild
+    if (_lastConstraints == null) return;
 
-      final changes = PanelResizing.calculateResize(
-        delta: delta,
-        prevConfig: prevData.config as InlinePanel,
-        prevState: prevState,
-        prevCollapsedSize: prevData.collapsedSize,
-        nextConfig: nextData.config as InlinePanel,
-        nextState: nextState,
-        nextCollapsedSize: nextData.collapsedSize,
-        pixelToFlexRatio: pixelToFlexRatio,
-      );
+    final config = widget.style ?? const PanelStyle();
+    final layoutData = _engine.createLayoutData(
+      uniquePanelConfigs: {for (var p in widget.children) p.id: p},
+      config: config,
+      stateManager: _stateManager,
+    );
 
-      for (final entry in changes.entries) {
-        _stateManager.updateSize(entry.key, entry.value);
-      }
-    });
+    final currentPixelToFlexRatio = _engine.calculatePixelToFlexRatio(
+      layoutData: layoutData,
+      constraints: _lastConstraints!,
+      axis: _cachedAxis,
+      config: config,
+    );
+
+    // Fetch the latest state to ensure we are accumulating deltas correctly
+    final prevState = _stateManager.getState(prevData.config.id)!;
+    final nextState = _stateManager.getState(nextData.config.id)!;
+
+    final changes = PanelResizing.calculateResize(
+      delta: delta,
+      prevConfig: prevData.config as InlinePanel,
+      prevState: prevState,
+      prevCollapsedSize: prevData.collapsedSize,
+      nextConfig: nextData.config as InlinePanel,
+      nextState: nextState,
+      nextCollapsedSize: nextData.collapsedSize,
+      pixelToFlexRatio: currentPixelToFlexRatio,
+    );
+
+    for (final entry in changes.entries) {
+      _stateManager.updateSize(entry.key, entry.value);
+    }
   }
 }
