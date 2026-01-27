@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import 'package:panel_layout/panel_layout.dart';
+
+class ScopedTab extends StatelessWidget {
+  const ScopedTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PanelLayout(
+      // Outer Layout Style: Dark Theme
+      style: PanelStyle(
+        headerDecoration: const BoxDecoration(
+          color: Color(0xFF212121),
+          border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+        ),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+        iconColor: Colors.white,
+        panelBoxDecoration: const BoxDecoration(color: Color(0xFF303030)),
+      ),
+      children: [
+        // Left Panel (Outer Scope)
+        InlinePanel(
+          id: const PanelId('outer_left'),
+          anchor: PanelAnchor.left,
+          width: 200,
+          title: 'OUTER SCOPE',
+          icon: const Icon(Icons.chevron_left),
+          child: const Center(
+            child: Text('Dark Theme', style: TextStyle(color: Colors.white70)),
+          ),
+        ),
+
+        // Center Panel (Contains Nested Scope)
+        PanelLayout(
+          // Inner Layout Style: Light/Blue Theme
+          // This overrides the outer style for all children in this subtree.
+          style: PanelStyle(
+            headerDecoration: BoxDecoration(
+              color: Colors.blue[100],
+              border: Border(bottom: BorderSide(color: Colors.blue[300]!)),
+            ),
+            titleTextStyle: TextStyle(
+              color: Colors.blue[900],
+              fontWeight: FontWeight.w600,
+            ),
+            iconColor: Colors.blue[900],
+            panelBoxDecoration: const BoxDecoration(color: Colors.white),
+          ),
+          children: [
+            InlinePanel(
+              id: const PanelId('inner_top'),
+              anchor: PanelAnchor.top,
+              height: 100,
+              title: 'INNER SCOPE (TOP)',
+              icon: const Icon(Icons.chevron_left),
+              child: const Center(child: Text('Light/Blue Theme')),
+            ),
+            const Center(child: Text('Content Area')),
+          ],
+        ),
+      ],
+    );
+  }
+}
