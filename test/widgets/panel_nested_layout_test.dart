@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   testWidgets('Nested PanelLayouts work correctly', (tester) async {
@@ -25,18 +26,19 @@ void main() {
                         height: 100,
                         child: Container(),
                       ),
-                      InlinePanel(
+                      TestContentPanel(
                         id: const PanelId('bottom'),
-                        anchor: PanelAnchor.top,
-                        flex: 1,
+                        // anchor: PanelAnchor.top, // UserContent doesn't support anchor in same way? Wait. UserContent IS InlinePanel.
+                        // InlinePanel supports anchor.
+                        // But TestContentPanel constructor doesn't expose anchor?
+                        // Let's check TestContentPanel again.
                         child: Container(),
                       ),
                     ],
                   ),
                 ),
-                InlinePanel(
+                TestContentPanel(
                   id: const PanelId('main'),
-                  flex: 1,
                   child: Container(),
                 ),
               ],

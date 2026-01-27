@@ -2,21 +2,25 @@ import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 import '../state/panel_runtime_state.dart';
 import '../widgets/panels/inline_panel.dart';
+import '../widgets/internal/internal_layout_adapter.dart';
 
 /// Encapsulates the logic for resizing panels.
 @internal
 class PanelResizing {
   /// Determines if two adjacent panels can be resized relative to each other.
   static bool canResize(InlinePanel prev, InlinePanel next) {
+    final prevFlex = prev is InternalLayoutAdapter ? prev.flex : null;
+    final nextFlex = next is InternalLayoutAdapter ? next.flex : null;
+
     // Case 1: Prev is fixed and resizable
-    if (prev.flex == null && prev.resizable) return true;
+    if (prevFlex == null && prev.resizable) return true;
 
     // Case 2: Next is fixed and resizable
-    if (next.flex == null && next.resizable) return true;
+    if (nextFlex == null && next.resizable) return true;
 
     // Case 3: Both are flexible and both are resizable
-    if (prev.flex != null &&
-        next.flex != null &&
+    if (prevFlex != null &&
+        nextFlex != null &&
         prev.resizable &&
         next.resizable) {
       return true;
@@ -44,9 +48,13 @@ class PanelResizing {
     double pixelToFlexRatio = 0.0,
   }) {
     final changes = <PanelId, double>{};
+    final prevFlex =
+        prevConfig is InternalLayoutAdapter ? prevConfig.flex : null;
+    final nextFlex =
+        nextConfig is InternalLayoutAdapter ? nextConfig.flex : null;
 
     // Case 1: Prev is fixed, Next is whatever. Resize Prev.
-    if (prevConfig.flex == null && prevConfig.resizable) {
+    if (prevFlex == null && prevConfig.resizable) {
       if (prevState.collapsed) return changes;
 
       final minSize = prevConfig.minSize ?? 0.0;
@@ -61,7 +69,7 @@ class PanelResizing {
       changes[prevConfig.id] = newSize;
 
       // Isolation: If Next is Flex, it must absorb the delta to prevent global shift
-      if (nextConfig.flex != null && pixelToFlexRatio > 0) {
+      if (nextFlex != null && pixelToFlexRatio > 0) {
          final actualDelta = newSize - prevState.size;
          final deltaFlex = actualDelta * pixelToFlexRatio;
          // Flex panels can theoretically go to 0 or very small
@@ -73,7 +81,7 @@ class PanelResizing {
     }
 
     // Case 2: Prev is flex (or not resizable), Next is fixed. Resize Next (inverse).
-    if (nextConfig.flex == null && nextConfig.resizable) {
+    if (nextFlex == null && nextConfig.resizable) {
       if (nextState.collapsed) return changes;
 
       final minSize = nextConfig.minSize ?? 0.0;
@@ -88,7 +96,7 @@ class PanelResizing {
       changes[nextConfig.id] = newSize;
 
       // Isolation: If Prev is Flex, it must absorb the delta to prevent global shift
-      if (prevConfig.flex != null && pixelToFlexRatio > 0) {
+      if (prevFlex != null && pixelToFlexRatio > 0) {
         final actualDelta = nextState.size - newSize; // Positive if next shrank
         final deltaFlex = actualDelta * pixelToFlexRatio;
         // If next shrank (dragged right), actualDelta is positive, Prev grows.
@@ -101,8 +109,8 @@ class PanelResizing {
     }
 
     // Case 3: Both are flexible. Adjust flex weights.
-    if (prevConfig.flex != null &&
-        nextConfig.flex != null &&
+    if (prevFlex != null &&
+        nextFlex != null &&
         prevConfig.resizable &&
         nextConfig.resizable) {
       if (prevState.collapsed || nextState.collapsed) return changes;

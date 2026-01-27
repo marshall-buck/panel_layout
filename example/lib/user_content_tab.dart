@@ -4,7 +4,7 @@ import 'main.dart'; // To access kAppPanelStyle
 
 // -----------------------------------------------------------------------------
 // Tab 5: User Content
-// Demonstrates: Extending UserContent for specialized, property-free panels
+// Demonstrates: Standard Widgets as panels (filling available space)
 // -----------------------------------------------------------------------------
 class UserContentTab extends StatelessWidget {
   const UserContentTab({super.key});
@@ -30,10 +30,9 @@ class UserContentTab extends StatelessWidget {
         ),
 
         // 2. Main Content Area (Implicit Flex: 1)
-        // We can use a raw UserContent or just an InlinePanel(flex: 1) to hold the nested layout.
-        // Let's use UserContent to handle the "fill remaining space" logic cleanly without props.
+        // We can use a raw Widget or just an InlinePanel(flex: 1) to hold the nested layout.
+        // Standard widgets automatically fill remaining space without props.
         _NestedLayoutContainer(
-          id: const PanelId('main_area'),
           content: PanelLayout(
             style: kAppPanelStyle,
             children: [
@@ -48,7 +47,7 @@ class UserContentTab extends StatelessWidget {
               ),
 
               // B. User Content 1 (Editor)
-              EditorPanel(id: const PanelId('editor_area')),
+              const EditorPanel(),
 
               // C. Tools Panel (Anchored Right)
               // This sits between Editor and Preview.
@@ -65,7 +64,7 @@ class UserContentTab extends StatelessWidget {
               ),
 
               // D. User Content 2 (Preview)
-              PreviewPanel(id: const PanelId('preview_area')),
+              const PreviewPanel(),
             ],
           ),
         ),
@@ -75,22 +74,22 @@ class UserContentTab extends StatelessWidget {
 }
 
 // A simple wrapper to allow the nested layout to fill the vertical space
-class _NestedLayoutContainer extends UserContent {
+class _NestedLayoutContainer extends StatelessWidget {
   final Widget content;
-  const _NestedLayoutContainer({required super.id, required this.content});
+  const _NestedLayoutContainer({required this.content});
 
   @override
-  Widget buildContent(BuildContext context) {
+  Widget build(BuildContext context) {
     return content;
   }
 }
 
-// Custom UserContent implementations
-class EditorPanel extends UserContent {
-  const EditorPanel({super.key, required super.id});
+// Custom implementations
+class EditorPanel extends StatelessWidget {
+  const EditorPanel({super.key});
 
   @override
-  Widget buildContent(BuildContext context) {
+  Widget build(BuildContext context) {
     return Container(
       color: Colors.blueGrey[50],
       child: const Center(
@@ -99,7 +98,7 @@ class EditorPanel extends UserContent {
           children: [
             Icon(Icons.edit_note, size: 48, color: Colors.blueGrey),
             Text('Editor Area'),
-            Text('(UserContent)', style: TextStyle(fontSize: 10)),
+            Text('(Standard Widget)', style: TextStyle(fontSize: 10)),
           ],
         ),
       ),
@@ -107,11 +106,11 @@ class EditorPanel extends UserContent {
   }
 }
 
-class PreviewPanel extends UserContent {
-  const PreviewPanel({super.key, required super.id});
+class PreviewPanel extends StatelessWidget {
+  const PreviewPanel({super.key});
 
   @override
-  Widget buildContent(BuildContext context) {
+  Widget build(BuildContext context) {
     return Container(
       color: Colors.amber[50],
       child: const Center(
@@ -120,7 +119,7 @@ class PreviewPanel extends UserContent {
           children: [
             Icon(Icons.visibility, size: 48, color: Colors.amber),
             Text('Preview Area'),
-            Text('(UserContent)', style: TextStyle(fontSize: 10)),
+            Text('(Standard Widget)', style: TextStyle(fontSize: 10)),
           ],
         ),
       ),

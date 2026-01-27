@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   group('PanelLayout Mixed Anchors', () {
@@ -19,9 +20,9 @@ void main() {
                 height: 50,
                 child: const Text('Top'),
               ),
-              InlinePanel(
+              TestContentPanel(
                 id: const PanelId('center'),
-                flex: 1,
+                flexOverride: 1,
                 child: const Text('Center'),
               ),
               InlinePanel(
@@ -55,9 +56,9 @@ void main() {
                 width: 50,
                 child: const Text('Left'),
               ),
-              InlinePanel(
+              TestContentPanel(
                 id: const PanelId('center'),
-                flex: 1,
+                flexOverride: 1,
                 child: const Text('Center'),
               ),
               InlinePanel(
@@ -267,9 +268,9 @@ void main() {
                 height: 50,
                 child: const Text('Root Top'),
               ),
-              InlinePanel(
+              TestContentPanel(
                 id: const PanelId('inner_container'),
-                flex: 1,
+                flexOverride: 1,
                 child: PanelLayout(
                   children: [
                     InlinePanel(
@@ -278,9 +279,9 @@ void main() {
                       width: 100,
                       child: const Text('Inner Left'),
                     ),
-                    InlinePanel(
+                    TestContentPanel(
                       id: const PanelId('inner_neutral'),
-                      flex: 1,
+                      flexOverride: 1,
                       child: const Text('Inner Neutral'),
                     ),
                   ],

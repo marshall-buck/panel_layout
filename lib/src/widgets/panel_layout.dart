@@ -14,6 +14,7 @@ import '../controllers/panel_layout_controller.dart';
 import 'widgets.dart';
 import 'animation/animated_panel.dart';
 import 'internal/panel_resize_handle.dart';
+import 'internal/internal_layout_adapter.dart';
 
 /// The root widget of the panel layout system.
 ///
@@ -56,11 +57,11 @@ class PanelLayout extends StatefulWidget {
     super.key,
   });
 
-  /// The list of declarative panel configurations.
+  /// The list of declarative panel configurations or standard widgets.
   ///
-  /// These widgets should extend [BasePanel] (typically [InlinePanel] or [OverlayPanel]).
-  /// The order of [InlinePanel]s in this list determines their layout order.
-  final List<BasePanel> children;
+  /// - [BasePanel]s (like [InlinePanel]) allow for full configuration (sizing, anchoring).
+  /// - Standard [Widget]s are automatically wrapped in an internal adapter that fills remaining space (flex=1).
+  final List<Widget> children;
 
   /// An optional controller to manipulate panel state programmatically.
   ///
@@ -97,6 +98,8 @@ class _PanelLayoutState extends State<PanelLayout>
   PanelLayoutController get _effectiveController =>
       widget.controller ?? _internalController!;
 
+  late List<BasePanel> _processedChildren;
+
   // Track previous frame's constraints/ratio for calculations
   BoxConstraints? _lastConstraints;
   bool _wasAnimating = false;
@@ -104,7 +107,8 @@ class _PanelLayoutState extends State<PanelLayout>
   @override
   void initState() {
     super.initState();
-    _cachedAxis = _engine.validateAndComputeAxis(widget.children);
+    _processedChildren = _processChildren(widget.children);
+    _cachedAxis = _engine.validateAndComputeAxis(_processedChildren);
     _stateManager = PanelStateManager();
     _stateManager.addListener(_onStateChange);
     if (widget.controller == null) {
@@ -112,6 +116,23 @@ class _PanelLayoutState extends State<PanelLayout>
     }
     _reconcileState();
     _effectiveController.attach(this);
+  }
+
+  List<BasePanel> _processChildren(List<Widget> children) {
+    final result = <BasePanel>[];
+    int adapterCount = 0;
+
+    for (final child in children) {
+      if (child is BasePanel) {
+        result.add(child);
+      } else {
+        // Auto-wrap standard widgets
+        final id = PanelId('auto_panel_$adapterCount');
+        adapterCount++;
+        result.add(InternalLayoutAdapter(id: id, child: child));
+      }
+    }
+    return result;
   }
 
   void _onStateChange() {
@@ -123,7 +144,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
     bool isAnyAnimating = false;
 
-    for (final panel in widget.children) {
+    for (final panel in _processedChildren) {
       if (panel is! InlinePanel) continue;
 
       final anim = _stateManager.getAnimationController(panel.id);
@@ -135,12 +156,15 @@ class _PanelLayoutState extends State<PanelLayout>
 
       if (isAnimating) isAnyAnimating = true;
 
-      // We look for Fixed panels that are animating for stability locking
-      if (panel.flex != null) continue;
-
-      final neighbor = _getStableNeighbor(panel);
-      if (neighbor == null || neighbor.flex == null) continue;
-
+            // We look for Fixed panels that are animating for stability locking
+            final panelFlex = panel is InternalLayoutAdapter ? panel.flex : null;
+            if (panelFlex != null) continue;
+      
+            final neighbor = _getStableNeighbor(panel);
+            if (neighbor == null) continue;
+            
+            final neighborFlex = neighbor is InternalLayoutAdapter ? neighbor.flex : null;
+            if (neighborFlex == null) continue;
       final neighborState = _stateManager.getState(neighbor.id);
       if (neighborState == null) continue;
 
@@ -151,7 +175,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
           // Calculate FRESH ratio
           final layoutData = _engine.createLayoutData(
-            uniquePanelConfigs: {for (var p in widget.children) p.id: p},
+            uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
             config: widget.style ?? const PanelStyle(),
             stateManager: _stateManager,
           );
@@ -173,7 +197,7 @@ class _PanelLayoutState extends State<PanelLayout>
           final override = neighborState.fixedPixelSizeOverride!;
 
           final layoutData = _engine.createLayoutData(
-            uniquePanelConfigs: {for (var p in widget.children) p.id: p},
+            uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
             config: widget.style ?? const PanelStyle(),
             stateManager: _stateManager,
           );
@@ -201,7 +225,7 @@ class _PanelLayoutState extends State<PanelLayout>
   }
 
   InlinePanel? _getStableNeighbor(InlinePanel sourcePanel) {
-    final panels = widget.children.whereType<InlinePanel>().toList();
+    final panels = _processedChildren.whereType<InlinePanel>().toList();
     final index = panels.indexWhere((p) => p.id == sourcePanel.id);
     if (index == -1) return null;
 
@@ -224,7 +248,8 @@ class _PanelLayoutState extends State<PanelLayout>
   @override
   void didUpdateWidget(PanelLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _cachedAxis = _engine.validateAndComputeAxis(widget.children);
+    _processedChildren = _processChildren(widget.children);
+    _cachedAxis = _engine.validateAndComputeAxis(_processedChildren);
     if (widget.controller != oldWidget.controller) {
       if (oldWidget.controller == null) {
         _internalController?.detach();
@@ -281,7 +306,7 @@ class _PanelLayoutState extends State<PanelLayout>
   /// Ensures internal state maps match the current list of children.
   void _reconcileState() {
     final config = widget.style ?? const PanelStyle();
-    _stateManager.reconcile(widget.children, config, this);
+    _stateManager.reconcile(_processedChildren, config, this);
   }
 
   @override
@@ -289,7 +314,7 @@ class _PanelLayoutState extends State<PanelLayout>
     final config = widget.style ?? const PanelStyle();
     final axis = _cachedAxis;
     final uniquePanelConfigs = <PanelId, BasePanel>{};
-    for (final panel in widget.children) {
+    for (final panel in _processedChildren) {
       uniquePanelConfigs[panel.id] = panel;
     }
 
@@ -409,8 +434,9 @@ class _PanelLayoutState extends State<PanelLayout>
         if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
       }
 
-      // Skip resize handle between two UserContent panels
-      if (prev.config is UserContent && next.config is UserContent) {
+      // Skip resize handle between two InternalLayoutAdapter panels (content fillers)
+      if (prev.config is InternalLayoutAdapter &&
+          next.config is InternalLayoutAdapter) {
         continue;
       }
 
@@ -447,7 +473,7 @@ class _PanelLayoutState extends State<PanelLayout>
 
     final config = widget.style ?? const PanelStyle();
     final layoutData = _engine.createLayoutData(
-      uniquePanelConfigs: {for (var p in widget.children) p.id: p},
+      uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
       config: config,
       stateManager: _stateManager,
     );

@@ -4,6 +4,7 @@ import 'package:panel_layout/src/models/panel_id.dart';
 import 'package:panel_layout/src/state/panel_state_manager.dart';
 import 'package:panel_layout/src/widgets/panels/inline_panel.dart';
 import 'package:flutter/widgets.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,7 @@ void main() {
         width: 100,
         child: Container(),
       );
-      final panel2 = InlinePanel(id: PanelId('2'), flex: 1, child: Container());
+      final panel2 = TestContentPanel(id: PanelId('2'), child: Container());
 
       manager.reconcile([panel1, panel2], const PanelStyle(), vsync);
 

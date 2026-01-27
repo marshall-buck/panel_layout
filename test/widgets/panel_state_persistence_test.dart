@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
 import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
@@ -34,9 +35,9 @@ void main() {
                           anchor: PanelAnchor.left,
                           child: SizedBox.expand(),
                         ),
-                      const InlinePanel(
+                      const TestContentPanel(
                         id: PanelId('content'),
-                        flex: 1,
+                        flexOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -79,9 +80,9 @@ void main() {
                           anchor: PanelAnchor.left,
                           child: SizedBox.expand(),
                         ),
-                      const InlinePanel(
+                      const TestContentPanel(
                         id: PanelId('content'),
-                        flex: 1,
+                        flexOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -116,9 +117,9 @@ void main() {
                           anchor: PanelAnchor.left,
                           child: SizedBox.expand(),
                         ),
-                      const InlinePanel(
+                      const TestContentPanel(
                         id: PanelId('content'),
-                        flex: 1,
+                        flexOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -159,9 +160,9 @@ void main() {
                           anchor: PanelAnchor.left,
                           child: SizedBox.expand(),
                         ),
-                      const InlinePanel(
+                      const TestContentPanel(
                         id: PanelId('content'),
-                        flex: 1,
+                        flexOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -199,9 +200,9 @@ void main() {
                           anchor: PanelAnchor.left,
                           child: SizedBox.expand(),
                         ),
-                      const InlinePanel(
+                      const TestContentPanel(
                         id: PanelId('content'),
-                        flex: 1,
+                        flexOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -236,9 +237,9 @@ void main() {
                           anchor: PanelAnchor.left,
                           child: SizedBox.expand(),
                         ),
-                      const InlinePanel(
+                      const TestContentPanel(
                         id: PanelId('content'),
-                        flex: 1,
+                        flexOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],

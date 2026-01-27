@@ -3,6 +3,7 @@ import '../../core/debug_flag.dart';
 import '../../models/panel_enums.dart';
 import '../../models/panel_id.dart';
 import '../../widgets/panels/inline_panel.dart';
+import '../../widgets/internal/internal_layout_adapter.dart';
 import '../layout_data.dart';
 import 'layout_context.dart';
 
@@ -37,7 +38,10 @@ class InlineLayoutStrategy {
       final config = p.config as InlinePanel;
       final override = p.state.fixedPixelSizeOverride;
 
-      if (config.flex != null && override == null) {
+      // Check for flex on InternalLayoutAdapter
+      final flex = config is InternalLayoutAdapter ? config.flex : null;
+
+      if (flex != null && override == null) {
         // Flexible: Sum up animated weight
         final animatedWeight = p.effectiveSize;
         if (animatedWeight > 0) {

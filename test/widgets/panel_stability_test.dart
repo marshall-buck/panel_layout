@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   double getPanelSize(WidgetTester tester, PanelId id, Axis axis) {
@@ -23,9 +24,9 @@ void main() {
             body: PanelLayout(
               controller: controller,
               children: [
-                InlinePanel(id: PanelId('A'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('A'), child: Container()),
                 InlinePanel(id: PanelId('B'), width: 100, anchor: PanelAnchor.right, child: Container()),
-                InlinePanel(id: PanelId('C'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('C'), child: Container()),
               ],
             ),
           ),
@@ -53,9 +54,9 @@ void main() {
             body: PanelLayout(
               controller: controller,
               children: [
-                InlinePanel(id: PanelId('A'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('A'), child: Container()),
                 InlinePanel(id: PanelId('B'), width: 100, anchor: PanelAnchor.left, child: Container()),
-                InlinePanel(id: PanelId('C'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('C'), child: Container()),
               ],
             ),
           ),
@@ -85,9 +86,9 @@ void main() {
             body: PanelLayout(
               controller: controller,
               children: [
-                InlinePanel(id: PanelId('A'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('A'), child: Container()),
                 InlinePanel(id: PanelId('B'), height: 100, anchor: PanelAnchor.bottom, child: Container()),
-                InlinePanel(id: PanelId('C'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('C'), child: Container()),
               ],
             ),
           ),
@@ -117,9 +118,9 @@ void main() {
             body: PanelLayout(
               controller: controller,
               children: [
-                InlinePanel(id: PanelId('A'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('A'), child: Container()),
                 InlinePanel(id: PanelId('B'), height: 100, anchor: PanelAnchor.top, child: Container()),
-                InlinePanel(id: PanelId('C'), flex: 1, child: Container()),
+                TestContentPanel(id: PanelId('C'), child: Container()),
               ],
             ),
           ),

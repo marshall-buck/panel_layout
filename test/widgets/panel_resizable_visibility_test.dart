@@ -83,44 +83,6 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Resize handle icon is hidden when both flexible panels are not resizable',
-    (tester) async {
-      const handleIcon = Icons.drag_handle;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Directionality(
-            textDirection: TextDirection.ltr,
-            child: Scaffold(
-              body: PanelLayout(
-                style: const PanelStyle(handleIcon: handleIcon),
-                children: [
-                  InlinePanel(
-                    id: const PanelId('f1'),
-                    flex: 1,
-                    resizable: false,
-                    child: const SizedBox(),
-                  ),
-                  InlinePanel(
-                    id: const PanelId('f2'),
-                    flex: 1,
-                    resizable: true,
-                    child: const SizedBox(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Both flexible panels must be resizable to allow resizing between them.
-      // Here f1 is not resizable, so it should be hidden.
-      expect(find.byIcon(handleIcon), findsNothing);
-    },
-  );
-
   testWidgets('Resize handle cursor is defer when not resizable', (
     tester,
   ) async {

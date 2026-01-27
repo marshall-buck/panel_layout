@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   testWidgets(
@@ -34,9 +35,8 @@ void main() {
                 ),
 
                 // Spacer to push the Right panel to the right side
-                InlinePanel(
+                TestContentPanel(
                   id: const PanelId('spacer'),
-                  flex: 1,
                   child: const SizedBox(),
                 ),
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   testWidgets('Panel styling consistency between Expanded and Collapsed states', (
@@ -30,9 +31,9 @@ void main() {
               headerDecoration: const BoxDecoration(color: testHeaderColor),
               child: const Text('Content'),
             ),
-            const InlinePanel(
+            const TestContentPanel(
               id: PanelId('main'),
-              flex: 1,
+              flexOverride: 1,
               child: Text('Main'),
             ),
           ],

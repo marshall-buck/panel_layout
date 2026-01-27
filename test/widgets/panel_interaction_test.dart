@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
 import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
@@ -31,9 +32,9 @@ void main() {
                   width: 100,
                   child: Container(),
                 ),
-                InlinePanel(
+                TestContentPanel(
                   id: const PanelId('right'),
-                  flex: 1,
+                  flexOverride: 1,
                   child: Container(),
                 ),
               ],

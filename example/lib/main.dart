@@ -134,19 +134,14 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
         ),
 
         // CENTER PANEL: Editor
-        // Flex 1 to fill space.
-        InlinePanel(
-          id: const PanelId('editor'),
-          flex: 1,
-          title: 'main.dart',
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(16),
-            alignment: Alignment.topLeft,
-            child: const Text(
-              'void main(){\n  print("Hello World");\n}',
-              style: TextStyle(fontFamily: 'monospace', fontSize: 14),
-            ),
+        // Standard widgets automatically fill available space (flex: 1).
+        Container(
+          color: Colors.white,
+          padding: const EdgeInsets.all(16),
+          alignment: Alignment.topLeft,
+          child: const Text(
+            'void main(){\n  print("Hello World");\n}',
+            style: TextStyle(fontFamily: 'monospace', fontSize: 14),
           ),
         ),
 
@@ -220,11 +215,7 @@ class VerticalSplitTab extends StatelessWidget {
         ),
 
         // CENTER PANEL: Content
-        InlinePanel(
-          id: const PanelId('content'),
-          flex: 1,
-          child: const Center(child: Text('Main Content Area')),
-        ),
+        const Center(child: Text('Main Content Area')),
 
         // BOTTOM PANEL: Terminal
         // Resizable
@@ -304,101 +295,93 @@ class _OverlaysTabState extends State<OverlaysTab> {
 
         // 2. Content Area (Inline, Flex)
         // Contains the nested Horizontal Layout.
-        InlinePanel(
-          id: const PanelId('inner_layout'),
-          flex: 1,
-          child: PanelLayout(
-            controller: _innerController,
-            style: kAppPanelStyle,
-            children: [
-              // 2a. Z-Order Demo: Popover Overlay (Inner Scope)
-              // Anchored to 'right_sidebar' within this inner layout.
-              OverlayPanel(
-                id: const PanelId('popover_behind'),
-                anchorTo: const PanelId('right_sidebar'),
-                anchor: PanelAnchor.left,
-                width: 200,
-                initialVisible: false,
-                title: 'POPOVER',
-                icon: const Icon(Icons.close),
-                panelBoxDecoration: BoxDecoration(
-                  color: Colors.amber[50],
-                  border: Border.all(color: Colors.amber[300]!),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(-5, 0),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      'I animated out from BEHIND the sidebar!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.brown),
-                    ),
+        PanelLayout(
+          controller: _innerController,
+          style: kAppPanelStyle,
+          children: [
+            // 2a. Z-Order Demo: Popover Overlay (Inner Scope)
+            // Anchored to 'right_sidebar' within this inner layout.
+            OverlayPanel(
+              id: const PanelId('popover_behind'),
+              anchorTo: const PanelId('right_sidebar'),
+              anchor: PanelAnchor.left,
+              width: 200,
+              initialVisible: false,
+              title: 'POPOVER',
+              icon: const Icon(Icons.close),
+              panelBoxDecoration: BoxDecoration(
+                color: Colors.amber[50],
+                border: Border.all(color: Colors.amber[300]!),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(-5, 0),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'I animated out from BEHIND the sidebar!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.brown),
                   ),
                 ),
               ),
+            ),
 
-              // 2b. Main Content (Inner Scope)
-              InlinePanel(
-                id: const PanelId('bg'),
-                flex: 1,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Main Content Area (Nested Horizontal)'),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Opens 'overlay' which is in the Root Layout
-                          _rootController.setVisible(
-                            const PanelId('overlay'),
-                            true,
-                          );
-                        },
-                        child: const Text('Open Global Overlay'),
-                      ),
-                    ],
+            // 2b. Main Content (Inner Scope)
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Main Content Area (Nested Horizontal)'),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Opens 'overlay' which is in the Root Layout
+                      _rootController.setVisible(
+                        const PanelId('overlay'),
+                        true,
+                      );
+                    },
+                    child: const Text('Open Global Overlay'),
                   ),
-                ),
+                ],
               ),
+            ),
 
-              // 2c. Right Sidebar (Inner Scope)
-              InlinePanel(
-                id: const PanelId('right_sidebar'),
-                anchor: PanelAnchor.right,
-                width: 250,
-                title: 'SIDEBAR',
-                clipContent: true,
-                icon: const Icon(Icons.chevron_left),
-                child: Column(
-                  children: [
-                    const ListTile(
-                      title: Text('Sidebar Content'),
-                      subtitle: Text('Click below to test Z-Order'),
+            // 2c. Right Sidebar (Inner Scope)
+            InlinePanel(
+              id: const PanelId('right_sidebar'),
+              anchor: PanelAnchor.right,
+              width: 250,
+              title: 'SIDEBAR',
+              clipContent: true,
+              icon: const Icon(Icons.chevron_left),
+              child: Column(
+                children: [
+                  const ListTile(
+                    title: Text('Sidebar Content'),
+                    subtitle: Text('Click below to test Z-Order'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _innerController.toggleVisible(
+                          const PanelId('popover_behind'),
+                        );
+                      },
+                      child: const Text('Toggle Popover (Behind)'),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _innerController.toggleVisible(
-                            const PanelId('popover_behind'),
-                          );
-                        },
-                        child: const Text('Toggle Popover (Behind)'),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
 
         // 3. Global Overlay (Root Scope)
@@ -483,40 +466,32 @@ class ScopedTab extends StatelessWidget {
         ),
 
         // Center Panel (Contains Nested Scope)
-        InlinePanel(
-          id: const PanelId('center_container'),
-          flex: 1,
-          child: PanelLayout(
-            // Inner Layout Style: Light/Blue Theme
-            // This overrides the outer style for all children in this subtree.
-            style: PanelStyle(
-              headerDecoration: BoxDecoration(
-                color: Colors.blue[100],
-                border: Border(bottom: BorderSide(color: Colors.blue[300]!)),
-              ),
-              titleTextStyle: TextStyle(
-                color: Colors.blue[900],
-                fontWeight: FontWeight.w600,
-              ),
-              iconColor: Colors.blue[900],
-              panelBoxDecoration: const BoxDecoration(color: Colors.white),
+        PanelLayout(
+          // Inner Layout Style: Light/Blue Theme
+          // This overrides the outer style for all children in this subtree.
+          style: PanelStyle(
+            headerDecoration: BoxDecoration(
+              color: Colors.blue[100],
+              border: Border(bottom: BorderSide(color: Colors.blue[300]!)),
             ),
-            children: [
-              InlinePanel(
-                id: const PanelId('inner_top'),
-                anchor: PanelAnchor.top,
-                height: 100,
-                title: 'INNER SCOPE (TOP)',
-                icon: const Icon(Icons.chevron_left),
-                child: const Center(child: Text('Light/Blue Theme')),
-              ),
-              InlinePanel(
-                id: const PanelId('inner_bottom'),
-                flex: 1,
-                child: const Center(child: Text('Content Area')),
-              ),
-            ],
+            titleTextStyle: TextStyle(
+              color: Colors.blue[900],
+              fontWeight: FontWeight.w600,
+            ),
+            iconColor: Colors.blue[900],
+            panelBoxDecoration: const BoxDecoration(color: Colors.white),
           ),
+          children: [
+            InlinePanel(
+              id: const PanelId('inner_top'),
+              anchor: PanelAnchor.top,
+              height: 100,
+              title: 'INNER SCOPE (TOP)',
+              icon: const Icon(Icons.chevron_left),
+              child: const Center(child: Text('Light/Blue Theme')),
+            ),
+            const Center(child: Text('Content Area')),
+          ],
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import '../utils/test_content_panel.dart';
 
 void main() {
   group('Panel Resize Constraints', () {
@@ -21,9 +22,9 @@ void main() {
                   initialCollapsed: true, // Start collapsed
                   child: Container(color: Colors.red),
                 ),
-                InlinePanel(
+                TestContentPanel(
                   id: PanelId('main'),
-                  flex: 1,
+                  flexOverride: 1,
                   child: Container(color: Colors.blue),
                 ),
               ],
@@ -77,9 +78,9 @@ void main() {
                   width: 100, // Small width, close to rail limit
                   child: Container(color: Colors.red),
                 ),
-                InlinePanel(
+                TestContentPanel(
                   id: PanelId('main'),
-                  flex: 1,
+                  flexOverride: 1,
                   child: Container(color: Colors.blue),
                 ),
               ],

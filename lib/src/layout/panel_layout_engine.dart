@@ -3,6 +3,7 @@ import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
 import '../widgets/panels/base_panel.dart';
 import '../widgets/panels/inline_panel.dart';
+import '../widgets/internal/internal_layout_adapter.dart';
 import '../widgets/panels/overlay_panel.dart';
 import '../state/panel_state_manager.dart';
 import '../core/exceptions.dart';
@@ -26,9 +27,9 @@ class PanelLayoutEngine {
       if (child is InlinePanel && child.anchor != null) {
         final childAxis =
             (child.anchor == PanelAnchor.left ||
-                    child.anchor == PanelAnchor.right)
-                ? Axis.horizontal
-                : Axis.vertical;
+                child.anchor == PanelAnchor.right)
+            ? Axis.horizontal
+            : Axis.vertical;
 
         if (axis == null) {
           axis = childAxis;
@@ -93,11 +94,14 @@ class PanelLayoutEngine {
 
     for (final data in layoutData) {
       if (data.config is! InlinePanel) continue;
-      final config = data.config as InlinePanel;
 
       if (!data.state.visible && data.visualFactor <= 0) continue;
 
-      if (config.flex == null) {
+      final flex = data.config is InternalLayoutAdapter
+          ? (data.config as InternalLayoutAdapter).flex
+          : null;
+
+      if (flex == null) {
         // Fixed panel (or collapsed fixed/flex)
         // effectiveSize handles interpolation for collapse and visibility
         usedPixelSpace += data.effectiveSize;
@@ -182,15 +186,20 @@ class PanelLayoutEngine {
         // It contributes 0 to usedPixelSpace and 0 to totalFlexOthers (temporarily).
       } else if (data.state.collapsed) {
         usedPixelSpace += data.collapsedSize;
-      } else if ((data.config as InlinePanel).flex == null) {
-        // Fixed panel
-        usedPixelSpace += data.effectiveSize;
       } else {
-        // Flex (Other)
-        if (data.state.fixedPixelSizeOverride != null) {
-          usedPixelSpace += data.state.fixedPixelSizeOverride!;
+        final flex = data.config is InternalLayoutAdapter
+            ? (data.config as InternalLayoutAdapter).flex
+            : null;
+        if (flex == null) {
+          // Fixed panel
+          usedPixelSpace += data.effectiveSize;
         } else {
-          totalFlexOthers += data.effectiveSize;
+          // Flex (Other)
+          if (data.state.fixedPixelSizeOverride != null) {
+            usedPixelSpace += data.state.fixedPixelSizeOverride!;
+          } else {
+            totalFlexOthers += data.effectiveSize;
+          }
         }
       }
     }
@@ -214,11 +223,15 @@ class PanelLayoutEngine {
       (d) => d.config.id == targetPanelId,
       orElse: () => layoutData.first,
     );
-    final targetFlex = (targetData.config as InlinePanel).flex ?? 1.0;
+    final targetFlex = targetData.config is InternalLayoutAdapter
+        ? (targetData.config as InternalLayoutAdapter).flex
+        : 1.0;
 
     if (totalFlexOthers <= 0) {
       // No other flex panels. Target takes all space.
-      return targetData.state.size; // Or targetFlex? Original used state.size or default.
+      return targetData
+          .state
+          .size; // Or targetFlex? Original used state.size or default.
     }
 
     if (flexibleSpace <= targetPixels) {

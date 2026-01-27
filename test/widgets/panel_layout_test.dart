@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:panel_layout/panel_layout.dart';
 import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
@@ -53,14 +54,14 @@ void main() {
             height: 100,
             child: PanelLayout(
               children: [
-                InlinePanel(
+                TestContentPanel(
                   id: const PanelId('f1'),
-                  flex: 1,
+                  flexOverride: 1,
                   child: Container(color: const Color(0xFF00FF00)),
                 ),
-                InlinePanel(
+                TestContentPanel(
                   id: const PanelId('f2'),
-                  flex: 3,
+                  flexOverride: 3,
                   child: Container(color: const Color(0xFF00FF00)),
                 ),
               ],
@@ -70,8 +71,8 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(findPanel('f1')).width, 98.0);
-    expect(tester.getSize(findPanel('f2')).width, 294.0);
+    expect(tester.getSize(findPanel('f1')).width, 100.0);
+    expect(tester.getSize(findPanel('f2')).width, 300.0);
   });
 
   testWidgets('PanelLayout mixes Fixed and Flex panels', (tester) async {
@@ -89,9 +90,9 @@ void main() {
                   width: 100,
                   child: Container(color: const Color(0xFFFF0000)),
                 ),
-                InlinePanel(
+                TestContentPanel(
                   id: const PanelId('flex'),
-                  flex: 1,
+                  flexOverride: 1,
                   child: Container(color: const Color(0xFF00FF00)),
                 ),
               ],

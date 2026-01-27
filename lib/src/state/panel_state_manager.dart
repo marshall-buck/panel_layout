@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
-import '../widgets/panels/inline_panel.dart';
+import '../widgets/internal/internal_layout_adapter.dart';
 import '../layout/panel_style.dart';
 import 'panel_runtime_state.dart';
 
@@ -117,7 +117,7 @@ class PanelStateManager extends ChangeNotifier {
   }
 
   double _getInitialSize(BasePanel panel) {
-    if (panel is InlinePanel && panel.flex != null) return panel.flex!;
+    if (panel is InternalLayoutAdapter) return panel.flex;
     if (panel.width != null) return panel.width!;
     if (panel.height != null) return panel.height!;
     return 0.0;

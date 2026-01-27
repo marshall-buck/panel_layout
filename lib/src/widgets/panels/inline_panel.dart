@@ -19,7 +19,6 @@ class InlinePanel extends BasePanel {
     super.anchorTo,
     super.width,
     super.height,
-    this.flex,
     this.minSize,
     this.maxSize,
     this.railIconAlignment,
@@ -54,16 +53,7 @@ class InlinePanel extends BasePanel {
     this.showTitleInRail = true,
     super.clipContent = false,
     super.key,
-  }) : assert(
-         (width != null || height != null) ? flex == null : true,
-         'Cannot provide both fixed size (width/height) and flex.',
-       );
-
-  /// The flex factor for fluid sizing.
-  ///
-  /// If non-null, the panel will expand to fill available space relative to other flexible panels.
-  /// Use this OR [width]/[height], not both.
-  final double? flex;
+  });
 
   /// The minimum size (width or height) the panel can be resized to by the user.
   final double? minSize;
