@@ -6,7 +6,7 @@
   * **Granular Updates**: `AnimatedPanel` now listens to dedicated `ValueNotifier`s and `AnimationController`s, ensuring only the animating panel repaints.
   * **Internal**: Refactored `PanelStateManager` to support granular state notification.
 
-# 0.5.10
+## 0.5.10
 
 * **Simplified API**: Users can now pass standard `Widget`s directly to `PanelLayout.children`.
   * Removed `UserContent` class.
@@ -14,7 +14,7 @@
   * Added `LayoutAdapter` mixin for marking widgets as panel participants (optional).
 * **Breaking Change**: `UserContent` has been removed. Use standard widgets or extending classes with the `LayoutAdapter` mixin instead.
 
-# 0.5.9
+## 0.5.9
 
 * **New Feature**: Introduced `UserContent` class.
   * An abstract base class for defining content-only panels that fill available space (`flex: 1`).

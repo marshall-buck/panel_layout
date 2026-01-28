@@ -38,29 +38,44 @@ class PanelLayoutController {
 
   /// Toggles the visibility of the panel with the given [id].
   ///
-  /// If the panel is visible, it will be hidden. If hidden, it will be shown.
+  /// **Visibility** refers to whether the panel is shown at all.
+  /// - **Visible**: The panel is displayed (either expanded or collapsed).
+  /// - **Hidden**: The panel is completely removed from the layout and takes up no space.
+  ///
+  /// To minimize a panel without hiding it completely, use [toggleCollapsed] instead.
   void toggleVisible(PanelId id) {
     _state?.toggleVisible(id);
   }
 
   /// Toggles the collapsed state of the panel with the given [id].
   ///
-  /// If the panel is expanded, it will collapse to its rail size.
-  /// If collapsed, it will expand to its last known size.
+  /// **Collapsing** refers to minimizing the panel to its "rail" size (e.g., just the icon).
+  /// - **Collapsed**: The panel is visible but minimized to its header/rail size.
+  /// - **Expanded**: The panel is visible and showing its full content.
+  ///
+  /// This does not affect whether the panel is [visible] or hidden.
   void toggleCollapsed(PanelId id) {
     _state?.toggleCollapsed(id);
   }
 
   /// Sets the visibility of the panel with the given [id].
   ///
-  /// [visible] determines whether the panel should be shown (true) or hidden (false).
+  /// **Visibility** refers to whether the panel is shown at all.
+  /// - If [visible] is `true`, the panel is displayed (either expanded or collapsed).
+  /// - If [visible] is `false`, the panel is completely hidden and takes up no space.
+  ///
+  /// To minimize a panel without hiding it completely, use [setCollapsed] instead.
   void setVisible(PanelId id, bool visible) {
     _state?.setVisible(id, visible);
   }
 
   /// Sets the collapsed state of the panel with the given [id].
   ///
-  /// [collapsed] determines whether the panel should be collapsed (true) or expanded (false).
+  /// **Collapsing** refers to minimizing the panel to its "rail" size (e.g., just the icon).
+  /// - If [collapsed] is `true`, the panel is minimized to its header/rail size.
+  /// - If [collapsed] is `false`, the panel is expanded to its full content size.
+  ///
+  /// A collapsed panel remains visible on screen. To hide it completely, use [setVisible].
   void setCollapsed(PanelId id, bool collapsed) {
     _state?.setCollapsed(id, collapsed);
   }
