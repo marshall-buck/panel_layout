@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
 import '../state/panel_scope.dart';
-import '../state/panel_data_scope.dart';
 import '../state/panel_state_manager.dart';
 import '../layout/panel_style.dart';
 import '../layout/layout_data.dart';
@@ -377,40 +376,32 @@ class _PanelLayoutState extends State<PanelLayout>
     final widgets = <Widget>[];
     for (final panel in uniquePanelConfigs.values) {
       // Wrap in ListenableBuilder to isolate updates from parent rebuilds
-      final childWidget = ListenableBuilder(
-        listenable: _stateManager,
-        builder: (context, _) {
-          final state = _stateManager.getState(panel.id)!;
-          final factor = _stateManager.getAnimationController(panel.id)!.value;
-          final collapseFactor = _stateManager
-              .getCollapseController(panel.id)!
-              .value;
+      // OPTIMIZATION: Removed global ListenableBuilder.
+      // AnimatedPanel now listens internally to specific animations and state changes.
 
-          Widget panelWidget = AnimatedPanel(
-            config: panel,
-            state: state,
-            factor: factor,
-            collapseFactor: collapseFactor,
-          );
+      final state = _stateManager.getState(panel.id)!;
+      final stateNotifier = _stateManager.getStateNotifier(panel.id)!;
+      final visibilityAnim = _stateManager.getAnimationController(panel.id)!;
+      final collapseAnim = _stateManager.getCollapseController(panel.id)!;
 
-          // If anchored to external link, wrap in Follower
-          if (panel is OverlayPanel && panel.anchorLink != null) {
-            panelWidget = CompositedTransformFollower(
-              link: panel.anchorLink!,
-              showWhenUnlinked: false,
-              child: panelWidget,
-            );
-          }
-
-          return PanelDataScope(
-            state: state,
-            config: panel,
-            child: panelWidget,
-          );
-        },
+      Widget panelWidget = AnimatedPanel(
+        config: panel,
+        initialState: state,
+        stateNotifier: stateNotifier,
+        visibilityAnimation: visibilityAnim,
+        collapseAnimation: collapseAnim,
       );
 
-      widgets.add(LayoutId(id: panel.id, child: childWidget));
+      // If anchored to external link, wrap in Follower
+      if (panel is OverlayPanel && panel.anchorLink != null) {
+        panelWidget = CompositedTransformFollower(
+          link: panel.anchorLink!,
+          showWhenUnlinked: false,
+          child: panelWidget,
+        );
+      }
+
+      widgets.add(LayoutId(id: panel.id, child: panelWidget));
     }
     return widgets;
   }

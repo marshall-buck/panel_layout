@@ -16,6 +16,7 @@ import 'panel_runtime_state.dart';
 @internal
 class PanelStateManager extends ChangeNotifier {
   final Map<PanelId, PanelRuntimeState> _panelStates = {};
+  final Map<PanelId, ValueNotifier<PanelRuntimeState>> _stateNotifiers = {};
   final Map<PanelId, AnimationController> _animationControllers = {};
   final Map<PanelId, AnimationController> _collapseControllers = {};
 
@@ -36,6 +37,10 @@ class PanelStateManager extends ChangeNotifier {
 
   /// Retrieves the runtime state for a panel.
   PanelRuntimeState? getState(PanelId id) => _panelStates[id];
+
+  /// Retrieves the state notifier for a panel.
+  ValueNotifier<PanelRuntimeState>? getStateNotifier(PanelId id) =>
+      _stateNotifiers[id];
 
   /// Ensures internal state maps match the current list of children.
   /// Adds missing states and removes orphaned ones.
@@ -58,7 +63,14 @@ class PanelStateManager extends ChangeNotifier {
     // Remove orphaned states and controllers
     // Only remove state if it's not preserved
     _panelStates.removeWhere(
-      (id, _) => !currentIds.contains(id) && !_preservedIds.contains(id),
+      (id, _) {
+        if (!currentIds.contains(id) && !_preservedIds.contains(id)) {
+           _stateNotifiers[id]?.dispose();
+           _stateNotifiers.remove(id);
+           return true;
+        }
+        return false;
+      },
     );
 
     _animationControllers.removeWhere((id, controller) {
@@ -80,11 +92,13 @@ class PanelStateManager extends ChangeNotifier {
     // Add new states and controllers
     for (final panel in panels) {
       if (!_panelStates.containsKey(panel.id)) {
-        _panelStates[panel.id] = PanelRuntimeState(
+        final initialState = PanelRuntimeState(
           size: _getInitialSize(panel),
           visible: panel.initialVisible,
           collapsed: panel.initialCollapsed,
         );
+        _panelStates[panel.id] = initialState;
+        _stateNotifiers[panel.id] = ValueNotifier(initialState);
       }
 
       // Controllers are always recreated (they need vsync and are ephemeral)
@@ -123,37 +137,39 @@ class PanelStateManager extends ChangeNotifier {
     return 0.0;
   }
 
+  void _updateState(PanelId id, PanelRuntimeState newState) {
+    _panelStates[id] = newState;
+    _stateNotifiers[id]?.value = newState;
+    notifyListeners();
+  }
+
   void setVisible(PanelId id, bool visible) {
     final state = _panelStates[id];
     if (state != null && state.visible != visible) {
-      _panelStates[id] = state.copyWith(visible: visible);
+      _updateState(id, state.copyWith(visible: visible));
       _animatePanel(id, visible);
-      notifyListeners();
     }
   }
 
   void setCollapsed(PanelId id, bool collapsed) {
     final state = _panelStates[id];
     if (state != null && state.collapsed != collapsed) {
-      _panelStates[id] = state.copyWith(collapsed: collapsed);
+      _updateState(id, state.copyWith(collapsed: collapsed));
       _animateCollapse(id, collapsed);
-      notifyListeners();
     }
   }
 
   void updateSize(PanelId id, double size) {
     final state = _panelStates[id];
     if (state != null) {
-      _panelStates[id] = state.copyWith(size: size);
-      notifyListeners();
+      _updateState(id, state.copyWith(size: size));
     }
   }
 
   void setFixedSizeOverride(PanelId id, double size) {
     final state = _panelStates[id];
     if (state != null) {
-      _panelStates[id] = state.copyWith(fixedPixelSizeOverride: size);
-      notifyListeners();
+      _updateState(id, state.copyWith(fixedPixelSizeOverride: size));
     }
   }
 
@@ -161,13 +177,12 @@ class PanelStateManager extends ChangeNotifier {
     final state = _panelStates[id];
     if (state != null) {
       // Reconstruct to force null override
-      _panelStates[id] = PanelRuntimeState(
+      _updateState(id, PanelRuntimeState(
         size: newSize,
         visible: state.visible,
         collapsed: state.collapsed,
         fixedPixelSizeOverride: null,
-      );
-      notifyListeners();
+      ));
     }
   }
 
@@ -200,6 +215,9 @@ class PanelStateManager extends ChangeNotifier {
     }
     for (final controller in _collapseControllers.values) {
       controller.dispose();
+    }
+    for (final notifier in _stateNotifiers.values) {
+      notifier.dispose();
     }
     super.dispose();
   }

@@ -1,3 +1,11 @@
+# 0.6.0
+
+* **Performance Overhaul**: Addressed critical rendering and logic bottlenecks to eliminate animation jank and reduce initial load times.
+  * **Optimized Rendering**: Switched from `Clip.antiAlias` to `Clip.hardEdge` in `BasePanel` and `AnimatedVerticalPanel`. This eliminates expensive `saveLayer` calls, significantly reducing GPU usage and fixing "shader compilation" jank on first frame or tab switch.
+  * **Optimized State Management**: Refactored `PanelLayout` to stop rebuilding the entire widget tree on every animation tick.
+  * **Granular Updates**: `AnimatedPanel` now listens to dedicated `ValueNotifier`s and `AnimationController`s, ensuring only the animating panel repaints.
+  * **Internal**: Refactored `PanelStateManager` to support granular state notification.
+
 # 0.5.10
 
 * **Simplified API**: Users can now pass standard `Widget`s directly to `PanelLayout.children`.

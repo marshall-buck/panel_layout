@@ -33,7 +33,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           minSize: 150,
           maxSize: 400,
           headerHeight: 48,
-          title: 'headerHeight: 48',
+          title: 'Long List',
           clipContent: true,
           // Icon used for both header and collapsed rail
           icon: const Icon(Icons.chevron_left),

@@ -20,17 +20,20 @@ class AnimatedVerticalPanel extends StatelessWidget {
     super.key,
     required this.config,
     required this.state,
-    required this.factor,
-    required this.collapseFactor,
+    required this.visibilityAnimation,
+    required this.collapseAnimation,
   });
 
   final BasePanel config;
   final PanelRuntimeState state;
-  final double factor;
-  final double collapseFactor;
+  final Animation<double> visibilityAnimation;
+  final Animation<double> collapseAnimation;
 
   @override
   Widget build(BuildContext context) {
+    final factor = visibilityAnimation.value;
+    final collapseFactor = collapseAnimation.value;
+
     if (factor <= 0 && !state.visible) {
       return const SizedBox.shrink();
     }
@@ -114,7 +117,7 @@ class AnimatedVerticalPanel extends StatelessWidget {
       width: double.infinity, // Vertical panels span width
       child: Container(
         decoration: decoration,
-        clipBehavior: decoration != null ? Clip.antiAlias : Clip.none,
+        clipBehavior: decoration != null ? Clip.hardEdge : Clip.none,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
