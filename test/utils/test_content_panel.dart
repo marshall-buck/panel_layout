@@ -4,12 +4,12 @@ class TestContentPanel extends InternalLayoutAdapter {
   const TestContentPanel({
     required super.id,
     required super.child,
-    this.flexOverride = 1.0,
+    this.layoutWeightOverride = 1.0,
     super.key,
   });
 
-  final double flexOverride;
+  final double layoutWeightOverride;
 
   @override
-  double get flex => flexOverride;
+  double get layoutWeight => layoutWeightOverride;
 }

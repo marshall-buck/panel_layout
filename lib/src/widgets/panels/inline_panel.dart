@@ -25,6 +25,7 @@ class InlinePanel extends BasePanel {
     this.closingDirection,
     this.railDecoration,
     this.resizable = true,
+    this.action = PanelAction.collapse,
 
     /// Whether the panel is initially visible.
     super.initialVisible = true,
@@ -71,6 +72,10 @@ class InlinePanel extends BasePanel {
   /// Whether the panel can be manually resized by the user (via drag handle).
   final bool resizable;
 
+  /// The action to perform when the header icon is tapped.
+  /// Defaults to [PanelAction.collapse].
+  final PanelAction action;
+
   /// The direction the panel moves when closing (collapsing).
   ///
   /// Used to determine the rotation of the icon in the rail.
@@ -101,7 +106,16 @@ class InlinePanel extends BasePanel {
 
   @override
   void onHeaderIconTap(BuildContext context) {
-    PanelScope.of(context).toggleCollapsed(id);
+    switch (action) {
+      case PanelAction.collapse:
+        PanelScope.of(context).toggleCollapsed(id);
+        break;
+      case PanelAction.close:
+        PanelScope.of(context).setVisible(id, false);
+        break;
+      case PanelAction.none:
+        break;
+    }
   }
 
   @override

@@ -10,7 +10,7 @@
 
 * **Simplified API**: Users can now pass standard `Widget`s directly to `PanelLayout.children`.
   * Removed `UserContent` class.
-  * Standard widgets are automatically wrapped in an internal adapter that fills available space (flex: 1).
+  * Standard widgets are automatically wrapped in an internal adapter that fills available space (layoutWeight: 1).
   * Added `LayoutAdapter` mixin for marking widgets as panel participants (optional).
 * **Breaking Change**: `UserContent` has been removed. Use standard widgets or extending classes with the `LayoutAdapter` mixin instead.
 

@@ -4,7 +4,6 @@ import '../widgets/panels/base_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
 
-// TODO: Should the class extends equatble and have extensions instead of getters??
 /// A unified data structure used by the [PanelLayoutDelegate].
 ///
 /// It combines the static configuration from [BasePanel] with the
@@ -12,8 +11,8 @@ import '../models/panel_id.dart';
 ///
 /// This class acts as the "snapshot" of a panel for a single layout pass.
 @internal
-class PanelLayoutData {
-  PanelLayoutData({
+class PanelLayoutData extends Equatable {
+  const PanelLayoutData({
     required this.config,
     required this.state,
     this.visualFactor = 1.0,
@@ -69,8 +68,17 @@ class PanelLayoutData {
     final current = base + (collapsedSize - base) * collapseFactor;
     return current * visualFactor;
   }
+
+  @override
+  List<Object?> get props => [
+        config,
+        state,
+        visualFactor,
+        collapseFactor,
+        collapsedSize,
+      ];
 }
-// TODO: This should probably go in th emodels folder, yes?
+
 /// A unique identifier for a resize handle between two panels.
 @internal
 class HandleLayoutId extends Equatable {

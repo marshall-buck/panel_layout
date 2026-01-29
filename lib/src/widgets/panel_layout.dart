@@ -2,10 +2,10 @@ import 'package:flutter/widgets.dart';
 
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
+import '../models/layout_data.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_state_manager.dart';
 import '../layout/panel_style.dart';
-import '../layout/layout_data.dart';
 import '../layout/panel_layout_delegate.dart';
 import '../layout/panel_resizing.dart';
 import '../layout/panel_layout_engine.dart';
@@ -37,11 +37,8 @@ import 'internal/internal_layout_adapter.dart';
 ///       width: 250,
 ///       child: Sidebar(),
 ///     ),
-///     InlinePanel(
-///       id: PanelId('content'),
-///       flex: 1,
-///       child: MainContent(),
-///     ),
+///     // Standard widget wrapped automatically (layoutWeight: 1)
+///     MainContent(),
 ///   ],
 /// )
 /// ```
@@ -59,7 +56,7 @@ class PanelLayout extends StatefulWidget {
   /// The list of declarative panel configurations or standard widgets.
   ///
   /// - [BasePanel]s (like [InlinePanel]) allow for full configuration (sizing, anchoring).
-  /// - Standard [Widget]s are automatically wrapped in an internal adapter that fills remaining space (flex=1).
+  /// - Standard [Widget]s are automatically wrapped in an internal adapter that fills remaining space (layoutWeight=1).
   final List<Widget> children;
 
   /// An optional controller to manipulate panel state programmatically.
@@ -156,21 +153,21 @@ class _PanelLayoutState extends State<PanelLayout>
       if (isAnimating) isAnyAnimating = true;
 
             // We look for Fixed panels that are animating for stability locking
-            final panelFlex = panel is InternalLayoutAdapter ? panel.flex : null;
-            if (panelFlex != null) continue;
+            final panelWeight = panel is InternalLayoutAdapter ? panel.layoutWeight : null;
+            if (panelWeight != null) continue;
       
             final neighbor = _getStableNeighbor(panel);
             if (neighbor == null) continue;
             
-            final neighborFlex = neighbor is InternalLayoutAdapter ? neighbor.flex : null;
-            if (neighborFlex == null) continue;
+            final neighborWeight = neighbor is InternalLayoutAdapter ? neighbor.layoutWeight : null;
+            if (neighborWeight == null) continue;
       final neighborState = _stateManager.getState(neighbor.id);
       if (neighborState == null) continue;
 
       if (isAnimating) {
         // LOCK: If not already locked, lock it to current pixel size
         if (neighborState.fixedPixelSizeOverride == null) {
-          final currentFlex = neighborState.size;
+          final currentWeight = neighborState.size;
 
           // Calculate FRESH ratio
           final layoutData = _engine.createLayoutData(
@@ -178,7 +175,7 @@ class _PanelLayoutState extends State<PanelLayout>
             config: widget.style ?? const PanelStyle(),
             stateManager: _stateManager,
           );
-          final ratio = _engine.calculatePixelToFlexRatio(
+          final ratio = _engine.calculatePixelToWeightRatio(
             layoutData: layoutData,
             constraints: _lastConstraints!,
             axis: _cachedAxis,
@@ -186,12 +183,12 @@ class _PanelLayoutState extends State<PanelLayout>
           );
 
           if (ratio > 0) {
-            final currentPixels = currentFlex / ratio;
+            final currentPixels = currentWeight / ratio;
             _stateManager.setFixedSizeOverride(neighbor.id, currentPixels);
           }
         }
       } else {
-        // UNLOCK: If locked, calculate new flex and unlock
+        // UNLOCK: If locked, calculate new weight and unlock
         if (neighborState.fixedPixelSizeOverride != null) {
           final override = neighborState.fixedPixelSizeOverride!;
 
@@ -201,7 +198,7 @@ class _PanelLayoutState extends State<PanelLayout>
             stateManager: _stateManager,
           );
 
-          final newFlex = _engine.calculateNewFlexForUnlockedPanel(
+          final newWeight = _engine.calculateNewWeightForUnlockedPanel(
             layoutData: layoutData,
             targetPanelId: neighbor.id,
             targetPixels: override,
@@ -210,7 +207,7 @@ class _PanelLayoutState extends State<PanelLayout>
             config: widget.style ?? const PanelStyle(),
           );
 
-          _stateManager.clearFixedSizeOverride(neighbor.id, newFlex);
+          _stateManager.clearFixedSizeOverride(neighbor.id, newWeight);
         }
       }
     }
@@ -328,8 +325,8 @@ class _PanelLayoutState extends State<PanelLayout>
           stateManager: _stateManager,
         );
 
-        // 2. Calculate Pixel-to-Flex Ratio
-        final pixelToFlexRatio = _engine.calculatePixelToFlexRatio(
+        // 2. Calculate Pixel-to-Weight Ratio
+        final pixelToWeightRatio = _engine.calculatePixelToWeightRatio(
           layoutData: layoutData,
           constraints: constraints,
           axis: axis,
@@ -342,7 +339,7 @@ class _PanelLayoutState extends State<PanelLayout>
           ..._buildResizeHandles(
             layoutData: layoutData,
             axis: axis,
-            pixelToFlexRatio: pixelToFlexRatio,
+            pixelToWeightRatio: pixelToWeightRatio,
           ),
         ];
 
@@ -409,7 +406,7 @@ class _PanelLayoutState extends State<PanelLayout>
   List<Widget> _buildResizeHandles({
     required List<PanelLayoutData> layoutData,
     required Axis axis,
-    required double pixelToFlexRatio,
+    required double pixelToWeightRatio,
   }) {
     final widgets = <Widget>[];
     final dockedPanels = layoutData
@@ -443,7 +440,7 @@ class _PanelLayoutState extends State<PanelLayout>
               next.config as InlinePanel,
             ),
             onDragUpdate: (delta) =>
-                _handleResize(delta, prev, next, pixelToFlexRatio),
+                _handleResize(delta, prev, next, pixelToWeightRatio),
             onDragStart: widget.onResizeStart,
             onDragEnd: widget.onResizeEnd,
           ),
@@ -457,7 +454,7 @@ class _PanelLayoutState extends State<PanelLayout>
     double delta,
     PanelLayoutData prevData,
     PanelLayoutData nextData,
-    double pixelToFlexRatio,
+    double pixelToWeightRatio,
   ) {
     // Calculate fresh ratio and data since we don't rebuild
     if (_lastConstraints == null) return;
@@ -469,7 +466,7 @@ class _PanelLayoutState extends State<PanelLayout>
       stateManager: _stateManager,
     );
 
-    final currentPixelToFlexRatio = _engine.calculatePixelToFlexRatio(
+    final currentPixelToWeightRatio = _engine.calculatePixelToWeightRatio(
       layoutData: layoutData,
       constraints: _lastConstraints!,
       axis: _cachedAxis,
@@ -488,7 +485,7 @@ class _PanelLayoutState extends State<PanelLayout>
       nextConfig: nextData.config as InlinePanel,
       nextState: nextState,
       nextCollapsedSize: nextData.collapsedSize,
-      pixelToFlexRatio: currentPixelToFlexRatio,
+      pixelToWeightRatio: currentPixelToWeightRatio,
     );
 
     for (final entry in changes.entries) {

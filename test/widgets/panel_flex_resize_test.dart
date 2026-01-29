@@ -16,12 +16,12 @@ void main() {
               children: [
                 TestContentPanel(
                   id: PanelId('left'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(color: Colors.red),
                 ),
                 TestContentPanel(
                   id: PanelId('right'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(color: Colors.blue),
                 ),
               ],

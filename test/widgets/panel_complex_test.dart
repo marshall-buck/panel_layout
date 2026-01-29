@@ -97,7 +97,7 @@ void main() {
                   ),
                   TestContentPanel(
                     id: const PanelId('right'),
-                    flexOverride: 1,
+                    layoutWeightOverride: 1,
                     child: Container(),
                   ),
                 ],

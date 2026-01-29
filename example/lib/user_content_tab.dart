@@ -30,7 +30,7 @@ class UserContentTab extends StatelessWidget {
         ),
 
         // 2. Main Content Area (Implicit Flex: 1)
-        // We can use a raw Widget or just an InlinePanel(flex: 1) to hold the nested layout.
+        // We can use a raw Widget or just an Widget (layoutWeight: 1) to hold the nested layout.
         // Standard widgets automatically fill remaining space without props.
         _NestedLayoutContainer(
           content: PanelLayout(

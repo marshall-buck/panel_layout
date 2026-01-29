@@ -7,7 +7,7 @@ import '../panels/inline_panel.dart';
 /// a child that is not a [BasePanel].
 ///
 /// Behavior:
-/// - Always has a flex factor of 1.0 (fills available space).
+/// - Always has a layout weight of 1.0 (fills available space).
 /// - Has no header, decoration, or built-in padding.
 /// - Does not initiate resizing (passive).
 class InternalLayoutAdapter extends InlinePanel {
@@ -22,8 +22,8 @@ class InternalLayoutAdapter extends InlinePanel {
           resizable: false,
         );
 
-  /// Standard widgets wrapped in this adapter always have a flex of 1.0.
-  double get flex => 1.0;
+  /// Standard widgets wrapped in this adapter always have a layout weight of 1.0.
+  double get layoutWeight => 1.0;
 
   @override
   Widget build(BuildContext context) {

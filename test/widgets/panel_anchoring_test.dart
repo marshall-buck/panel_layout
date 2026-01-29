@@ -62,7 +62,7 @@ void main() {
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(),
                 ),
                 OverlayPanel(

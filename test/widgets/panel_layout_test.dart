@@ -56,12 +56,12 @@ void main() {
               children: [
                 TestContentPanel(
                   id: const PanelId('f1'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(color: const Color(0xFF00FF00)),
                 ),
                 TestContentPanel(
                   id: const PanelId('f2'),
-                  flexOverride: 3,
+                  layoutWeightOverride: 3,
                   child: Container(color: const Color(0xFF00FF00)),
                 ),
               ],
@@ -92,7 +92,7 @@ void main() {
                 ),
                 TestContentPanel(
                   id: const PanelId('flex'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(color: const Color(0xFF00FF00)),
                 ),
               ],

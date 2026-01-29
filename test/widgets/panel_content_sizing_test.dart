@@ -34,7 +34,7 @@ void main() {
                 ),
                 TestContentPanel(
                   id: const PanelId('fill'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(),
                 ),
               ],
@@ -62,7 +62,7 @@ void main() {
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(),
                 ),
                 OverlayPanel(
@@ -107,7 +107,7 @@ void main() {
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(),
                 ),
                 OverlayPanel(
@@ -153,7 +153,7 @@ void main() {
                 ),
                 TestContentPanel(
                   id: const PanelId('fill'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(),
                 ),
               ],
@@ -179,7 +179,7 @@ void main() {
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(),
                 ),
                 OverlayPanel(

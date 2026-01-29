@@ -131,7 +131,7 @@ class PanelStateManager extends ChangeNotifier {
   }
 
   double _getInitialSize(BasePanel panel) {
-    if (panel is InternalLayoutAdapter) return panel.flex;
+    if (panel is InternalLayoutAdapter) return panel.layoutWeight;
     if (panel.width != null) return panel.width!;
     if (panel.height != null) return panel.height!;
     return 0.0;

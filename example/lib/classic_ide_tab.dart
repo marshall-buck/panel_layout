@@ -41,7 +41,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
         ),
 
         // CENTER PANEL: Editor
-        // Standard widgets automatically fill available space (flex: 1).
+        // Standard widgets automatically fill available space (layoutWeight: 1).
         Container(
           color: Colors.white,
           padding: const EdgeInsets.all(16),

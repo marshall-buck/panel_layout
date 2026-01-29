@@ -4,13 +4,10 @@ import '../../models/panel_enums.dart';
 import '../../models/panel_id.dart';
 import '../../widgets/panels/inline_panel.dart';
 import '../../widgets/internal/internal_layout_adapter.dart';
-import '../layout_data.dart';
+import '../../models/layout_data.dart';
 import 'layout_context.dart';
 
-// TODO: What is the time complexity?
-// TODO: Lets seperate terminlogy between flutter's actual flex, and the app's internal flex calucaliotns. Do this thtought he app
-// TODO: Better class documentaion.
-
+/// Handles the linear layout of panels that share space (Row/Column behavior).
 class InlineLayoutStrategy {
   const InlineLayoutStrategy();
 
@@ -42,10 +39,10 @@ class InlineLayoutStrategy {
       final config = p.config as InlinePanel;
       final override = p.state.fixedPixelSizeOverride;
 
-      // Check for flex on InternalLayoutAdapter
-      final flex = config is InternalLayoutAdapter ? config.flex : null;
+      // Check for layoutWeight on InternalLayoutAdapter
+      final weight = config is InternalLayoutAdapter ? config.layoutWeight : null;
 
-      if (flex != null && override == null) {
+      if (weight != null && override == null) {
         // Flexible: Sum up animated weight
         final animatedWeight = p.effectiveSize;
         if (animatedWeight > 0) {
@@ -177,6 +174,13 @@ class InlineLayoutStrategy {
     return panelRects;
   }
 
+  /// Orders inline panels based on anchoring dependencies.
+  ///
+  /// This ensures that panels anchored to other panels are processed after their targets.
+  ///
+  /// **Time Complexity**: Approaches O(N^2) in the worst case (reverse dependency chain).
+  /// However, since N (number of panels) is typically very small (< 20), this is negligible
+  /// for UI performance. If N grows significantly, a Topological Sort (O(V+E)) should be used.
   List<PanelLayoutData> _orderInlinePanels(List<PanelLayoutData> source) {
     final ordered = <PanelLayoutData>[];
     final deferred = <PanelLayoutData>[];

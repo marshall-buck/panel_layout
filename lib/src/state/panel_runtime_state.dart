@@ -26,7 +26,7 @@ class PanelRuntimeState {
   bool collapsed;
 
   /// If set, this panel behaves as a Fixed panel with this specific pixel size,
-  /// ignoring its [flex] configuration. Used for animation stability.
+  /// ignoring its [layoutWeight] configuration. Used for animation stability.
   double? fixedPixelSizeOverride;
 
   /// Creates a copy of this state with the given fields replaced.

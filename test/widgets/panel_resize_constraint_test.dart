@@ -24,7 +24,7 @@ void main() {
                 ),
                 TestContentPanel(
                   id: PanelId('main'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(color: Colors.blue),
                 ),
               ],
@@ -80,7 +80,7 @@ void main() {
                 ),
                 TestContentPanel(
                   id: PanelId('main'),
-                  flexOverride: 1,
+                  layoutWeightOverride: 1,
                   child: Container(color: Colors.blue),
                 ),
               ],

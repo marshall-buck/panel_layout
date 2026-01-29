@@ -22,7 +22,7 @@ void main() {
               ),
               TestContentPanel(
                 id: const PanelId('center'),
-                flexOverride: 1,
+                layoutWeightOverride: 1,
                 child: const Text('Center'),
               ),
               InlinePanel(
@@ -58,7 +58,7 @@ void main() {
               ),
               TestContentPanel(
                 id: const PanelId('center'),
-                flexOverride: 1,
+                layoutWeightOverride: 1,
                 child: const Text('Center'),
               ),
               InlinePanel(
@@ -270,7 +270,7 @@ void main() {
               ),
               TestContentPanel(
                 id: const PanelId('inner_container'),
-                flexOverride: 1,
+                layoutWeightOverride: 1,
                 child: PanelLayout(
                   children: [
                     InlinePanel(
@@ -281,7 +281,7 @@ void main() {
                     ),
                     TestContentPanel(
                       id: const PanelId('inner_neutral'),
-                      flexOverride: 1,
+                      layoutWeightOverride: 1,
                       child: const Text('Inner Neutral'),
                     ),
                   ],

@@ -5,7 +5,7 @@ import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
 import '../state/panel_state_manager.dart';
 import 'panel_style.dart';
-import 'layout_data.dart';
+import '../models/layout_data.dart';
 import 'panel_layout_engine.dart';
 import 'strategies/layout_context.dart';
 import 'strategies/inline_layout_strategy.dart';

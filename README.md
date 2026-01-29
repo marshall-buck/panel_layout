@@ -43,18 +43,16 @@ class MyIdeLayout extends StatelessWidget {
         ),
 
         // Main Content (Ratio-based)
-        // Standard widgets fill remaining space automatically (ratio: 1)
+        // Standard widgets fill remaining space automatically (layoutWeight: 1)
         Container(
           color: Color(0xFFFFFFFF),
           child: Center(child: Text('Main Editor')),
         ),
 
         // Right Sidebar (Ratio-based)
-        InlinePanel(
-          id: PanelId('right_sidebar'),
-          flex: 2, // Takes twice the space of other ratio-based items
-          child: Container(color: Color(0xFFEEEEEE), child: Text('Properties')),
-        ),
+        // Standard widgets fill remaining space automatically. 
+        // (For custom weight, wrap in InternalLayoutAdapter or similar - future feature)
+        Container(color: Color(0xFFEEEEEE), child: Text('Properties')),
       ],
     );
   }
@@ -150,7 +148,7 @@ This section details the internal architecture of the `panel_layout` package. It
 
 ### 1. Declarative Configuration vs. Imperative State
 
-The package bridges the gap between Flutter's declarative UI pattern and the imperative nature of resizing state (dragging a handle changes a value).
+The package bridges the gap between the declarative UI pattern and the imperative nature of resizing state (dragging a handle changes a value).
 
 * **Reconciliation**: On every build, the `PanelLayout` widget processes its `children`. It compares the declarative configuration (e.g., "I want a sidebar of width 200") with its internal `PanelStateManager`.
 * **State Persistence**: User interactions (resizing, collapsing) are stored in `PanelStateManager`. When the declarative configuration updates (e.g., parent rebuilds), the manager ensures user-defined state (like a custom width dragged by the user) is preserved unless explicitly overridden.
@@ -173,10 +171,10 @@ One of the most complex aspects of mixing pixel-defined and ratio-defined panels
 * **Scenario**: Imagine a 200px absolute panel next to a "ratio: 1" panel.
 * **Problem**: If you drag the handle, you are changing the 200px width. But if you have two ratio-based panels, dragging the handle changes their *ratios*, not their pixel widths directly.
 
-To solve this, the engine calculates a **Pixel-to-Flex Ratio** (leveraging Flutter's `flex` concept under the hood) for every frame. This ratio represents how many pixels a single unit of "flex" value occupies.
+To solve this, the engine calculates a **Pixel-to-Weight Ratio** (leveraging Flutter's `flex` concept under the hood) for every frame. This ratio represents how many pixels a single unit of "layoutWeight" value occupies.
 
 * When resizing an **Absolute** panel, we simply adjust its stored pixel size.
-* When resizing two **Ratio-based** panels, we convert the drag delta (pixels) into a ratio delta using the current frame's conversion factor: `deltaRatio = deltaPixels / pixelToRatioFactor`.
+* When resizing two **Ratio-based** panels, we convert the drag delta (pixels) into a ratio delta using the current frame's conversion factor: `deltaRatio = deltaPixels / pixelToWeightRatio`.
 
 ### 4. Animation & Performance
 

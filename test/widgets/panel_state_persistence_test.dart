@@ -37,7 +37,7 @@ void main() {
                         ),
                       const TestContentPanel(
                         id: PanelId('content'),
-                        flexOverride: 1,
+                        layoutWeightOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -82,7 +82,7 @@ void main() {
                         ),
                       const TestContentPanel(
                         id: PanelId('content'),
-                        flexOverride: 1,
+                        layoutWeightOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -119,7 +119,7 @@ void main() {
                         ),
                       const TestContentPanel(
                         id: PanelId('content'),
-                        flexOverride: 1,
+                        layoutWeightOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -162,7 +162,7 @@ void main() {
                         ),
                       const TestContentPanel(
                         id: PanelId('content'),
-                        flexOverride: 1,
+                        layoutWeightOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -202,7 +202,7 @@ void main() {
                         ),
                       const TestContentPanel(
                         id: PanelId('content'),
-                        flexOverride: 1,
+                        layoutWeightOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],
@@ -239,7 +239,7 @@ void main() {
                         ),
                       const TestContentPanel(
                         id: PanelId('content'),
-                        flexOverride: 1,
+                        layoutWeightOverride: 1,
                         child: SizedBox.expand(),
                       ),
                     ],

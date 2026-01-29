@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
+import '../models/layout_data.dart';
 import '../widgets/panels/base_panel.dart';
 import '../widgets/panels/inline_panel.dart';
 import '../widgets/internal/internal_layout_adapter.dart';
@@ -8,10 +9,7 @@ import '../widgets/panels/overlay_panel.dart';
 import '../state/panel_state_manager.dart';
 import '../core/exceptions.dart';
 import 'panel_style.dart';
-import 'layout_data.dart';
 
-
-// TODO: Make sure no Time compelxity isues??
 
 /// A pure logic class responsible for calculating layout parameters
 /// and preparing data for the [PanelLayout] widget.
@@ -78,11 +76,11 @@ class PanelLayoutEngine {
     }).toList();
   }
 
-  /// Calculates the ratio between pixels and flex units.
+  /// Calculates the ratio between pixels and layout weights.
   ///
-  /// This is essential for resizing flexible panels, as it allows converting
-  /// drag deltas (pixels) into flex value changes.
-  double calculatePixelToFlexRatio({
+  /// This is essential for resizing weighted panels, as it allows converting
+  /// drag deltas (pixels) into weight value changes.
+  double calculatePixelToWeightRatio({
     required List<PanelLayoutData> layoutData,
     required BoxConstraints constraints,
     required Axis axis,
@@ -93,50 +91,48 @@ class PanelLayoutEngine {
         : constraints.maxHeight;
 
     double usedPixelSpace = 0.0;
-    double totalFlex = 0.0;
+    double totalWeight = 0.0;
 
     for (final data in layoutData) {
       if (data.config is! InlinePanel) continue;
 
       if (!data.state.visible && data.visualFactor <= 0) continue;
 
-      // TODO: Lets maek suere all prop names are diferetiang betwenn flutter's flex and the package's flex.
-
-      final flex = data.config is InternalLayoutAdapter
-          ? (data.config as InternalLayoutAdapter).flex
+      final weight = data.config is InternalLayoutAdapter
+          ? (data.config as InternalLayoutAdapter).layoutWeight
           : null;
 
-      if (flex == null) {
-        // Fixed panel (or collapsed fixed/flex)
+      if (weight == null) {
+        // Fixed panel (or collapsed fixed/weight)
         // effectiveSize handles interpolation for collapse and visibility
         usedPixelSpace += data.effectiveSize;
       } else {
-        // Flexible panel
+        // Weighted panel
         if (data.state.collapsed) {
-          // If a flex panel is collapsed, it acts as fixed pixels (rail)
+          // If a weighted panel is collapsed, it acts as fixed pixels (rail)
           usedPixelSpace += data.effectiveSize;
         } else {
-          // Normal flexible panel
-          // effectiveSize for flex panel returns its weighted flex?
-          // InlineLayoutStrategy uses effectiveSize for flex weight.
-          // So we should use effectiveSize here too if we want to support animated flex?
-          // But usually flex doesn't animate via effectiveSize logic?
+          // Normal weighted panel
+          // effectiveSize for weighted panel returns its weighted weight?
+          // InlineLayoutStrategy uses effectiveSize for layout weight.
+          // So we should use effectiveSize here too if we want to support animated weights?
+          // But usually weights don't animate via effectiveSize logic?
           // PanelLayoutData.effectiveSize:
-          // base = state.size (flex).
+          // base = state.size (weight).
           // current = base + (collapsed - base) * factor.
           // If factor > 0 (collapsing), it returns interpolation.
-          // BUT calculatePixelToFlexRatio separates UsedPixels vs TotalFlex.
-          // If it is collapsing, it is transitioning from Flex to Pixels.
+          // BUT calculatePixelToWeightRatio separates UsedPixels vs TotalWeight.
+          // If it is collapsing, it is transitioning from Weight to Pixels.
           // This is hard to model with simple ratio.
-          // But for Stability test (Fixed panel collapsing), this branch (Flex) is for neighbors.
+          // But for Stability test (Fixed panel collapsing), this branch (Weight) is for neighbors.
           // Neighbors are NOT collapsing.
           // So state.collapsed is false.
-          // So we add to totalFlex.
-          // We should use state.size (Flex factor).
-          // effectiveSize for Flex panel = state.size * visualFactor.
+          // So we add to totalWeight.
+          // We should use state.size (Weight factor).
+          // effectiveSize for Weight panel = state.size * visualFactor.
           // If visualFactor < 1 (fading in/out), its weight is reduced.
-          // Yes, we should use effectiveSize for TotalFlex too!
-          totalFlex += data.effectiveSize;
+          // Yes, we should use effectiveSize for TotalWeight too!
+          totalWeight += data.effectiveSize;
         }
       }
     }
@@ -157,14 +153,14 @@ class PanelLayoutEngine {
     usedPixelSpace += visibleHandleCount * config.handleHitTestWidth;
 
     final flexibleSpace = totalSpace - usedPixelSpace;
-    return (flexibleSpace > 0 && totalFlex > 0)
-        ? totalFlex / flexibleSpace
+    return (flexibleSpace > 0 && totalWeight > 0)
+        ? totalWeight / flexibleSpace
         : 0.0;
   }
 
-  /// Calculates the new flex factor for a panel that is being unlocked
+  /// Calculates the new weight factor for a panel that is being unlocked
   /// (transitioning from a fixed pixel override back to flexible sizing).
-  double calculateNewFlexForUnlockedPanel({
+  double calculateNewWeightForUnlockedPanel({
     required List<PanelLayoutData> layoutData,
     required PanelId targetPanelId,
     required double targetPixels,
@@ -177,7 +173,7 @@ class PanelLayoutEngine {
         : constraints.maxHeight;
 
     double usedPixelSpace = 0.0;
-    double totalFlexOthers = 0.0;
+    double totalWeightOthers = 0.0;
 
     final dockedPanels = layoutData
         .where((d) => d.config is InlinePanel)
@@ -188,22 +184,22 @@ class PanelLayoutEngine {
 
       if (data.config.id == targetPanelId) {
         // This is the one we are unlocking.
-        // It contributes 0 to usedPixelSpace and 0 to totalFlexOthers (temporarily).
+        // It contributes 0 to usedPixelSpace and 0 to totalWeightOthers (temporarily).
       } else if (data.state.collapsed) {
         usedPixelSpace += data.collapsedSize;
       } else {
-        final flex = data.config is InternalLayoutAdapter
-            ? (data.config as InternalLayoutAdapter).flex
+        final weight = data.config is InternalLayoutAdapter
+            ? (data.config as InternalLayoutAdapter).layoutWeight
             : null;
-        if (flex == null) {
+        if (weight == null) {
           // Fixed panel
           usedPixelSpace += data.effectiveSize;
         } else {
-          // Flex (Other)
+          // Weight (Other)
           if (data.state.fixedPixelSizeOverride != null) {
             usedPixelSpace += data.state.fixedPixelSizeOverride!;
           } else {
-            totalFlexOthers += data.effectiveSize;
+            totalWeightOthers += data.effectiveSize;
           }
         }
       }
@@ -223,29 +219,29 @@ class PanelLayoutEngine {
 
     final flexibleSpace = totalSpace - usedPixelSpace;
 
-    // Retrieve the target panel's current flex from state (as fallback/reference)
+    // Retrieve the target panel's current weight from state (as fallback/reference)
     final targetData = layoutData.firstWhere(
       (d) => d.config.id == targetPanelId,
       orElse: () => layoutData.first,
     );
-    final targetFlex = targetData.config is InternalLayoutAdapter
-        ? (targetData.config as InternalLayoutAdapter).flex
+    final targetWeight = targetData.config is InternalLayoutAdapter
+        ? (targetData.config as InternalLayoutAdapter).layoutWeight
         : 1.0;
 
-    if (totalFlexOthers <= 0) {
-      // No other flex panels. Target takes all space.
+    if (totalWeightOthers <= 0) {
+      // No other weighted panels. Target takes all space.
       return targetData
           .state
-          .size; // Or targetFlex? Original used state.size or default.
+          .size; // Or targetWeight? Original used state.size or default.
     }
 
     if (flexibleSpace <= targetPixels) {
-      // Not enough space. Return large flex.
-      return targetFlex * 2;
+      // Not enough space. Return large weight.
+      return targetWeight * 2;
     }
 
-    // Equation: F_target = (pixels * F_others) / (Available - pixels)
-    final numerator = targetPixels * totalFlexOthers;
+    // Equation: W_target = (pixels * W_others) / (Available - pixels)
+    final numerator = targetPixels * totalWeightOthers;
     final denominator = flexibleSpace - targetPixels;
 
     if (denominator <= 0.1) {

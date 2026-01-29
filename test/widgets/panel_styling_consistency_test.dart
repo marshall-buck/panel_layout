@@ -33,7 +33,7 @@ void main() {
             ),
             const TestContentPanel(
               id: PanelId('main'),
-              flexOverride: 1,
+              layoutWeightOverride: 1,
               child: Text('Main'),
             ),
           ],
