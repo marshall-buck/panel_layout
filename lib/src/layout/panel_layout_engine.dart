@@ -10,6 +10,9 @@ import '../core/exceptions.dart';
 import 'panel_style.dart';
 import 'layout_data.dart';
 
+
+// TODO: Make sure no Time compelxity isues??
+
 /// A pure logic class responsible for calculating layout parameters
 /// and preparing data for the [PanelLayout] widget.
 class PanelLayoutEngine {
@@ -96,6 +99,8 @@ class PanelLayoutEngine {
       if (data.config is! InlinePanel) continue;
 
       if (!data.state.visible && data.visualFactor <= 0) continue;
+
+      // TODO: Lets maek suere all prop names are diferetiang betwenn flutter's flex and the package's flex.
 
       final flex = data.config is InternalLayoutAdapter
           ? (data.config as InternalLayoutAdapter).flex
