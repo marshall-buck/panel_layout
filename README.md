@@ -186,9 +186,5 @@ Animating layout changes (like collapsing a sidebar) is expensive if it triggers
 * **Repaint Boundaries**: Each panel is wrapped in a `RepaintBoundary` (via `AnimatedPanel` structure) so that resizing one panel doesn't force a repaint of its content if the content dimensions haven't changed (though often they do in resizing).
 * **Stable Neighbors**: During animation, the engine identifies "stable neighbors" to lock sizing constraints, preventing "wobble" effects where dynamic panels might jitter as available space changes rapidly.
 
-### 5. No External Dependencies
-
-The package is designed to be foundational. It avoids `material.dart` or `cupertino.dart` to ensure:
-
 
 // TODO: Make it so it doesnt make adiference the order the panels are included in the panel layout list.
