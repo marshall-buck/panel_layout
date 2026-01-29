@@ -70,7 +70,7 @@ class PanelLayoutData {
     return current * visualFactor;
   }
 }
-
+// TODO: This should probably go in th emodels folder, yes?
 /// A unique identifier for a resize handle between two panels.
 @internal
 class HandleLayoutId extends Equatable {
