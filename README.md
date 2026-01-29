@@ -50,7 +50,7 @@ class MyIdeLayout extends StatelessWidget {
         ),
 
         // Right Sidebar (Ratio-based)
-        // Standard widgets fill remaining space automatically. 
+        // Standard widgets fill remaining space automatically.
         // (For custom weight, wrap in InternalLayoutAdapter or similar - future feature)
         Container(color: Color(0xFFEEEEEE), child: Text('Properties')),
       ],
@@ -184,5 +184,4 @@ Animating layout changes (like collapsing a sidebar) is expensive if it triggers
 * **Repaint Boundaries**: Each panel is wrapped in a `RepaintBoundary` (via `AnimatedPanel` structure) so that resizing one panel doesn't force a repaint of its content if the content dimensions haven't changed (though often they do in resizing).
 * **Stable Neighbors**: During animation, the engine identifies "stable neighbors" to lock sizing constraints, preventing "wobble" effects where dynamic panels might jitter as available space changes rapidly.
 
-
-// TODO: Make it so it doesnt make adiference the order the panels are included in the panel layout list.
+TODO: Make it so it doesn't make a difference the order the panels are included in the panel layout list. The layout should be based on anchoring and not the index order.  maybe??

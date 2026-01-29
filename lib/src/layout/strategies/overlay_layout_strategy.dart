@@ -4,6 +4,7 @@ import '../../models/panel_id.dart';
 import '../../widgets/panels/overlay_panel.dart';
 import '../../models/layout_data.dart';
 import 'layout_context.dart';
+
 /// Handles the positioning of floating panels that sit above the main content (Stack behavior).
 class OverlayLayoutStrategy {
   const OverlayLayoutStrategy();
