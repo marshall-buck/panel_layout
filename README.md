@@ -1,6 +1,6 @@
 # Panel Layout
 
-A powerful, declarative Flutter package for building complex, resizable, and adaptable panel layouts. `panel_layout` allows you to create IDE-like interfaces, dashboard layouts, and flexible split-views with ease, all without depending on Material or Cupertino libraries.
+A Flutter package for creating advanced panel-based interfaces. `panel_layout` allows you to place panels almost anywhere related to other panels, supporting animations where panels can animate from any other panel. It is designed for creating various types of drawers and overlays.
 
 ## Features
 
@@ -57,6 +57,37 @@ class MyIdeLayout extends StatelessWidget {
     );
   }
 }
+```
+
+### Layout Behavior & Resizing
+
+By default, all `InlinePanel`s and standard widgets in a `PanelLayout` are resizable and participate in the space distribution (like a flex container).
+
+#### Fixed / Non-Resizable Panels
+
+To create a fixed-size panel that the user cannot resize, use an `InlinePanel` with `resizable: false`.
+
+```dart
+InlinePanel(
+  id: PanelId('fixed_sidebar'),
+  width: 250,
+  resizable: false, // User cannot drag to resize this
+  child: FixedContent(),
+)
+```
+
+#### Overlay vs. Inline
+
+* **Inline Panels**: Adding or removing an `InlinePanel` (or toggling its visibility) changes the available space for all other inline panels.
+* **Overlay Panels**: Adding an `OverlayPanel` has **zero effect** on the layout of other widgets. It floats on top.
+
+```dart
+// Adding this OverlayPanel will NOT shrink the MainContent
+OverlayPanel(
+  id: PanelId('floating_tools'),
+  anchor: PanelAnchor.topRight,
+  child: MainContent(),
+)
 ```
 
 ## Advanced Usage
@@ -183,5 +214,3 @@ Animating layout changes (like collapsing a sidebar) is expensive if it triggers
 * **Isolated Updates**: The `PanelLayoutDelegate` listens to the `PanelStateManager`. When an animation runs, it requests a *layout* update, but does not necessarily trigger a *widget rebuild* of the children.
 * **Repaint Boundaries**: Each panel is wrapped in a `RepaintBoundary` (via `AnimatedPanel` structure) so that resizing one panel doesn't force a repaint of its content if the content dimensions haven't changed (though often they do in resizing).
 * **Stable Neighbors**: During animation, the engine identifies "stable neighbors" to lock sizing constraints, preventing "wobble" effects where dynamic panels might jitter as available space changes rapidly.
-
-TODO: Make it so it doesn't make a difference the order the panels are included in the panel layout list. The layout should be based on anchoring and not the index order.  maybe??
