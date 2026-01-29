@@ -47,7 +47,7 @@ enum PanelAction {
 
   /// Toggles the collapsed/expanded state of the panel (InlinePanels).
   collapse,
-
+    // TODO: Shouldnt inmline panels also hav ethe ability to close?????
   /// Closes (hides) the panel entirely (OverlayPanels).
   close,
 }
