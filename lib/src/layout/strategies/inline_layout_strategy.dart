@@ -8,6 +8,8 @@ import '../layout_data.dart';
 import 'layout_context.dart';
 
 // TODO: What is the time complexity?
+// TODO: Lets seperate terminlogy between flutter's actual flex, and the app's internal flex calucaliotns. Do this thtought he app
+// TODO: Better class documentaion.
 
 class InlineLayoutStrategy {
   const InlineLayoutStrategy();
