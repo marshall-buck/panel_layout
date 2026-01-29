@@ -190,6 +190,5 @@ Animating layout changes (like collapsing a sidebar) is expensive if it triggers
 
 The package is designed to be foundational. It avoids `material.dart` or `cupertino.dart` to ensure:
 
-1. **Zero Style Enforcement**: It doesn't impose Material shadows, colors, or ripples.
-2. **Platform Adaptability**: It can be used in Desktop apps (MacOS/Windows/Linux) where Material design might look out of place.
-3. **Performance**: It carries no baggage from heavy design system libraries.
+
+// TODO: Make it so it doesnt make adiference the order the panels are included in the panel layout list.
