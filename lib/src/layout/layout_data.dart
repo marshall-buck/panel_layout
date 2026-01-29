@@ -4,6 +4,7 @@ import '../widgets/panels/base_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
 
+// TODO: Should the class extends equatble and have extensions instead of getters??
 /// A unified data structure used by the [PanelLayoutDelegate].
 ///
 /// It combines the static configuration from [BasePanel] with the
