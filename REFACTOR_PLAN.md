@@ -86,7 +86,7 @@ lib/
 
 * **README.md**:
   * **New Title**: `flutter_panels`
-  * **Pitch**: "Augment your UI with panels. Wrap your screen in a `PanelArea` to attach resizeable sidebars (`InlinePanel`) or floating tools (`OverlayPanel`)."
+  * **Pitch**: "Augment your UI with panels. Wrap your screen in a `PanelArea` to attach resizable sidebars (`InlinePanel`) or floating tools (`OverlayPanel`)."
 * **Doc Comments**: Update terminology to match `PanelArea`.
 
 ## 6. Execution Steps (Checklist)
