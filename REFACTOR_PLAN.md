@@ -93,11 +93,11 @@ lib/
 
 ### Phase 1: File & Class Renaming
 
-1. [ ] **Rename Files**: Execute file system renames for the main entry points and widgets.
-2. [ ] **Search & Replace**: Global replace of class names.
+1. [x] **Rename Files**: Execute file system renames for the main entry points and widgets.
+2. [x] **Search & Replace**: Global replace of class names.
     * `PanelArea` -> `PanelArea`
     * `PanelAreaController` -> `PanelController`
-3. [ ] **Update Pubspec**: Change name to `flutter_panels`.
+3. [x] **Update Pubspec**: Change name to `flutter_panels`.
 
 ### Phase 2: API Refactoring
 
@@ -112,23 +112,4 @@ lib/
 2. [ ] **Update Tests**: Refactor `test/` to use new API.
 3. [ ] **Update Example**: Rewrite `example/` to showcase `PanelArea(body: ...)`.
 
-## 7. Repository & Folder Renaming Guide
 
-### Step 1: Rename Local Folder
-
-```bash
-cd ..
-mv panel_layout flutter_panels
-cd flutter_panels
-```
-
-### Step 2: Update Remote Repository
-
-1. Rename repo to `flutter_panels` on GitHub.
-2. `git remote set-url origin https://github.com/USERNAME/flutter_panels.git`
-
-### Step 3: IDE Housekeeping
-
-1. Close IDE.
-2. Open `flutter_panels`.
-3. Run `flutter clean` and `flutter pub get`.
