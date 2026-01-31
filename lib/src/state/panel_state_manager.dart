@@ -116,7 +116,10 @@ class PanelStateManager extends ChangeNotifier {
           duration: effectiveDuration,
           value: state.visible ? 1.0 : 0.0,
         );
-        controller.addListener(notifyListeners);
+        // CRITICAL PERFORMANCE NOTE:
+        // Do NOT add `addListener(notifyListeners)` to these controllers.
+        // Doing so triggers a global layout rebuild on every animation frame,
+        // causing severe jank. AnimatedPanel listens to these controllers directly.
         _animationControllers[panel.id] = controller;
 
         final collapseController = AnimationController(
@@ -124,7 +127,8 @@ class PanelStateManager extends ChangeNotifier {
           duration: effectiveDuration,
           value: state.collapsed ? 1.0 : 0.0,
         );
-        collapseController.addListener(notifyListeners);
+        // CRITICAL PERFORMANCE NOTE:
+        // Do NOT add `addListener(notifyListeners)` to these controllers.
         _collapseControllers[panel.id] = collapseController;
       }
     }
