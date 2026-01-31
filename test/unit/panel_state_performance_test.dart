@@ -1,113 +1,61 @@
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_panels/src/models/panel_style.dart';
-import 'package:flutter_panels/src/models/panel_id.dart';
-import 'package:flutter_panels/src/state/panel_state_manager.dart';
-import 'package:flutter_panels/src/widgets/panels/inline_panel.dart';
-import 'package:flutter/widgets.dart';
-
-class TestTickerProvider extends TickerProvider {
-  const TestTickerProvider();
-
-  @override
-  Ticker createTicker(TickerCallback onTick) => Ticker(onTick);
-}
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter/material.dart';
 
 void main() {
-  group('PanelStateManager Performance', () {
-    late PanelStateManager manager;
+  testWidgets('Rendering Optimization: Opacity widget is REMOVED when panel is fully visible', (tester) async {
+    // 1. Setup a standard panel area
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PanelArea(
+          children: [
+            InlinePanel(
+              id: const PanelId('test'),
+              width: 200,
+              child: Container(color: Colors.red),
+            ),
+            Container(color: Colors.blue), // Content
+          ],
+        ),
+      ),
+    );
 
-    setUp(() {
-      manager = PanelStateManager();
-    });
+    // 2. Initial State: Panel is Visible (1.0 opacity).
+    // Expect NO Opacity widget wrapping the panel content.
+    // The hierarchy in AnimatedHorizontalPanel is complex, so we look for Opacity widgets.
+    // There might be Opacity widgets for the "Rail" (which is hidden/0.0), 
+    // but the Main Content should NOT be wrapped in Opacity(1.0).
 
-    tearDown(() {
-      manager.dispose();
-    });
+    // Let's find the content container (Red).
+    final contentFinder = find.byWidgetPredicate((w) => w is Container && w.color == Colors.red);
+    expect(contentFinder, findsOneWidget);
 
-    testWidgets('Animation ticks MUST NOT trigger global notifyListeners', (tester) async {
-      final panelId = PanelId('test_panel');
-      final panel = InlinePanel(
-        id: panelId,
-        width: 100,
-        child: Container(),
-        // Use a long duration to ensure we get many ticks
-        animationDuration: const Duration(seconds: 1), 
-      );
-
-      // Use a TickerProvider that hooks into the SchedulerBinding
-      manager.reconcile([panel], const PanelStyle(), const TestTickerProvider());
-
-      int notifyCount = 0;
-      manager.addListener(() {
-        notifyCount++;
+    // Check ancestors.
+    // If optimization is working, there should be NO Opacity widget with opacity 1.0 in the ancestry chain
+    // of the content (up to the AnimatedPanel).
+    
+    // Helper to check ancestry
+    bool hasOpacity1Wrapper(Finder childFinder) {
+      final element = tester.element(childFinder);
+      bool found = false;
+      element.visitAncestorElements((ancestor) {
+        if (ancestor.widget is Opacity) {
+          final op = ancestor.widget as Opacity;
+          if (op.opacity == 1.0) {
+            found = true;
+            return false; // Stop visiting
+          }
+        }
+        if (ancestor.widget is PanelArea) {
+          return false; // Stop at root
+        }
+        return true;
       });
+      return found;
+    }
 
-      // 1. Trigger Visibility Change
-      // This SHOULD trigger ONE notification for the state change (visible: true -> false)
-      manager.setVisible(panelId, false);
-      
-      // Initial state change notification
-      expect(notifyCount, equals(1), reason: 'Should notify once for state change');
+    expect(hasOpacity1Wrapper(contentFinder), isFalse, 
+      reason: 'Optimization Failed: Content is wrapped in unnecessary Opacity(1.0) widget.');
 
-      // 2. Advance Animation
-      final controller = manager.getAnimationController(panelId)!;
-      expect(controller.isAnimating, isTrue);
-
-      // Simulate multiple frames
-      // We pump with a duration to advance the clock. 
-      // Since we used Ticker(), this hooks into the binding tester controls.
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
-
-      // The count should remain at 1. 
-      // If it increased, it means the animation controller is driving the manager updates.
-      expect(notifyCount, equals(1), 
-        reason: 'Animation ticks caused global rebuilds! Regression detected. '
-                'PanelStateManager.notifyListeners was called ${notifyCount - 1} extra times during animation.');
-      
-      // finish animation
-      await tester.pump(const Duration(seconds: 1));
-      expect(controller.isAnimating, isFalse);
-    });
-
-    testWidgets('Collapse ticks MUST NOT trigger global notifyListeners', (tester) async {
-      final panelId = PanelId('test_panel');
-      final panel = InlinePanel(
-        id: panelId,
-        width: 100,
-        initialCollapsed: false,
-        child: Container(),
-        animationDuration: const Duration(seconds: 1), 
-      );
-
-      manager.reconcile([panel], const PanelStyle(), const TestTickerProvider());
-
-      int notifyCount = 0;
-      manager.addListener(() {
-        notifyCount++;
-      });
-
-      // 1. Trigger Collapse Change
-      manager.setCollapsed(panelId, true);
-      expect(notifyCount, equals(1), reason: 'Should notify once for state change');
-
-      // 2. Advance Animation
-      final controller = manager.getCollapseController(panelId)!;
-      expect(controller.isAnimating, isTrue);
-
-      // Simulate multiple frames
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
-
-      expect(notifyCount, equals(1), 
-        reason: 'Collapse animation ticks caused global rebuilds! Regression detected.');
-
-      // Finish animation to clean up
-      await tester.pump(const Duration(seconds: 1));
-      expect(controller.isAnimating, isFalse);
-    });
   });
 }

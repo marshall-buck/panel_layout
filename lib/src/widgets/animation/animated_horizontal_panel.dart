@@ -81,10 +81,15 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     final contentOpacity = (factor * (1.0 - collapseFactor)).clamp(0.0, 1.0);
 
-    Widget childWidget = Opacity(
-      opacity: contentOpacity,
-      child: IgnorePointer(ignoring: contentOpacity == 0.0, child: config),
-    );
+    Widget childWidget = config;
+    
+    // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully opaque
+    if (contentOpacity < 1.0) {
+      childWidget = Opacity(
+        opacity: contentOpacity,
+        child: IgnorePointer(ignoring: contentOpacity == 0.0, child: childWidget),
+      );
+    }
 
     // Layout Safety for Fixed Sizes:
     if (hasFixedWidth) {
@@ -101,15 +106,9 @@ class AnimatedHorizontalPanel extends StatelessWidget {
           child: childWidget,
         ),
       );
-    } else {
-      // If not fixed width, we still might need to handle the content squeezing.
-      // But for now we trust the content acts responsively or the user set a min width logic elsewhere.
-      // Actually, to match previous behavior for safety, if it's shrinking, we might want to clip.
     }
 
-    // Add OverflowBox logic if height is also fixed (generic fallback from original code)
-    // although for "HorizontalPanel" we mostly care about width.
-    // If the panel has fixed height, that constraint comes from the parent or config.
+    // Add OverflowBox logic if height is also fixed
     if (config.height != null && hasFixedWidth) {
       childWidget = OverflowBox(
         minWidth: expandedSize,
@@ -117,21 +116,7 @@ class AnimatedHorizontalPanel extends StatelessWidget {
         minHeight: config.height,
         maxHeight: config.height,
         alignment: _getAlignment(config.anchor),
-        child:
-            config, // Need to re-wrap raw config? No, childWidget is already wrapped in Opacity/IgnorePointer.
-        // Wait, previous code wrapped childWidget in OverflowBox.
-      );
-      // Re-applying the Opacity wrapper logic properly:
-      childWidget = OverflowBox(
-        minWidth: expandedSize,
-        maxWidth: expandedSize,
-        minHeight: config.height,
-        maxHeight: config.height,
-        alignment: _getAlignment(config.anchor),
-        child: Opacity(
-          opacity: contentOpacity,
-          child: IgnorePointer(ignoring: contentOpacity == 0.0, child: config),
-        ),
+        child: childWidget,
       );
     }
 
@@ -143,23 +128,12 @@ class AnimatedHorizontalPanel extends StatelessWidget {
         childWidget,
         // Only render the rail layer if we have content or decoration for it
         if (railContent != null || railDecoration != null)
-          Positioned(
-            left: config.anchor == PanelAnchor.left ? 0 : null,
-            right: config.anchor == PanelAnchor.right ? 0 : null,
-            top: 0,
-            bottom: 0,
-            width: railSize,
-            child: IgnorePointer(
-              ignoring: collapseFactor == 0.0,
-              child: Opacity(
-                opacity: collapseFactor.clamp(0.0, 1.0),
-                child: Container(
-                  decoration: railDecoration,
-                  alignment: railAlignment,
-                  child: railContent,
-                ),
-              ),
-            ),
+          _buildRailLayer(
+            railSize: railSize,
+            collapseFactor: collapseFactor,
+            decoration: railDecoration,
+            alignment: railAlignment,
+            child: railContent,
           ),
       ],
     );
@@ -169,6 +143,44 @@ class AnimatedHorizontalPanel extends StatelessWidget {
       height: config
           .height, // Pass through fixed height if any, else null (flexible)
       child: ClipRect(child: content),
+    );
+  }
+
+  Widget _buildRailLayer({
+    required double railSize,
+    required double collapseFactor,
+    required BoxDecoration? decoration,
+    required Alignment alignment,
+    required Widget? child,
+  }) {
+    // Note: We keep the rail in the tree even if collapseFactor is 0 (fully expanded)
+    // so that widget finders in tests can locate it (even if invisible).
+    // Opacity 0.0 is efficient enough (skips painting).
+
+    Widget rail = Container(
+      decoration: decoration,
+      alignment: alignment,
+      child: child,
+    );
+
+    // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully collapsed
+    if (collapseFactor < 1.0) {
+      rail = Opacity(
+        opacity: collapseFactor.clamp(0.0, 1.0),
+        child: rail,
+      );
+    }
+
+    return Positioned(
+      left: config.anchor == PanelAnchor.left ? 0 : null,
+      right: config.anchor == PanelAnchor.right ? 0 : null,
+      top: 0,
+      bottom: 0,
+      width: railSize,
+      child: IgnorePointer(
+        ignoring: collapseFactor == 0.0,
+        child: rail,
+      ),
     );
   }
 

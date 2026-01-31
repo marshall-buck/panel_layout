@@ -135,25 +135,38 @@ class AnimatedVerticalPanel extends StatelessWidget {
             // As animatedSize shrinks to headerHeight, this Expanded widget
             // will naturally shrink to 0.
             Expanded(
-              child: Opacity(
-                // Fade out content as we collapse (optional, but looks nicer)
-                opacity: contentOpacity,
-                child: ClipRect(
-                  // Clip content so it doesn't overflow visually if it has fixed size inner parts
-                  child: OverflowBox(
-                    // Allow content to maintain its logical size (e.g. alignment)
-                    // while the container shrinks.
-                    alignment: Alignment.topLeft,
-                    minHeight: math.max(0.0, fullSize - headerHeight),
-                    maxHeight: math.max(0.0, fullSize - headerHeight),
-                    child: config.child,
-                  ),
-                ),
-              ),
+              child: _buildContent(contentOpacity, headerHeight),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildContent(double opacity, double headerHeight) {
+    Widget content = ClipRect(
+      // Clip content so it doesn't overflow visually if it has fixed size inner parts
+      child: OverflowBox(
+        // Allow content to maintain its logical size (e.g. alignment)
+        // while the container shrinks.
+        alignment: Alignment.topLeft,
+        minHeight: math.max(0.0, state.size - headerHeight), // Use passed headerHeight
+        maxHeight: math.max(0.0, state.size - headerHeight),
+        child: config.child,
+      ),
+    );
+
+    // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully opaque
+    if (opacity < 1.0) {
+      content = Opacity(
+        opacity: opacity,
+        child: IgnorePointer(
+          ignoring: opacity == 0.0,
+          child: content,
+        ),
+      );
+    }
+
+    return content;
   }
 }
