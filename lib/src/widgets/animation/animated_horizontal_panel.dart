@@ -94,6 +94,8 @@ class AnimatedHorizontalPanel extends StatelessWidget {
     // Layout Safety for Fixed Sizes:
     if (hasFixedWidth) {
       // Fixed Width: Scroll horizontally to prevent overflow during shrink.
+      // We use SingleChildScrollView because it correctly handles "wrap content height"
+      // while allowing "overflow width", avoiding infinite size errors or overflow warnings.
       childWidget = SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         reverse: config.anchor == PanelAnchor.right,
