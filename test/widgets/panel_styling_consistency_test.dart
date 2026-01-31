@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_toggle_button.dart';
 import '../utils/test_content_panel.dart';
 
 void main() {
   testWidgets('Panel styling consistency between Expanded and Collapsed states', (
     tester,
   ) async {
-    final controller = PanelLayoutController();
+    final controller = PanelAreaController();
     const panelId = PanelId('test_panel');
     const testIconColor = Colors.red;
     const testHeaderColor = Colors.blue;
 
     await tester.pumpWidget(
       MaterialApp(
-        home: PanelLayout(
+        home: PanelArea(
           controller: controller,
           style: const PanelStyle(
             headerDecoration: BoxDecoration(color: Colors.white), // Default

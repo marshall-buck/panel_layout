@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_toggle_button.dart';
 
 void main() {
   Widget buildTestWidget({
@@ -10,11 +10,11 @@ void main() {
   }) {
     // We mock the environment by manually providing the data needed for PanelToggleButton.
     // However, PanelToggleButton uses PanelScope and PanelDataScope.
-    // It's easier to build a minimal PanelLayout.
+    // It's easier to build a minimal PanelArea.
     return MaterialApp(
       home: Scaffold(
-        body: PanelLayout(
-          controller: PanelLayoutController(), // Unused, we set initial state
+        body: PanelArea(
+          controller: PanelAreaController(), // Unused, we set initial state
           children: [
             InlinePanel(
               id: const PanelId('test_panel'),
@@ -61,8 +61,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: PanelLayout(
-            controller: PanelLayoutController(),
+          body: PanelArea(
+            controller: PanelAreaController(),
 
             children: [
               InlinePanel(
@@ -120,8 +120,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: PanelLayout(
-            controller: PanelLayoutController(),
+          body: PanelArea(
+            controller: PanelAreaController(),
 
             children: [
               InlinePanel(

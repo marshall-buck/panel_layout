@@ -4,15 +4,19 @@ import '../widgets/panels/base_panel.dart';
 import '../state/panel_runtime_state.dart';
 import '../models/panel_id.dart';
 
-/// A unified data structure used by the [PanelLayoutDelegate].
+/// A fully resolved state of a panel, ready for layout calculation.
 ///
-/// It combines the static configuration from [BasePanel] with the
-/// dynamic runtime state from [PanelRuntimeState], along with current animation values.
+/// This class merges:
+/// 1. **Static Configuration**: The user-defined [BasePanel] widget properties (anchor, max size, etc.).
+/// 2. **Runtime State**: The persistent [PanelRuntimeState] (current size, collapsed status).
+/// 3. **Animation Values**: The ephemeral interpolation factors for the current frame.
 ///
-/// This class acts as the "snapshot" of a panel for a single layout pass.
+/// The [PanelLayoutEngine] generates a list of [ResolvedPanel]s on every layout pass.
+/// It uses this "snapshot" to calculate the final [Rect] for each panel without modifying
+/// the underlying state or configuration.
 @internal
-class PanelLayoutData extends Equatable {
-  const PanelLayoutData({
+class ResolvedPanel extends Equatable {
+  const ResolvedPanel({
     required this.config,
     required this.state,
     this.visualFactor = 1.0,

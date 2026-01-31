@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 void main() {
   group('Panel Header Height Logic', () {
@@ -15,7 +15,7 @@ void main() {
         await tester.pumpWidget(
           Directionality(
             textDirection: TextDirection.ltr,
-            child: PanelLayout(
+            child: PanelArea(
               style: const PanelStyle(
                 iconSize: testIconSize,
                 headerPadding: testPadding,
@@ -50,7 +50,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             style: const PanelStyle(
               iconSize: testIconSize,
               headerPadding: configPadding,
@@ -80,7 +80,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             style: const PanelStyle(iconSize: 24, headerPadding: 8),
             children: [
               InlinePanel(

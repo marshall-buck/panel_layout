@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 void main() {
   group('Scope Widget Tests', () {
@@ -8,7 +8,7 @@ void main() {
       await tester.pumpWidget(
         Builder(
           builder: (context) {
-            expect(() => PanelLayout.of(context), throwsException);
+            expect(() => PanelArea.of(context), throwsException);
             return Container();
           },
         ),
@@ -18,13 +18,13 @@ void main() {
     testWidgets('PanelScope.of(listen: false) returns controller', (
       tester,
     ) async {
-      final controller = PanelLayoutController();
-      late PanelLayoutController found;
+      final controller = PanelAreaController();
+      late PanelAreaController found;
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: controller,
             children: [
               InlinePanel(
@@ -48,12 +48,12 @@ void main() {
       // InheritedModel.inheritFrom registers a dependency.
       // We can trigger updateShouldNotifyDependent by changing state.
       int builds = 0;
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: controller,
             children: [
               InlinePanel(

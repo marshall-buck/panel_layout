@@ -2,11 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../../models/panel_id.dart';
 import '../../models/panel_enums.dart';
-import '../../layout/panel_style.dart';
+import '../../models/panel_style.dart';
 import 'inline_panel.dart';
 import '../internal/panel_toggle_button.dart';
 
-/// An abstract configuration class for panels in a [PanelLayout].
+/// An abstract configuration class for panels in a [PanelArea].
 ///
 /// **Do not implement this class directly.** Instead, use one of the concrete implementations:
 /// - [InlinePanel]: For panels that share space in a linear layout (Row/Column).

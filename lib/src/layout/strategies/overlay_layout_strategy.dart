@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import '../../models/panel_enums.dart';
 import '../../models/panel_id.dart';
 import '../../widgets/panels/overlay_panel.dart';
-import '../../models/layout_data.dart';
+import '../../models/resolved_panel.dart';
 import 'layout_context.dart';
 
 /// Handles the positioning of floating panels that sit above the main content (Stack behavior).
@@ -16,7 +16,7 @@ class OverlayLayoutStrategy {
   void layout({
     required LayoutContext context,
     required Size size,
-    required List<PanelLayoutData> panels,
+    required List<ResolvedPanel> panels,
     required Map<PanelId, Rect> inlineRects,
     required TextDirection textDirection,
   }) {

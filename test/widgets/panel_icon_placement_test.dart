@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_toggle_button.dart';
 
 void main() {
   Widget buildTestLayout(List<BasePanel> children) {
@@ -10,7 +10,7 @@ void main() {
         body: SizedBox(
           width: 800,
           height: 600,
-          child: PanelLayout(children: children),
+          child: PanelArea(children: children),
         ),
       ),
     );

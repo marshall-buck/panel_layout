@@ -1,18 +1,18 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
 import '../utils/test_content_panel.dart';
 
 void main() {
-  group('PanelLayout Mixed Anchors', () {
+  group('PanelArea Mixed Anchors', () {
     testWidgets('Vertical Layout with Neutral Center Panel works', (
       tester,
     ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('top'),
@@ -48,7 +48,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('left'),
@@ -84,7 +84,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('top'),
@@ -107,7 +107,7 @@ void main() {
       expect(exception, isA<AnchorException>());
       expect(
         exception.toString(),
-        contains('PanelLayout contains InlinePanels with conflicting axes'),
+        contains('PanelArea contains InlinePanels with conflicting axes'),
       );
     });
 
@@ -117,7 +117,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('left'),
@@ -148,7 +148,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('top'),
@@ -174,11 +174,11 @@ void main() {
     });
 
     testWidgets('Neutral panel can be collapsed (Vertical)', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: controller,
             children: [
               InlinePanel(
@@ -221,7 +221,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('top_anchor'),
@@ -260,7 +260,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('root_top'),
@@ -271,7 +271,7 @@ void main() {
               TestContentPanel(
                 id: const PanelId('inner_container'),
                 layoutWeightOverride: 1,
-                child: PanelLayout(
+                child: PanelArea(
                   children: [
                     InlinePanel(
                       id: const PanelId('inner_left'),

@@ -1,10 +1,10 @@
 /// Represents the ephemeral runtime state of a panel.
 ///
-/// This state is managed by the [PanelLayout] engine and persists
+/// This state is managed by the [PanelArea] engine and persists
 /// across widget rebuilds (e.g., preserving a user-dragged width).
 ///
 /// **Note**: This state is currently ephemeral and will be lost on hot restart
-/// or if the [PanelLayout] widget is completely removed from the tree.
+/// or if the [PanelArea] widget is completely removed from the tree.
 /// (Persistence is planned for a future release).
 class PanelRuntimeState {
   PanelRuntimeState({

@@ -1,31 +1,31 @@
 import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 
-/// A controller for the [PanelLayout] widget.
+/// A controller for the [PanelArea] widget.
 ///
 /// Use this controller to manipulate the state of panels programmatically
-/// from outside the [PanelLayout] widget tree.
+/// from outside the [PanelArea] widget tree.
 ///
 /// Typical usage:
-/// 1. Create a [PanelLayoutController].
-/// 2. Pass it to the [PanelLayout] constructor.
+/// 1. Create a [PanelAreaController].
+/// 2. Pass it to the [PanelArea] constructor.
 /// 3. Call methods like [toggleVisible] or [setCollapsed] in response to user events.
 ///
 /// Don't forget to [dispose] the controller when it is no longer needed.
-class PanelLayoutController {
+class PanelAreaController {
   PanelLayoutStateInterface? _state;
 
-  /// Attaches the controller to a [PanelLayout] state.
+  /// Attaches the controller to a [PanelArea] state.
   ///
-  /// This is called automatically by the [PanelLayout] widget.
+  /// This is called automatically by the [PanelArea] widget.
   @internal
   void attach(PanelLayoutStateInterface state) {
     _state = state;
   }
 
-  /// Detaches the controller from the [PanelLayout] state.
+  /// Detaches the controller from the [PanelArea] state.
   ///
-  /// This is called automatically when the [PanelLayout] is disposed or updated.
+  /// This is called automatically when the [PanelArea] is disposed or updated.
   @internal
   void detach() {
     _state = null;

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 void main() {
   testWidgets('InlinePanel applies ClipRect when clipContent is true', (
@@ -9,7 +9,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: const PanelId('panel1'),
@@ -35,7 +35,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: const PanelId('panel1'),
@@ -69,7 +69,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             OverlayPanel(
               id: const PanelId('overlay1'),

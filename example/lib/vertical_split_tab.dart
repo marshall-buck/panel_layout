@@ -1,13 +1,13 @@
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 class VerticalSplitTab extends StatelessWidget {
   const VerticalSplitTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return PanelLayout(
+    return PanelArea(
       style: kAppPanelStyle,
       children: [
         // TOP PANEL: Header / Toolbar

@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-import '../../layout/panel_style.dart';
+import '../../models/panel_style.dart';
 
 /// A draggable handle widget used to resize adjacent panels.
 ///
 /// This widget renders a transparent hit target that captures drag gestures
-/// and reports the delta back to the parent [PanelLayout].
+/// and reports the delta back to the parent [PanelArea].
 ///
 /// It does not manage size state itself; it only invokes callbacks.
 @internal

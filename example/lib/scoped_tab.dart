@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 class ScopedTab extends StatelessWidget {
   const ScopedTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return PanelLayout(
+    return PanelArea(
       // Outer Layout Style: Dark Theme
       style: PanelStyle(
         headerDecoration: const BoxDecoration(
@@ -35,7 +35,7 @@ class ScopedTab extends StatelessWidget {
         ),
 
         // Center Panel (Contains Nested Scope)
-        PanelLayout(
+        PanelArea(
           // Inner Layout Style: Light/Blue Theme
           // This overrides the outer style for all children in this subtree.
           style: PanelStyle(

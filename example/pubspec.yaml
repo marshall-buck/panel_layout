@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  panel_layout:
+  flutter_panels:
     path: ../
 
 dev_dependencies:

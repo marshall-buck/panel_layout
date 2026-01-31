@@ -2,12 +2,12 @@ import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
 import '../core/constants.dart';
 
-/// Configuration for the [PanelLayout] system.
+/// Configuration for the [PanelArea] system.
 ///
 /// This class defines the visual styling and behavior defaults for all panels
 /// and resize handles within the layout.
 ///
-/// Provide this to the [PanelLayout.style] parameter.
+/// Provide this to the [PanelArea.style] parameter.
 @immutable
 class PanelStyle extends Equatable {
   const PanelStyle({

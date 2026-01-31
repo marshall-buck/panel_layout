@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 void main() {
   group('Easy Mode Panel Tests', () {
     testWidgets('InlinePanel renders title and icon', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: PanelLayout(
+          home: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('test'),
@@ -30,7 +30,7 @@ void main() {
     testWidgets('InlinePanel icon toggles collapse', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: PanelLayout(
+          home: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('test'),
@@ -72,7 +72,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: PanelLayout(
+          home: PanelArea(
             style: const PanelStyle(
               headerDecoration: BoxDecoration(color: headerColor),
               panelBoxDecoration: BoxDecoration(color: panelColor),

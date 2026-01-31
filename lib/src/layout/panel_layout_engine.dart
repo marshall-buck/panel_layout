@@ -1,18 +1,18 @@
 import 'package:flutter/widgets.dart';
 import '../models/panel_id.dart';
 import '../models/panel_enums.dart';
-import '../models/layout_data.dart';
+import '../models/resolved_panel.dart';
 import '../widgets/panels/base_panel.dart';
 import '../widgets/panels/inline_panel.dart';
 import '../widgets/internal/internal_layout_adapter.dart';
 import '../widgets/panels/overlay_panel.dart';
 import '../state/panel_state_manager.dart';
 import '../core/exceptions.dart';
-import 'panel_style.dart';
+import '../models/panel_style.dart';
 
 
 /// A pure logic class responsible for calculating layout parameters
-/// and preparing data for the [PanelLayout] widget.
+/// and preparing data for the [PanelArea] widget.
 class PanelLayoutEngine {
   const PanelLayoutEngine();
 
@@ -48,8 +48,8 @@ class PanelLayoutEngine {
     return axis ?? Axis.horizontal;
   }
 
-  /// Prepares the list of [PanelLayoutData] needed for the layout delegate.
-  List<PanelLayoutData> createLayoutData({
+  /// Prepares the list of [ResolvedPanel] needed for the layout delegate.
+  List<ResolvedPanel> createLayoutData({
     required Map<PanelId, BasePanel> uniquePanelConfigs,
     required PanelStyle config,
     required PanelStateManager stateManager,
@@ -66,7 +66,7 @@ class PanelLayoutEngine {
             iconSize + (panelConfig.railPadding ?? config.railPadding);
       }
 
-      return PanelLayoutData(
+      return ResolvedPanel(
         config: panelConfig,
         state: state,
         visualFactor: anim.value,
@@ -81,7 +81,7 @@ class PanelLayoutEngine {
   /// This is essential for resizing weighted panels, as it allows converting
   /// drag deltas (pixels) into weight value changes.
   double calculatePixelToWeightRatio({
-    required List<PanelLayoutData> layoutData,
+    required List<ResolvedPanel> layoutData,
     required BoxConstraints constraints,
     required Axis axis,
     required PanelStyle config,
@@ -117,7 +117,7 @@ class PanelLayoutEngine {
           // InlineLayoutStrategy uses effectiveSize for layout weight.
           // So we should use effectiveSize here too if we want to support animated weights?
           // But usually weights don't animate via effectiveSize logic?
-          // PanelLayoutData.effectiveSize:
+          // ResolvedPanel.effectiveSize:
           // base = state.size (weight).
           // current = base + (collapsed - base) * factor.
           // If factor > 0 (collapsing), it returns interpolation.
@@ -161,7 +161,7 @@ class PanelLayoutEngine {
   /// Calculates the new weight factor for a panel that is being unlocked
   /// (transitioning from a fixed pixel override back to flexible sizing).
   double calculateNewWeightForUnlockedPanel({
-    required List<PanelLayoutData> layoutData,
+    required List<ResolvedPanel> layoutData,
     required PanelId targetPanelId,
     required double targetPixels,
     required BoxConstraints constraints,

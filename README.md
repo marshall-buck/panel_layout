@@ -1,20 +1,21 @@
-# Panel Layout
+# flutter_panels
 
-A Flutter package for creating advanced panel-based interfaces. `panel_layout` allows you to place panels almost anywhere related to other panels, supporting animations where panels can animate from any other panel. It is designed for creating various types of drawers and overlays.
+Augment your UI with flexible, resizable panels. `flutter_panels` allows you to attach sidebars (`InlinePanel`) or floating tools (`OverlayPanel`) to your existing application's UI.
 
 ## Features
-
-* **Declarative Configuration**: Define your layout structure using a simple list of widgets (`InlinePanel`, `OverlayPanel`, or standard widgets).
-* **Resizable Panels**: Built-in resize handles that work automatically between inline panels.
+<!-- TODO: redo -->
+* **Declarative Configuration**: Define your panel structure using a simple list of widgets (`InlinePanel`, `OverlayPanel`, or standard widgets).
+* **Resizable Panels**: Built-in resize handles that work automatically between  panels.
+<!-- TODO: Where is this?? -->
 * **Ratio & Absolute Sizing**: Mix ratio-based (like standard flex) and absolute-sized (pixel-width) panels seamlessly.
 * **Overlay Support**: Easily position independent panels anchored to other panels or the window without affecting the main layout flow.
 * **Animations**: Smooth transitions for visibility toggling and collapsing/expanding.
-* **Programmatic Control**: Use `PanelLayoutController` to manipulate panel state (visibility, collapse) from anywhere.
+* **Programmatic Control**: Use `PanelAreaController` to manipulate panel state (visibility, collapse) from anywhere.
 * **Framework Agnostic**: Pure Flutter implementation. No dependency on Material or Cupertino, giving you full styling control.
 
 ## Getting Started
 
-The core widget is `PanelLayout`. It accepts a list of children, which can be:
+The core widget is `PanelArea`. It accepts a list of children, which can be:
 
 1. **`InlinePanel`**: A panel that participates in the linear flow (like a generic Row/Column child).
 2. **`OverlayPanel`**: A panel that sits on top of the content, anchored to a specific location or other panels.
@@ -26,12 +27,12 @@ Here is a simple example creating a standard "Sidebar - Content - Sidebar" layou
 
 ```dart
 import 'package:flutter/widgets.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 class MyIdeLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return PanelLayout(
+    return PanelArea(
       children: [
         // Left Sidebar (Absolute width)
         InlinePanel(
@@ -61,7 +62,7 @@ class MyIdeLayout extends StatelessWidget {
 
 ### Layout Behavior & Resizing
 
-By default, all `InlinePanel`s and standard widgets in a `PanelLayout` are resizable and participate in the space distribution (like a flex container).
+By default, all `InlinePanel`s and standard widgets in a `PanelArea` are resizable and participate in the space distribution (like a flex container).
 
 #### Fixed / Non-Resizable Panels
 
@@ -94,7 +95,7 @@ OverlayPanel(
 
 ### Controlling Panels Programmatically
 
-You can control the state of your panels (visibility, collapsed state) using a `PanelLayoutController`. This is optional; the layout manages its own state internally, but a controller allows you to drive changes from buttons or external events.
+You can control the state of your panels (visibility, collapsed state) using a `PanelAreaController`. This is optional; the layout manages its own state internally, but a controller allows you to drive changes from buttons or external events.
 
 ```dart
 class MyControlledLayout extends StatefulWidget {
@@ -104,12 +105,12 @@ class MyControlledLayout extends StatefulWidget {
 
 class _MyControlledLayoutState extends State<MyControlledLayout> {
   // Controller is optional, but useful for external triggers
-  late final PanelLayoutController _controller;
+  late final PanelAreaController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = PanelLayoutController();
+    _controller = PanelAreaController();
   }
 
   @override
@@ -133,7 +134,7 @@ class _MyControlledLayoutState extends State<MyControlledLayout> {
         ),
         // Layout
         Expanded(
-          child: PanelLayout(
+          child: PanelArea(
             controller: _controller,
             children: [
               InlinePanel(
@@ -156,7 +157,7 @@ class _MyControlledLayoutState extends State<MyControlledLayout> {
 `OverlayPanel`s do not affect the layout of other widgets. They render on top and can be anchored anywhere.
 
 ```dart
-PanelLayout(
+PanelArea(
   children: [
     InlinePanel(id: PanelId('main'), child: MainContent()),
 
@@ -175,22 +176,22 @@ PanelLayout(
 
 ## Under the Hood: Architecture & Mechanics
 
-This section details the internal architecture of the `panel_layout` package. It is intended for those who want to understand how the package manages complex layout requirements, state reconciliation, and performance optimization.
+This section details the internal architecture of the `flutter_panels` package. It is intended for those who want to understand how the package manages complex layout requirements, state reconciliation, and performance optimization.
 
 ### 1. Declarative Configuration vs. Imperative State
 
 The package bridges the gap between the declarative UI pattern and the imperative nature of resizing state (dragging a handle changes a value).
 
-* **Reconciliation**: On every build, the `PanelLayout` widget processes its `children`. It compares the declarative configuration (e.g., "I want a sidebar of width 200") with its internal `PanelStateManager`.
+* **Reconciliation**: On every build, the `PanelArea` widget processes its `children`. It compares the declarative configuration (e.g., "I want a sidebar of width 200") with its internal `PanelStateManager`.
 * **State Persistence**: User interactions (resizing, collapsing) are stored in `PanelStateManager`. When the declarative configuration updates (e.g., parent rebuilds), the manager ensures user-defined state (like a custom width dragged by the user) is preserved unless explicitly overridden.
 
 ### 2. The Layout Engine
 
 The core layout logic does not use standard `Row` or `Column` widgets, as they lack the concept of "linked" resizing (where growing one child shrinks another) and stable resize handles.
 
-Instead, it utilizes a `CustomMultiChildLayout` with a specialized `PanelLayoutDelegate` and `PanelLayoutEngine`.
+Instead, it utilizes a `CustomMultiChildLayout` with a specialized `PanelAreaDelegate` and `PanelLayoutEngine`.
 
-* **`PanelLayoutDelegate`**: This class acts as the bridge between the Flutter render tree and our abstract layout logic. It queries the `PanelStateManager` for the current visual properties (size, visibility) of every ID.
+* **`PanelAreaDelegate`**: This class acts as the bridge between the Flutter render tree and our abstract layout logic. It queries the `PanelStateManager` for the current visual properties (size, visibility) of every ID.
 * **`PanelLayoutEngine`**: This is a pure logic class (no Flutter dependencies besides basic geometry). It calculates the specific `Rect` for every panel.
   * It handles the mixing of **Pixel-Sized** (absolute) and **Ratio-Sized** (weighted) panels.
   * It computes the layout in multiple passes: first allocating absolute sizes, then distributing remaining space to remaining panels.
@@ -209,8 +210,8 @@ To solve this, the engine calculates a **Pixel-to-Weight Ratio** (leveraging Flu
 
 ### 4. Animation & Performance
 
-Animating layout changes (like collapsing a sidebar) is expensive if it triggers a full rebuild of the widget tree every frame. `panel_layout` optimizes this:
+Animating layout changes (like collapsing a sidebar) is expensive if it triggers a full rebuild of the widget tree every frame. `flutter_panels` optimizes this:
 
-* **Isolated Updates**: The `PanelLayoutDelegate` listens to the `PanelStateManager`. When an animation runs, it requests a *layout* update, but does not necessarily trigger a *widget rebuild* of the children.
+* **Isolated Updates**: The `PanelAreaDelegate` listens to the `PanelStateManager`. When an animation runs, it requests a *layout* update, but does not necessarily trigger a *widget rebuild* of the children.
 * **Repaint Boundaries**: Each panel is wrapped in a `RepaintBoundary` (via `AnimatedPanel` structure) so that resizing one panel doesn't force a repaint of its content if the content dimensions haven't changed (though often they do in resizing).
 * **Stable Neighbors**: During animation, the engine identifies "stable neighbors" to lock sizing constraints, preventing "wobble" effects where dynamic panels might jitter as available space changes rapidly.

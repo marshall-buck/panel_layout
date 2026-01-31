@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-/// A mixin to mark a standard [Widget] as a participant in a [PanelLayout].
+/// A mixin to mark a standard [Widget] as a participant in a [PanelArea].
 ///
-/// While any [Widget] can be added to a [PanelLayout], using this mixin
+/// While any [Widget] can be added to a [PanelArea], using this mixin
 /// allows for future extensibility and clearer intent.
 ///
 /// Widgets using this mixin (or standard widgets wrapped internally)

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 
 void main() {
   testWidgets('Panel animates size when hidden', (tester) async {
-    final controller = PanelLayoutController();
+    final controller = PanelAreaController();
 
     await tester.pumpWidget(
       Directionality(
@@ -14,7 +14,7 @@ void main() {
           child: SizedBox(
             width: 400,
             height: 100,
-            child: PanelLayout(
+            child: PanelArea(
               controller: controller,
               children: [
                 InlinePanel(
@@ -49,13 +49,13 @@ void main() {
   testWidgets(
     'Anchored overlay panel animates out instead of disappearing instantly',
     (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       const duration = Duration(milliseconds: 100);
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               controller: controller,
               children: [
                 InlinePanel(

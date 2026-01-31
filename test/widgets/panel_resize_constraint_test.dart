@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
 import '../utils/test_content_panel.dart';
 
 void main() {
   group('Panel Resize Constraints', () {
     testWidgets('Cannot resize a collapsed panel', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       final panelId = PanelId('sidebar');
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               controller: controller,
               children: [
                 InlinePanel(
@@ -71,7 +71,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               children: [
                 InlinePanel(
                   id: panelId,

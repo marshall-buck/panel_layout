@@ -1,14 +1,23 @@
+# 0.7.0
+
+* **Major Renaming & Rebranding**: Renamed the package and core widgets to better reflect its purpose as a UI augmentation system.
+  * **Package Name**: `panel_layout` -> `flutter_panels`.
+  * **Root Widget**: `PanelLayout` -> `PanelArea`.
+  * **Controller**: `PanelLayoutController` -> `PanelAreaController`.
+  * **Delegate**: `PanelLayoutDelegate` -> `PanelAreaDelegate`.
+* **Internal Refactoring**: Preserved internal "Layout" terminology for core engine and data classes to distinguish between public API and internal implementation.
+
 # 0.6.0
 
 * **Performance Overhaul**: Addressed critical rendering and logic bottlenecks to eliminate animation jank and reduce initial load times.
   * **Optimized Rendering**: Switched from `Clip.antiAlias` to `Clip.hardEdge` in `BasePanel` and `AnimatedVerticalPanel`. This eliminates expensive `saveLayer` calls, significantly reducing GPU usage and fixing "shader compilation" jank on first frame or tab switch.
-  * **Optimized State Management**: Refactored `PanelLayout` to stop rebuilding the entire widget tree on every animation tick.
+  * **Optimized State Management**: Refactored `PanelArea` to stop rebuilding the entire widget tree on every animation tick.
   * **Granular Updates**: `AnimatedPanel` now listens to dedicated `ValueNotifier`s and `AnimationController`s, ensuring only the animating panel repaints.
   * **Internal**: Refactored `PanelStateManager` to support granular state notification.
 
 ## 0.5.10
 
-* **Simplified API**: Users can now pass standard `Widget`s directly to `PanelLayout.children`.
+* **Simplified API**: Users can now pass standard `Widget`s directly to `PanelArea.children`.
   * Removed `UserContent` class.
   * Standard widgets are automatically wrapped in an internal adapter that fills available space (layoutWeight: 1).
   * Added `LayoutAdapter` mixin for marking widgets as panel participants (optional).
@@ -20,12 +29,12 @@
   * An abstract base class for defining content-only panels that fill available space (`flex: 1`).
   * Designed to be extended by users to create specialized content regions without headers or default decorations.
   * Adjacent `UserContent` panels do not generate resize handles between them.
-* **New Feature**: Added `onResizeStart` and `onResizeEnd` callbacks to `PanelLayout` to track user resize interactions.
+* **New Feature**: Added `onResizeStart` and `onResizeEnd` callbacks to `PanelArea` to track user resize interactions.
 * **Behavior Change**: Adjacent `UserContent` panels no longer show a resize handle, allowing for seamless content regions.
 
 ## 0.5.8
 
-* **Breaking Change**: Removed `axis` parameter from `PanelLayout`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
+* **Breaking Change**: Removed `axis` parameter from `PanelArea`. The layout axis is now automatically inferred from the `anchor` property of the `InlinePanel` children (Left/Right -> Horizontal, Top/Bottom -> Vertical).
 * Added `ScopedTab` to example app to demonstrate nested, scoped configurations.
 * Added `clipContent` to BasePanel.
 * Updated documentation to clarify `PanelStyle` scoping rules.
@@ -34,11 +43,11 @@
 
 ## 0.5.7
 
-* **Breaking Change**: Renamed `PanelLayoutConfig` to `PanelStyle`.
-* **API Change**: `PanelLayout` now accepts a `style` parameter (of type `PanelStyle`) instead of `config`.
+* **Breaking Change**: Renamed `PanelAreaConfig` to `PanelStyle`.
+* **API Change**: `PanelArea` now accepts a `style` parameter (of type `PanelStyle`) instead of `config`.
 * **Breaking Change**: Removed `PanelTheme` and `ResizeHandleTheme` widgets.
 * **New Feature**: Introduced `PanelStyle` for centralized, type-safe configuration of layout styling and behavior.
-* **API Change**: `PanelLayout` now accepts a `style` parameter (of type `PanelStyle`) to set global defaults for headers, decorations, resize handles, and animations.
+* **API Change**: `PanelArea` now accepts a `style` parameter (of type `PanelStyle`) to set global defaults for headers, decorations, resize handles, and animations.
 * **Improvement**: `BasePanel` properties (like `headerPadding`, `iconSize`) now fall back to values in `PanelStyle` instead of hardcoded constants or separate themes.
 
 ## 0.5.6

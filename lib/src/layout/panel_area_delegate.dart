@@ -4,14 +4,14 @@ import '../core/debug_flag.dart';
 import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
 import '../state/panel_state_manager.dart';
-import 'panel_style.dart';
-import '../models/layout_data.dart';
+import '../models/panel_style.dart';
+import '../models/resolved_panel.dart';
 import 'panel_layout_engine.dart';
 import 'strategies/layout_context.dart';
 import 'strategies/inline_layout_strategy.dart';
 import 'strategies/overlay_layout_strategy.dart';
 
-/// A delegate that calculates the layout of panels based on [PanelLayoutData].
+/// A delegate that calculates the layout of panels based on [ResolvedPanel].
 ///
 /// This is the "brain" of the layout engine, responsible for positioning
 /// inline and overlay panels according to their anchors and sizes.
@@ -20,9 +20,9 @@ import 'strategies/overlay_layout_strategy.dart';
 /// - [InlineLayoutStrategy] for the grid/flex layout.
 /// - [OverlayLayoutStrategy] for floating panels.
 @internal
-class PanelLayoutDelegate extends MultiChildLayoutDelegate
+class PanelAreaDelegate extends MultiChildLayoutDelegate
     implements LayoutContext {
-  PanelLayoutDelegate({
+  PanelAreaDelegate({
     required this.stateManager,
     required this.configs,
     required this.style,
@@ -73,7 +73,7 @@ class PanelLayoutDelegate extends MultiChildLayoutDelegate
   }
 
   @override
-  bool shouldRelayout(PanelLayoutDelegate oldDelegate) {
+  bool shouldRelayout(PanelAreaDelegate oldDelegate) {
     // If configs or style change, we must relayout.
     // Changes to state are handled by super(relayout: stateManager).
     return oldDelegate.configs != configs ||

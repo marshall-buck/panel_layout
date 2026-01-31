@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 
 void main() {
-  testWidgets('PanelLayout vertical axis sizes correctly', (tester) async {
+  testWidgets('PanelArea vertical axis sizes correctly', (tester) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -12,7 +12,7 @@ void main() {
           child: SizedBox(
             width: 100,
             height: 400,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('t1'),

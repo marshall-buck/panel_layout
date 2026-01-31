@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_toggle_button.dart';
-import 'package:panel_layout/src/core/constants.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_toggle_button.dart';
+import 'package:flutter_panels/src/core/constants.dart';
 
 void main() {
   testWidgets('Panel collapse animation respects collapsedSize', (
@@ -17,7 +17,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: id,
@@ -37,7 +37,7 @@ void main() {
     // Expect 2 icons: One in Header, One in Rail
     expect(find.byKey(const Key('toggle_icon')), findsNWidgets(2));
 
-    final controller = PanelLayout.of(
+    final controller = PanelArea.of(
       tester.element(find.byKey(const Key('content'))),
     );
     controller.setCollapsed(id, true);
@@ -59,7 +59,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: id,
@@ -97,7 +97,7 @@ void main() {
     double angle = math.atan2(matrix.entry(1, 0), matrix.entry(0, 0));
     expect(angle, 0.0);
 
-    final controller = PanelLayout.of(tester.element(railIconFinder));
+    final controller = PanelArea.of(tester.element(railIconFinder));
     controller.setCollapsed(id, true);
     await tester.pumpAndSettle();
 
@@ -116,7 +116,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: id,
@@ -146,7 +146,7 @@ void main() {
       matching: find.byType(Row),
     );
 
-    final controller = PanelLayout.of(tester.element(contentRowFinder));
+    final controller = PanelArea.of(tester.element(contentRowFinder));
     controller.setCollapsed(id, true);
 
     await tester.pump();
@@ -171,7 +171,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: id,
@@ -202,7 +202,7 @@ void main() {
       200.0 - expectedHeaderHeight,
     );
 
-    final controller = PanelLayout.of(
+    final controller = PanelArea.of(
       tester.element(find.byKey(const Key('content'))),
     );
     controller.setCollapsed(id, true);

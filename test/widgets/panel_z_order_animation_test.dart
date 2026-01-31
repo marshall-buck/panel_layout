@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 import '../utils/test_content_panel.dart';
 
 void main() {
   testWidgets(
     'Overlay panel anchored to Left of Right-Inline panel animates from behind',
     (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       const animationDuration = Duration(milliseconds: 200);
 
       // We define the Overlay BEFORE the Inline panel in the list.
@@ -19,7 +19,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               controller: controller,
               children: [
                 // Widget B: The Overlay that should be BEHIND

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
-import 'package:panel_layout/src/widgets/internal/internal_layout_adapter.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/src/widgets/internal/internal_layout_adapter.dart';
 
 void main() {
   group('Standard Widget Support', () {
@@ -13,7 +13,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 Container(key: const Key('child1'), color: Colors.red),
                 Container(key: const Key('child2'), color: Colors.blue),
@@ -47,7 +47,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 Container(key: const Key('child1'), color: Colors.red),
                 Container(key: const Key('child2'), color: Colors.blue),
@@ -74,7 +74,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 Container(key: const Key('child1')),
                 Container(key: const Key('child2')),
@@ -95,7 +95,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('sidebar'),

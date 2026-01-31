@@ -1,1 +1,1 @@
-export 'panel_layout_controller.dart' hide PanelLayoutStateInterface;
+export 'panel_area_controller.dart' hide PanelLayoutStateInterface;

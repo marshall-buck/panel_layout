@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
   (w) => w is AnimatedPanel && w.config.id == PanelId(id),
@@ -9,8 +9,8 @@ Finder findPanel(String id) => find.byWidgetPredicate(
 
 void main() {
   group('Coverage Gaps', () {
-    test('PanelLayoutController works when detached', () {
-      final controller = PanelLayoutController();
+    test('PanelAreaController works when detached', () {
+      final controller = PanelAreaController();
       // These should not crash
       controller.toggleVisible(const PanelId('none'));
       controller.toggleCollapsed(const PanelId('none'));
@@ -22,7 +22,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('p1'),
@@ -49,7 +49,7 @@ void main() {
             child: SizedBox(
               width: 800,
               height: 600,
-              child: PanelLayout(
+              child: PanelArea(
                 children: [
                   InlinePanel(
                     id: const PanelId('base'),

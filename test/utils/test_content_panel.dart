@@ -1,4 +1,4 @@
-import 'package:panel_layout/src/widgets/internal/internal_layout_adapter.dart';
+import 'package:flutter_panels/src/widgets/internal/internal_layout_adapter.dart';
 
 class TestContentPanel extends InternalLayoutAdapter {
   const TestContentPanel({

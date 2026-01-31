@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import '../../models/panel_enums.dart';
 import '../../state/panel_runtime_state.dart';
-import '../../layout/panel_style.dart';
+import '../../models/panel_style.dart';
 import '../panels/base_panel.dart';
 import '../panels/inline_panel.dart';
 import '../internal/panel_toggle_button.dart';

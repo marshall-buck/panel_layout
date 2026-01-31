@@ -2,34 +2,34 @@ import 'package:flutter/widgets.dart';
 
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
-import '../models/layout_data.dart';
+import '../models/resolved_panel.dart';
 import '../state/panel_scope.dart';
 import '../state/panel_state_manager.dart';
-import '../layout/panel_style.dart';
-import '../layout/panel_layout_delegate.dart';
+import '../models/panel_style.dart';
+import '../layout/panel_area_delegate.dart';
 import '../layout/panel_resizing.dart';
 import '../layout/panel_layout_engine.dart';
-import '../controllers/panel_layout_controller.dart';
+import '../controllers/panel_area_controller.dart';
 import 'widgets.dart';
 import 'animation/animated_panel.dart';
 import 'internal/panel_resize_handle.dart';
 import 'internal/internal_layout_adapter.dart';
 
-/// The root widget of the panel layout system.
+/// The root widget of the panel system.
 ///
-/// [PanelLayout] is a declarative widget that manages a list of [BasePanel] children,
+/// [PanelArea] is a declarative widget that manages a list of [BasePanel] children,
 /// orchestrating their layout, sizing, and animations.
 ///
 /// ### Features:
 /// - **Declarative Configuration**: Define panels as a list of [InlinePanel] and [OverlayPanel] widgets.
 /// - **State Management**: Internally tracks panel sizes (from user resizing) and visibility/collapse states.
-/// - **Controller**: Optionally accepts a [PanelLayoutController] for external programmatic control.
+/// - **Controller**: Optionally accepts a [PanelAreaController] for external programmatic control.
 /// - **Animations**: Automatically handles size and opacity transitions when panel state changes.
 /// - **Resizing**: Renders [PanelResizeHandle]s between adjacent resizable inline panels.
 ///
 /// ### Example:
 /// ```dart
-/// PanelLayout(
+/// PanelArea(
 ///   controller: myController,
 ///   children: [
 ///     InlinePanel(
@@ -42,9 +42,9 @@ import 'internal/internal_layout_adapter.dart';
 ///   ],
 /// )
 /// ```
-class PanelLayout extends StatefulWidget {
-  /// Creates a declarative panel layout.
-  const PanelLayout({
+class PanelArea extends StatefulWidget {
+  /// Creates a declarative panel area.
+  const PanelArea({
     required this.children,
     this.controller,
     this.style,
@@ -63,7 +63,7 @@ class PanelLayout extends StatefulWidget {
   ///
   /// If provided, you must dispose of it yourself. If not provided,
   /// the layout creates and manages its own internal controller.
-  final PanelLayoutController? controller;
+  final PanelAreaController? controller;
 
   /// The configuration for styling and behavior.
   final PanelStyle? style;
@@ -74,24 +74,24 @@ class PanelLayout extends StatefulWidget {
   /// Optional callback called when a user finishes dragging a resize handle.
   final VoidCallback? onResizeEnd;
 
-  /// Retrieves the [PanelLayoutController] from the closest [PanelScope] ancestor.
-  static PanelLayoutController of(BuildContext context) {
+  /// Retrieves the [PanelAreaController] from the closest [PanelScope] ancestor.
+  static PanelAreaController of(BuildContext context) {
     return PanelScope.of(context);
   }
 
   @override
-  State<PanelLayout> createState() => _PanelLayoutState();
+  State<PanelArea> createState() => _PanelLayoutState();
 }
 
-class _PanelLayoutState extends State<PanelLayout>
+class _PanelLayoutState extends State<PanelArea>
     with TickerProviderStateMixin
     implements PanelLayoutStateInterface {
   late final PanelStateManager _stateManager;
   late Axis _cachedAxis;
   static const _engine = PanelLayoutEngine();
 
-  PanelLayoutController? _internalController;
-  PanelLayoutController get _effectiveController =>
+  PanelAreaController? _internalController;
+  PanelAreaController get _effectiveController =>
       widget.controller ?? _internalController!;
 
   late List<BasePanel> _processedChildren;
@@ -108,7 +108,7 @@ class _PanelLayoutState extends State<PanelLayout>
     _stateManager = PanelStateManager();
     _stateManager.addListener(_onStateChange);
     if (widget.controller == null) {
-      _internalController = PanelLayoutController();
+      _internalController = PanelAreaController();
     }
     _reconcileState();
     _effectiveController.attach(this);
@@ -242,7 +242,7 @@ class _PanelLayoutState extends State<PanelLayout>
   }
 
   @override
-  void didUpdateWidget(PanelLayout oldWidget) {
+  void didUpdateWidget(PanelArea oldWidget) {
     super.didUpdateWidget(oldWidget);
     _processedChildren = _processChildren(widget.children);
     _cachedAxis = _engine.validateAndComputeAxis(_processedChildren);
@@ -255,7 +255,7 @@ class _PanelLayoutState extends State<PanelLayout>
       }
 
       if (widget.controller == null) {
-        _internalController = PanelLayoutController();
+        _internalController = PanelAreaController();
       }
       _effectiveController.attach(this);
     }
@@ -353,7 +353,7 @@ class _PanelLayoutState extends State<PanelLayout>
           child: PanelConfigurationScope(
             style: config,
             child: CustomMultiChildLayout(
-              delegate: PanelLayoutDelegate(
+              delegate: PanelAreaDelegate(
                 stateManager: _stateManager,
                 configs: uniquePanelConfigs,
                 style: config,
@@ -404,7 +404,7 @@ class _PanelLayoutState extends State<PanelLayout>
   }
 
   List<Widget> _buildResizeHandles({
-    required List<PanelLayoutData> layoutData,
+    required List<ResolvedPanel> layoutData,
     required Axis axis,
     required double pixelToWeightRatio,
   }) {
@@ -452,8 +452,8 @@ class _PanelLayoutState extends State<PanelLayout>
 
   void _handleResize(
     double delta,
-    PanelLayoutData prevData,
-    PanelLayoutData nextData,
+    ResolvedPanel prevData,
+    ResolvedPanel nextData,
     double pixelToWeightRatio,
   ) {
     // Calculate fresh ratio and data since we don't rebuild

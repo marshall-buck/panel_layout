@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 class OverlaysTab extends StatefulWidget {
   const OverlaysTab({super.key});
@@ -10,8 +10,8 @@ class OverlaysTab extends StatefulWidget {
 }
 
 class _OverlaysTabState extends State<OverlaysTab> {
-  final _rootController = PanelLayoutController();
-  final _innerController = PanelLayoutController();
+  final _rootController = PanelAreaController();
+  final _innerController = PanelAreaController();
 
   @override
   void dispose() {
@@ -24,7 +24,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
   Widget build(BuildContext context) {
     // ROOT LAYOUT: Vertical
     // Manages the Top Bar, the Content Area, and Global Overlays.
-    return PanelLayout(
+    return PanelArea(
       controller: _rootController,
       style: kAppPanelStyle,
       children: [
@@ -46,7 +46,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
 
         // 2. Content Area (Inline, Flex)
         // Contains the nested Horizontal Layout.
-        PanelLayout(
+        PanelArea(
           controller: _innerController,
           style: kAppPanelStyle,
           children: [

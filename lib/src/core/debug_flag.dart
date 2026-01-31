@@ -19,6 +19,6 @@ bool kEnablePanelLayoutLogs = false;
 /// Logs are only printed if [kDebugMode] is true AND [kEnablePanelLayoutLogs] is true.
 void panelLayoutLog(String message) {
   if (kDebugMode && kEnablePanelLayoutLogs) {
-    debugPrint('[PanelLayout] $message');
+    debugPrint('[PanelArea] $message');
   }
 }

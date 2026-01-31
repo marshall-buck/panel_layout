@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
@@ -23,7 +23,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('list'),
@@ -58,7 +58,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),
@@ -103,7 +103,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),
@@ -137,7 +137,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('scroll'),
@@ -175,7 +175,7 @@ void main() {
           child: SizedBox(
             width: 800,
             height: 600,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 TestContentPanel(
                   id: const PanelId('bg'),

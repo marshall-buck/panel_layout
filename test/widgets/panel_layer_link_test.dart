@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 
 void main() {
   testWidgets('Overlay panel follows external LayerLink', (tester) async {
@@ -24,7 +24,7 @@ void main() {
 
             // Panel Layout
             Positioned.fill(
-              child: PanelLayout(
+              child: PanelArea(
                 children: [
                   OverlayPanel(
                     id: const PanelId('follower'),

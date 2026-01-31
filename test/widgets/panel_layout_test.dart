@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
@@ -9,7 +9,7 @@ Finder findPanel(String id) => find.byWidgetPredicate(
 );
 
 void main() {
-  testWidgets('PanelLayout renders fixed panels with correct width', (
+  testWidgets('PanelArea renders fixed panels with correct width', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -19,7 +19,7 @@ void main() {
           child: SizedBox(
             height: 100,
             width: 800,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('p1'),
@@ -42,7 +42,7 @@ void main() {
     expect(tester.getSize(findPanel('p2')).width, 200.0);
   });
 
-  testWidgets('PanelLayout distributes flex space accounting for handle', (
+  testWidgets('PanelArea distributes flex space accounting for handle', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -52,7 +52,7 @@ void main() {
           child: SizedBox(
             width: 400,
             height: 100,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 TestContentPanel(
                   id: const PanelId('f1'),
@@ -75,7 +75,7 @@ void main() {
     expect(tester.getSize(findPanel('f2')).width, 300.0);
   });
 
-  testWidgets('PanelLayout mixes Fixed and Flex panels', (tester) async {
+  testWidgets('PanelArea mixes Fixed and Flex panels', (tester) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -83,7 +83,7 @@ void main() {
           child: SizedBox(
             width: 500,
             height: 100,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('fixed'),

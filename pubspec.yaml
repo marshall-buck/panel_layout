@@ -1,6 +1,6 @@
-name: panel_layout
-description: "A new Flutter package project."
-version: 0.6.0
+name: flutter_panels
+description: "Augment your UI with flexible, resizable panels."
+version: 0.7.0
 homepage:
 
 environment:

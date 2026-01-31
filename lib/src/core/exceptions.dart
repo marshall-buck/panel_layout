@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 import '../models/panel_enums.dart';
 import '../models/panel_id.dart';
 
-/// Exception thrown when [PanelLayout] detects conflicting panel anchors.
+/// Exception thrown when [PanelArea] detects conflicting panel anchors.
 ///
-/// This occurs when a single [PanelLayout] contains [InlinePanel]s that imply different
+/// This occurs when a single [PanelArea] contains [InlinePanel]s that imply different
 /// layout axes (e.g., mixing [PanelAnchor.top] (vertical) and [PanelAnchor.left] (horizontal)).
 class AnchorException implements Exception {
   final PanelId firstPanelId;
@@ -22,9 +22,9 @@ class AnchorException implements Exception {
 
   @override
   String toString() {
-    return 'AnchorException: PanelLayout contains InlinePanels with conflicting axes.\n'
+    return 'AnchorException: PanelArea contains InlinePanels with conflicting axes.\n'
         ' - Panel "${firstPanelId.value}" established axis: $firstAxis\n'
         ' - Panel "${conflictingPanelId.value}" conflicts with axis: $conflictingAxis\n'
-        'InlinePanels in a single PanelLayout must share the same axis (Vertical or Horizontal).';
+        'InlinePanels in a single PanelArea must share the same axis (Vertical or Horizontal).';
   }
 }

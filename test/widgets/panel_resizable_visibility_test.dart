@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
 
 void main() {
   testWidgets('Resize handle icon is hidden when panels are not resizable', (
@@ -14,7 +14,7 @@ void main() {
         home: Directionality(
           textDirection: TextDirection.ltr,
           child: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               style: const PanelStyle(handleIcon: handleIcon),
               children: [
                 InlinePanel(
@@ -53,7 +53,7 @@ void main() {
           home: Directionality(
             textDirection: TextDirection.ltr,
             child: Scaffold(
-              body: PanelLayout(
+              body: PanelArea(
                 style: const PanelStyle(handleIcon: handleIcon),
                 children: [
                   InlinePanel(
@@ -91,7 +91,7 @@ void main() {
         home: Directionality(
           textDirection: TextDirection.ltr,
           child: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('p1'),
@@ -130,7 +130,7 @@ void main() {
           home: Directionality(
             textDirection: TextDirection.ltr,
             child: Scaffold(
-              body: PanelLayout(
+              body: PanelArea(
                 children: [
                   InlinePanel(
                     id: const PanelId('p1'),

@@ -1,6 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 class ClassicIdeTab extends StatefulWidget {
   const ClassicIdeTab({super.key});
@@ -10,7 +10,7 @@ class ClassicIdeTab extends StatefulWidget {
 }
 
 class _ClassicIdeTabState extends State<ClassicIdeTab> {
-  final _controller = PanelLayoutController();
+  final _controller = PanelAreaController();
 
   @override
   void dispose() {
@@ -20,7 +20,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return PanelLayout(
+    return PanelArea(
       controller: _controller,
       style: kAppPanelStyle, // Apply global config
       children: [

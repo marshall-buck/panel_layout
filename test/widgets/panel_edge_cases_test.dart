@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
 
 void main() {
   group('Edge Cases', () {
-    testWidgets('Empty PanelLayout works', (tester) async {
+    testWidgets('Empty PanelArea works', (tester) async {
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(children: []),
+          child: PanelArea(children: []),
         ),
       );
-      expect(find.byType(PanelLayout), findsOneWidget);
+      expect(find.byType(PanelArea), findsOneWidget);
     });
 
     testWidgets('Duplicate IDs (Last one wins)', (tester) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               InlinePanel(
                 id: const PanelId('dup'),
@@ -41,11 +41,11 @@ void main() {
     });
 
     testWidgets('Handle disappears when panel is hidden', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: controller,
             children: [
               InlinePanel(

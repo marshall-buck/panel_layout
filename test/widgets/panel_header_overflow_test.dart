@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 
 void main() {
   testWidgets('Header row handles extreme narrow constraints without overflow', (
@@ -16,7 +16,7 @@ void main() {
           child: SizedBox(
             width: 10, // Extremely narrow
             height: 400,
-            child: PanelLayout(
+            child: PanelArea(
               children: [
                 InlinePanel(
                   id: const PanelId('narrow_panel'),
@@ -55,7 +55,7 @@ void main() {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
-        child: PanelLayout(
+        child: PanelArea(
           children: [
             InlinePanel(
               id: const PanelId('wide_panel'),

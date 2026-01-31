@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 import '../utils/test_content_panel.dart';
 
 void main() {
@@ -16,12 +16,12 @@ void main() {
   group('Directional Stability Tests', () {
     
     testWidgets('Anchor Right: Right neighbor (Next) stays stable', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       // [Flex A] [Fixed B (Anchor Right)] [Flex C]
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               controller: controller,
               children: [
                 TestContentPanel(id: PanelId('A'), child: Container()),
@@ -46,12 +46,12 @@ void main() {
     });
 
     testWidgets('Anchor Left: Left neighbor (Prev) stays stable', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       // [Flex A] [Fixed B (Anchor Left)] [Flex C]
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               controller: controller,
               children: [
                 TestContentPanel(id: PanelId('A'), child: Container()),
@@ -76,14 +76,14 @@ void main() {
     });
 
     testWidgets('Anchor Bottom: Bottom neighbor (Next) stays stable', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       // [Flex A]
       // [Fixed B (Anchor Bottom)]
       // [Flex C]
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               controller: controller,
               children: [
                 TestContentPanel(id: PanelId('A'), child: Container()),
@@ -108,14 +108,14 @@ void main() {
     });
 
     testWidgets('Anchor Top: Top neighbor (Prev) stays stable', (tester) async {
-      final controller = PanelLayoutController();
+      final controller = PanelAreaController();
       // [Flex A]
       // [Fixed B (Anchor Top)]
       // [Flex C]
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PanelLayout(
+            body: PanelArea(
               controller: controller,
               children: [
                 TestContentPanel(id: PanelId('A'), child: Container()),

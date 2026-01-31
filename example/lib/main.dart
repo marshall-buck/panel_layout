@@ -3,7 +3,7 @@ import 'package:example/overlays_tab.dart';
 import 'package:example/scoped_tab.dart';
 import 'package:example/vertical_split_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 import 'user_content_tab.dart';
 
 void main() {

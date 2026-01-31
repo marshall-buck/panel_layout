@@ -1,4 +1,4 @@
-export 'panel_layout.dart';
+export 'panel_area.dart';
 export 'panels/base_panel.dart';
 export 'panels/inline_panel.dart';
 export 'panels/overlay_panel.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:panel_layout/panel_layout.dart';
+import 'package:flutter_panels/flutter_panels.dart';
 import 'main.dart'; // To access kAppPanelStyle
 
 // -----------------------------------------------------------------------------
@@ -14,7 +14,7 @@ class UserContentTab extends StatelessWidget {
     // ROOT LAYOUT (Vertical)
     // 1. Top Panel
     // 2. Main Content Area (Nested Horizontal Layout)
-    return PanelLayout(
+    return PanelArea(
       style: kAppPanelStyle,
       children: [
         // 1. Top Panel (Resizable)
@@ -33,7 +33,7 @@ class UserContentTab extends StatelessWidget {
         // We can use a raw Widget or just an Widget (layoutWeight: 1) to hold the nested layout.
         // Standard widgets automatically fill remaining space without props.
         _NestedLayoutContainer(
-          content: PanelLayout(
+          content: PanelArea(
             style: kAppPanelStyle,
             children: [
               // A. Left Panel

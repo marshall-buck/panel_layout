@@ -2,7 +2,7 @@
 
 ## Objective
 
-Transform the package from a "Layout Engine" identity to a "UI Augmentation" identity. The core logic remains the same, but the public API and branding will shift to emphasize "attaching" panels to an existing app rather than "building" a layout.
+Ad
 
 **New Package Name:** `flutter_panels`
 
@@ -10,7 +10,7 @@ Transform the package from a "Layout Engine" identity to a "UI Augmentation" ide
 
 Shift from "Building a layout" to "Attaching panels to a body".
 
-* **Old:** `PanelLayout(children: [Sidebar, Body, Sidebar])`
+* **Old:** `PanelArea(children: [Sidebar, Body, Sidebar])`
 * **New:** `PanelArea(body: Body, panels: [InlinePanel(...), OverlayPanel(...)])`
 
 ## 2. Terminology & Renaming
@@ -22,10 +22,10 @@ The following names have been selected.
 | Concept | Old Name | New Name | Reasoning |
 | :--- | :--- | :--- | :--- |
 | **Package** | `panel_layout` | `flutter_panels` | Broad, feature-centric. |
-| **Root Widget** | `PanelLayout` | `PanelArea` | "Area" implies a designated region where panels live. |
+| **Root Widget** | `PanelArea` | `PanelArea` | "Area" implies a designated region where panels live. |
 | **Space-Taking Panel** | `InlinePanel` | **`InlinePanel`** | Kept original name. Describes participation in the layout flow. |
 | **Floating Panel** | `OverlayPanel` | **`OverlayPanel`** | Kept original. Clearly indicates z-index layering. |
-| **Delegate** | `PanelLayoutDelegate` | `PanelAreaDelegate` | Matches root widget. |
+| **Delegate** | `PanelAreaDelegate` | `PanelAreaDelegate` | Matches root widget. |
 
 ## 3. Public API Changes
 
@@ -70,15 +70,15 @@ Instead of relying on list order, `PanelArea` uses the panel's existing `anchor`
 
 ```text
 lib/
-├── flutter_panels.dart  <-- renamed from panel_layout.dart
+├── flutter_panels.dart  <-- renamed from flutter_panels.dart
 └── src/
     ├── widgets/
-    │   ├── panel_area.dart <-- renamed from panel_layout.dart
+    │   ├── panel_area.dart <-- renamed from flutter_panels.dart
     │   └── panels/
     │       ├── inline_panel.dart   <-- (Name retained)
     │       └── overlay_panel.dart <-- (Name retained)
     ├── controllers/
-    │   └── panel_controller.dart <-- renamed from panel_layout_controller.dart
+    │   └── panel_controller.dart <-- renamed from panel_area_controller.dart
     └── ... (internal classes renamed correspondingly)
 ```
 
@@ -95,8 +95,8 @@ lib/
 
 1. [ ] **Rename Files**: Execute file system renames for the main entry points and widgets.
 2. [ ] **Search & Replace**: Global replace of class names.
-    * `PanelLayout` -> `PanelArea`
-    * `PanelLayoutController` -> `PanelController`
+    * `PanelArea` -> `PanelArea`
+    * `PanelAreaController` -> `PanelController`
 3. [ ] **Update Pubspec**: Change name to `flutter_panels`.
 
 ### Phase 2: API Refactoring

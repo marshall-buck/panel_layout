@@ -3,7 +3,7 @@ import '../panels/inline_panel.dart';
 
 /// An internal wrapper that adapts standard [Widget]s into the panel system.
 ///
-/// This class is used automatically by [PanelLayout] when it encounters
+/// This class is used automatically by [PanelArea] when it encounters
 /// a child that is not a [BasePanel].
 ///
 /// Behavior:

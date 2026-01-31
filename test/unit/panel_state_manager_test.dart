@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/src/layout/panel_style.dart';
-import 'package:panel_layout/src/models/panel_id.dart';
-import 'package:panel_layout/src/state/panel_state_manager.dart';
-import 'package:panel_layout/src/widgets/panels/inline_panel.dart';
+import 'package:flutter_panels/src/models/panel_style.dart';
+import 'package:flutter_panels/src/models/panel_id.dart';
+import 'package:flutter_panels/src/state/panel_state_manager.dart';
+import 'package:flutter_panels/src/widgets/panels/inline_panel.dart';
 import 'package:flutter/widgets.dart';
 import '../utils/test_content_panel.dart';
 

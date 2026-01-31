@@ -4,7 +4,7 @@ import '../../models/panel_enums.dart';
 import '../../models/panel_id.dart';
 import '../../widgets/panels/inline_panel.dart';
 import '../../widgets/internal/internal_layout_adapter.dart';
-import '../../models/layout_data.dart';
+import '../../models/resolved_panel.dart';
 import 'layout_context.dart';
 
 /// Handles the linear layout of panels that share space (Row/Column behavior).
@@ -17,7 +17,7 @@ class InlineLayoutStrategy {
   Map<PanelId, Rect> layout({
     required LayoutContext context,
     required Size size,
-    required List<PanelLayoutData> panels,
+    required List<ResolvedPanel> panels,
     required Axis axis,
   }) {
     final isHorizontal = axis == Axis.horizontal;
@@ -32,7 +32,7 @@ class InlineLayoutStrategy {
 
     double usedMainSpace = 0;
     double totalWeight = 0;
-    final flexiblePanels = <PanelLayoutData>[];
+    final flexiblePanels = <ResolvedPanel>[];
 
     // Pass 1: Measure Fixed and Content
     for (final p in inlineIds) {
@@ -181,9 +181,9 @@ class InlineLayoutStrategy {
   /// **Time Complexity**: Approaches O(N^2) in the worst case (reverse dependency chain).
   /// However, since N (number of panels) is typically very small (< 20), this is negligible
   /// for UI performance. If N grows significantly, a Topological Sort (O(V+E)) should be used.
-  List<PanelLayoutData> _orderInlinePanels(List<PanelLayoutData> source) {
-    final ordered = <PanelLayoutData>[];
-    final deferred = <PanelLayoutData>[];
+  List<ResolvedPanel> _orderInlinePanels(List<ResolvedPanel> source) {
+    final ordered = <ResolvedPanel>[];
+    final deferred = <ResolvedPanel>[];
 
     for (final p in source) {
       if (p.config.anchorTo == null) {

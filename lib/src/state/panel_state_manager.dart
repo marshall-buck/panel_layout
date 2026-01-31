@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
 import '../widgets/internal/internal_layout_adapter.dart';
-import '../layout/panel_style.dart';
+import '../models/panel_style.dart';
 import 'panel_runtime_state.dart';
 
 /// Manages the runtime state and animations of panels.

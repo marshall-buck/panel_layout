@@ -4,7 +4,7 @@ import '../widgets/panels/base_panel.dart';
 
 /// An inherited widget that exposes the runtime state and configuration of a specific panel.
 ///
-/// This widget is automatically injected by [PanelLayout] for each of its children.
+/// This widget is automatically injected by [PanelArea] for each of its children.
 /// Use [PanelDataScope.of] within a custom panel builder to access data like
 /// current size, visibility, or collapse state.
 ///

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
@@ -10,14 +10,14 @@ Finder findPanel(String id) => find.byWidgetPredicate(
 );
 
 void main() {
-  group('PanelLayout Complex Scenarios', () {
+  group('PanelArea Complex Scenarios', () {
     testWidgets('zIndex controls child order (paint order)', (tester) async {
       final List<String> buildOrder = [];
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             children: [
               OverlayPanel(
                 id: const PanelId('high'),
@@ -50,13 +50,13 @@ void main() {
       expect(buildOrder, ['low', 'high']);
     });
 
-    testWidgets('PanelLayoutController toggles visibility', (tester) async {
-      final controller = PanelLayoutController();
+    testWidgets('PanelAreaController toggles visibility', (tester) async {
+      final controller = PanelAreaController();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: controller,
             children: [
               InlinePanel(
@@ -88,7 +88,7 @@ void main() {
             child: SizedBox(
               width: 400,
               height: 100,
-              child: PanelLayout(
+              child: PanelArea(
                 children: [
                   InlinePanel(
                     id: const PanelId('left'),
@@ -123,14 +123,14 @@ void main() {
       expect(tester.getSize(findPanel('left')).width, 150.0);
     });
 
-    testWidgets('PanelLayout handles controller swap', (tester) async {
-      final c1 = PanelLayoutController();
-      final c2 = PanelLayoutController();
+    testWidgets('PanelArea handles controller swap', (tester) async {
+      final c1 = PanelAreaController();
+      final c2 = PanelAreaController();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: c1,
             children: [
               InlinePanel(
@@ -147,7 +147,7 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: PanelLayout(
+          child: PanelArea(
             controller: c2,
             children: [
               InlinePanel(

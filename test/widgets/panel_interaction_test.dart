@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panel_layout/panel_layout.dart';
-import 'package:panel_layout/src/widgets/internal/panel_resize_handle.dart';
-import 'package:panel_layout/src/widgets/animation/animated_panel.dart';
+import 'package:flutter_panels/flutter_panels.dart';
+import 'package:flutter_panels/src/widgets/internal/panel_resize_handle.dart';
+import 'package:flutter_panels/src/widgets/animation/animated_panel.dart';
 import '../utils/test_content_panel.dart';
 
 Finder findPanel(String id) => find.byWidgetPredicate(
@@ -23,7 +23,7 @@ void main() {
           child: SizedBox(
             width: 400,
             height: 100,
-            child: PanelLayout(
+            child: PanelArea(
               onResizeStart: () => started = true,
               onResizeEnd: () => ended = true,
               children: [
