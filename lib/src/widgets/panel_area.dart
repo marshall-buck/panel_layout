@@ -98,7 +98,9 @@ class _PanelLayoutState extends State<PanelArea>
 
   // Track previous frame's constraints/ratio for calculations
   BoxConstraints? _lastConstraints;
-  bool _wasAnimating = false;
+
+  // Track animation status to trigger locking/unlocking only on status changes
+  final Map<PanelId, AnimationStatus> _lastAnimationStatus = {};
 
   @override
   void initState() {
@@ -107,6 +109,7 @@ class _PanelLayoutState extends State<PanelArea>
     _cachedAxis = _engine.validateAndComputeAxis(_processedChildren);
     _stateManager = PanelStateManager();
     _stateManager.addListener(_onStateChange);
+
     if (widget.controller == null) {
       _internalController = PanelAreaController();
     }
@@ -132,13 +135,8 @@ class _PanelLayoutState extends State<PanelArea>
   }
 
   void _onStateChange() {
-    // Avoid rebuilding the entire tree on every animation tick.
-    // Instead, we only update state. The Delegate listens to stateManager and relayouts.
-    // The AnimatedPanels listen to stateManager and repaint.
-
     if (_lastConstraints == null) return;
-
-    bool isAnyAnimating = false;
+    bool shouldRebuild = false;
 
     for (final panel in _processedChildren) {
       if (panel is! InlinePanel) continue;
@@ -146,78 +144,119 @@ class _PanelLayoutState extends State<PanelArea>
       final anim = _stateManager.getAnimationController(panel.id);
       final collapseAnim = _stateManager.getCollapseController(panel.id);
 
-      final isAnimating =
-          (anim != null && anim.isAnimating) ||
-          (collapseAnim != null && collapseAnim.isAnimating);
-
-      if (isAnimating) isAnyAnimating = true;
-
-            // We look for Fixed panels that are animating for stability locking
-            final panelWeight = panel is InternalLayoutAdapter ? panel.layoutWeight : null;
-            if (panelWeight != null) continue;
-      
-            final neighbor = _getStableNeighbor(panel);
-            if (neighbor == null) continue;
-            
-            final neighborWeight = neighbor is InternalLayoutAdapter ? neighbor.layoutWeight : null;
-            if (neighborWeight == null) continue;
-      final neighborState = _stateManager.getState(neighbor.id);
-      if (neighborState == null) continue;
-
-      if (isAnimating) {
-        // LOCK: If not already locked, lock it to current pixel size
-        if (neighborState.fixedPixelSizeOverride == null) {
-          final currentWeight = neighborState.size;
-
-          // Calculate FRESH ratio
-          final layoutData = _engine.createLayoutData(
-            uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
-            config: widget.style ?? const PanelStyle(),
-            stateManager: _stateManager,
-          );
-          final ratio = _engine.calculatePixelToWeightRatio(
-            layoutData: layoutData,
-            constraints: _lastConstraints!,
-            axis: _cachedAxis,
-            config: widget.style ?? const PanelStyle(),
-          );
-
-          if (ratio > 0) {
-            final currentPixels = currentWeight / ratio;
-            _stateManager.setFixedSizeOverride(neighbor.id, currentPixels);
-          }
-        }
+      // We combine status: if either is animating, we consider it animating.
+      // Prioritize the one that is active.
+      final AnimationStatus status;
+      if (anim != null &&
+          (anim.isAnimating ||
+              anim.status == AnimationStatus.forward ||
+              anim.status == AnimationStatus.reverse)) {
+        status = anim.status;
+      } else if (collapseAnim != null &&
+          (collapseAnim.isAnimating ||
+              collapseAnim.status == AnimationStatus.forward ||
+              collapseAnim.status == AnimationStatus.reverse)) {
+        status = collapseAnim.status;
       } else {
-        // UNLOCK: If locked, calculate new weight and unlock
-        if (neighborState.fixedPixelSizeOverride != null) {
-          final override = neighborState.fixedPixelSizeOverride!;
+        // Default to dismissed if neither (or completed/dismissed check)
+        status = anim?.status ?? AnimationStatus.dismissed;
+      }
 
-          final layoutData = _engine.createLayoutData(
-            uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
-            config: widget.style ?? const PanelStyle(),
-            stateManager: _stateManager,
-          );
+      final lastStatus =
+          _lastAnimationStatus[panel.id] ?? AnimationStatus.dismissed;
 
-          final newWeight = _engine.calculateNewWeightForUnlockedPanel(
-            layoutData: layoutData,
-            targetPanelId: neighbor.id,
-            targetPixels: override,
-            constraints: _lastConstraints!,
-            axis: _cachedAxis,
-            config: widget.style ?? const PanelStyle(),
-          );
+      if (status != lastStatus) {
+        _lastAnimationStatus[panel.id] = status;
 
-          _stateManager.clearFixedSizeOverride(neighbor.id, newWeight);
+        final isStarting =
+            (status == AnimationStatus.forward ||
+                status == AnimationStatus.reverse) &&
+            (lastStatus == AnimationStatus.completed ||
+                lastStatus == AnimationStatus.dismissed);
+
+        final isEnding =
+            (status == AnimationStatus.completed ||
+                status == AnimationStatus.dismissed) &&
+            (lastStatus == AnimationStatus.forward ||
+                lastStatus == AnimationStatus.reverse);
+
+        if (isStarting) {
+          _lockNeighbor(panel);
+        }
+
+        if (isEnding) {
+          _unlockNeighbor(panel);
+          shouldRebuild = true; // Rebuild to remove/add handles
         }
       }
     }
 
-    // Check if animation just finished
-    if (_wasAnimating && !isAnyAnimating) {
-      // Animation finished. Rebuild to clean up (e.g. remove handles for hidden panels).
+    if (shouldRebuild) {
       setState(() {});
     }
-    _wasAnimating = isAnyAnimating;
+  }
+
+  void _lockNeighbor(InlinePanel panel) {
+    // LOCK: Lock neighbor to current pixel size
+    final neighbor = _getStableNeighbor(panel);
+    if (neighbor == null) return;
+
+    // If neighbor has width/height, it's fixed.
+    if (neighbor.width != null || neighbor.height != null) return;
+
+    final neighborState = _stateManager.getState(neighbor.id);
+    if (neighborState == null || neighborState.fixedPixelSizeOverride != null) {
+      return;
+    }
+
+    final currentWeight = neighborState.size;
+
+    // Calculate FRESH ratio
+    final layoutData = _engine.createLayoutData(
+      uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
+      config: widget.style ?? const PanelStyle(),
+      stateManager: _stateManager,
+    );
+    final ratio = _engine.calculatePixelToWeightRatio(
+      layoutData: layoutData,
+      constraints: _lastConstraints!,
+      axis: _cachedAxis,
+      config: widget.style ?? const PanelStyle(),
+    );
+
+    if (ratio > 0) {
+      final currentPixels = currentWeight / ratio;
+      _stateManager.setFixedSizeOverride(neighbor.id, currentPixels);
+    }
+  }
+
+  void _unlockNeighbor(InlinePanel panel) {
+    final neighbor = _getStableNeighbor(panel);
+    if (neighbor == null) return;
+
+    final neighborState = _stateManager.getState(neighbor.id);
+    if (neighborState == null || neighborState.fixedPixelSizeOverride == null) {
+      return;
+    }
+
+    final override = neighborState.fixedPixelSizeOverride!;
+
+    final layoutData = _engine.createLayoutData(
+      uniquePanelConfigs: {for (var p in _processedChildren) p.id: p},
+      config: widget.style ?? const PanelStyle(),
+      stateManager: _stateManager,
+    );
+
+    final newWeight = _engine.calculateNewWeightForUnlockedPanel(
+      layoutData: layoutData,
+      targetPanelId: neighbor.id,
+      targetPixels: override,
+      constraints: _lastConstraints!,
+      axis: _cachedAxis,
+      config: widget.style ?? const PanelStyle(),
+    );
+
+    _stateManager.clearFixedSizeOverride(neighbor.id, newWeight);
   }
 
   InlinePanel? _getStableNeighbor(InlinePanel sourcePanel) {
@@ -225,17 +264,15 @@ class _PanelLayoutState extends State<PanelArea>
     final index = panels.indexWhere((p) => p.id == sourcePanel.id);
     if (index == -1) return null;
 
-    // Anchor Right/Bottom -> Stable is Right/Bottom (Next)
-    // Anchor Left/Top -> Stable is Left/Top (Prev)
     final isAnchorEnd =
         sourcePanel.anchor == PanelAnchor.right ||
         sourcePanel.anchor == PanelAnchor.bottom;
 
     if (isAnchorEnd) {
-      // Look for Next
+      // Anchor Right/Bottom -> Neighbor is Next (Right/Bottom)
       if (index < panels.length - 1) return panels[index + 1];
     } else {
-      // Look for Prev
+      // Anchor Left/Top -> Neighbor is Prev (Left/Top)
       if (index > 0) return panels[index - 1];
     }
     return null;
@@ -266,7 +303,6 @@ class _PanelLayoutState extends State<PanelArea>
   void dispose() {
     _effectiveController.detach();
     _internalController?.dispose();
-    _stateManager.removeListener(_onStateChange);
     _stateManager.dispose();
     super.dispose();
   }
@@ -297,6 +333,11 @@ class _PanelLayoutState extends State<PanelArea>
   @override
   void setCollapsed(PanelId id, bool collapsed) {
     _stateManager.setCollapsed(id, collapsed);
+  }
+
+  @override
+  void updateSize(PanelId id, double size) {
+    _stateManager.updateSize(id, size);
   }
 
   /// Ensures internal state maps match the current list of children.

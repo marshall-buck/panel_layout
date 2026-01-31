@@ -48,7 +48,5 @@ void main() {
       await tester.pump();
       expect(tester.getSize(find.byType(AnimatedPanel).first).width, 50.0);
     });
-
-
   });
 }

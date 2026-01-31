@@ -48,10 +48,12 @@ class PanelResizing {
     double pixelToWeightRatio = 0.0,
   }) {
     final changes = <PanelId, double>{};
-    final prevWeight =
-        prevConfig is InternalLayoutAdapter ? prevConfig.layoutWeight : null;
-    final nextWeight =
-        nextConfig is InternalLayoutAdapter ? nextConfig.layoutWeight : null;
+    final prevWeight = prevConfig is InternalLayoutAdapter
+        ? prevConfig.layoutWeight
+        : null;
+    final nextWeight = nextConfig is InternalLayoutAdapter
+        ? nextConfig.layoutWeight
+        : null;
 
     // Case 1: Prev is fixed, Next is whatever. Resize Prev.
     if (prevWeight == null && prevConfig.resizable) {
@@ -70,11 +72,14 @@ class PanelResizing {
 
       // Isolation: If Next is Weighted, it must absorb the delta to prevent global shift
       if (nextWeight != null && pixelToWeightRatio > 0) {
-         final actualDelta = newSize - prevState.size;
-         final deltaWeight = actualDelta * pixelToWeightRatio;
-         // Weighted panels can theoretically go to 0 or very small
-         final newWeight = (nextState.size - deltaWeight).clamp(0.0, double.infinity);
-         changes[nextConfig.id] = newWeight;
+        final actualDelta = newSize - prevState.size;
+        final deltaWeight = actualDelta * pixelToWeightRatio;
+        // Weighted panels can theoretically go to 0 or very small
+        final newWeight = (nextState.size - deltaWeight).clamp(
+          0.0,
+          double.infinity,
+        );
+        changes[nextConfig.id] = newWeight;
       }
 
       return changes;
@@ -101,7 +106,10 @@ class PanelResizing {
         final deltaWeight = actualDelta * pixelToWeightRatio;
         // If next shrank (dragged right), actualDelta is positive, Prev grows.
         // If next grew (dragged left), actualDelta is negative, Prev shrinks.
-        final newWeight = (prevState.size + deltaWeight).clamp(0.0, double.infinity);
+        final newWeight = (prevState.size + deltaWeight).clamp(
+          0.0,
+          double.infinity,
+        );
         changes[prevConfig.id] = newWeight;
       }
 
@@ -114,7 +122,9 @@ class PanelResizing {
         prevConfig.resizable &&
         nextConfig.resizable) {
       if (prevState.collapsed || nextState.collapsed) return changes;
-      if (pixelToWeightRatio <= 0) return changes; // Cannot resize without ratio
+      if (pixelToWeightRatio <= 0) {
+        return changes; // Cannot resize without ratio
+      }
 
       final w1 = prevState.size;
       final w2 = nextState.size;

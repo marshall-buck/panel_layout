@@ -33,7 +33,7 @@ class AnimatedPanel extends StatelessWidget {
 
   /// The dynamic runtime state (current size, visibility status).
   final PanelRuntimeState initialState;
-  
+
   /// The notifier for state changes.
   final ValueNotifier<PanelRuntimeState> stateNotifier;
 
@@ -46,7 +46,11 @@ class AnimatedPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([visibilityAnimation, collapseAnimation, stateNotifier]),
+      animation: Listenable.merge([
+        visibilityAnimation,
+        collapseAnimation,
+        stateNotifier,
+      ]),
       builder: (context, _) {
         final state = stateNotifier.value;
         final factor = visibilityAnimation.value;
@@ -76,12 +80,8 @@ class AnimatedPanel extends StatelessWidget {
             collapseAnimation: collapseAnimation,
           );
         }
-        
-        return PanelDataScope(
-            state: state,
-            config: config,
-            child: child,
-        );
+
+        return PanelDataScope(state: state, config: config, child: child);
       },
     );
   }

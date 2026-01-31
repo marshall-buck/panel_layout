@@ -82,7 +82,7 @@ class OverlayPanel extends BasePanel {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (header != null) header,
+        ?header,
         clipContent ? ClipRect(child: content) : content,
       ],
     );

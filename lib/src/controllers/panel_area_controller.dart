@@ -79,6 +79,14 @@ class PanelAreaController {
   void setCollapsed(PanelId id, bool collapsed) {
     _state?.setCollapsed(id, collapsed);
   }
+
+  /// Programmatically updates the size of the panel with the given [id].
+  ///
+  /// For flexible panels, [size] represents the new layout weight (e.g., 2.0).
+  /// For fixed panels, [size] represents the new logical pixel size (e.g., 300.0).
+  void updateSize(PanelId id, double size) {
+    _state?.updateSize(id, size);
+  }
 }
 
 /// Interface that [PanelLayoutState] implements to receive commands.
@@ -90,4 +98,5 @@ abstract class PanelLayoutStateInterface {
   void toggleCollapsed(PanelId id);
   void setVisible(PanelId id, bool visible);
   void setCollapsed(PanelId id, bool collapsed);
+  void updateSize(PanelId id, double size);
 }

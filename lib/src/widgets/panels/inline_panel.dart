@@ -128,7 +128,7 @@ class InlinePanel extends BasePanel {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.max,
       children: [
-        if (header != null) header,
+        ?header,
         Expanded(child: clipContent ? ClipRect(child: content) : content),
       ],
     );

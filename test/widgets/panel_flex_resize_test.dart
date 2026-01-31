@@ -35,7 +35,5 @@ void main() {
       // Verify no handle is present
       expect(find.byType(PanelResizeHandle), findsNothing);
     });
-
-
   });
 }

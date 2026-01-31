@@ -134,9 +134,7 @@ class AnimatedVerticalPanel extends StatelessWidget {
             // Body: Fills remaining space
             // As animatedSize shrinks to headerHeight, this Expanded widget
             // will naturally shrink to 0.
-            Expanded(
-              child: _buildContent(contentOpacity, headerHeight),
-            ),
+            Expanded(child: _buildContent(contentOpacity, headerHeight)),
           ],
         ),
       ),
@@ -150,7 +148,10 @@ class AnimatedVerticalPanel extends StatelessWidget {
         // Allow content to maintain its logical size (e.g. alignment)
         // while the container shrinks.
         alignment: Alignment.topLeft,
-        minHeight: math.max(0.0, state.size - headerHeight), // Use passed headerHeight
+        minHeight: math.max(
+          0.0,
+          state.size - headerHeight,
+        ), // Use passed headerHeight
         maxHeight: math.max(0.0, state.size - headerHeight),
         // OPTIMIZATION: Wrap content in RepaintBoundary to cache rasterization during animations.
         child: RepaintBoundary(child: config.child),
@@ -161,10 +162,7 @@ class AnimatedVerticalPanel extends StatelessWidget {
     if (opacity < 1.0) {
       content = Opacity(
         opacity: opacity,
-        child: IgnorePointer(
-          ignoring: opacity == 0.0,
-          child: content,
-        ),
+        child: IgnorePointer(ignoring: opacity == 0.0, child: content),
       );
     }
 

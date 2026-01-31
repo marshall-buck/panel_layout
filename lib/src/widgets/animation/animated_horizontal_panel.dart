@@ -84,12 +84,15 @@ class AnimatedHorizontalPanel extends StatelessWidget {
     // OPTIMIZATION: Wrap content in RepaintBoundary to cache rasterization during animations.
     // This is crucial for performance when animating Opacity of complex children (like Lists).
     Widget childWidget = RepaintBoundary(child: config);
-    
+
     // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully opaque
     if (contentOpacity < 1.0) {
       childWidget = Opacity(
         opacity: contentOpacity,
-        child: IgnorePointer(ignoring: contentOpacity == 0.0, child: childWidget),
+        child: IgnorePointer(
+          ignoring: contentOpacity == 0.0,
+          child: childWidget,
+        ),
       );
     }
 
@@ -169,10 +172,7 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully collapsed
     if (collapseFactor < 1.0) {
-      rail = Opacity(
-        opacity: collapseFactor.clamp(0.0, 1.0),
-        child: rail,
-      );
+      rail = Opacity(opacity: collapseFactor.clamp(0.0, 1.0), child: rail);
     }
 
     return Positioned(
@@ -181,10 +181,7 @@ class AnimatedHorizontalPanel extends StatelessWidget {
       top: 0,
       bottom: 0,
       width: railSize,
-      child: IgnorePointer(
-        ignoring: collapseFactor == 0.0,
-        child: rail,
-      ),
+      child: IgnorePointer(ignoring: collapseFactor == 0.0, child: rail),
     );
   }
 

@@ -37,10 +37,7 @@ void main() {
                     ],
                   ),
                 ),
-                TestContentPanel(
-                  id: const PanelId('main'),
-                  child: Container(),
-                ),
+                TestContentPanel(id: const PanelId('main'), child: Container()),
               ],
             ),
           ),

@@ -62,16 +62,14 @@ class PanelStateManager extends ChangeNotifier {
 
     // Remove orphaned states and controllers
     // Only remove state if it's not preserved
-    _panelStates.removeWhere(
-      (id, _) {
-        if (!currentIds.contains(id) && !_preservedIds.contains(id)) {
-           _stateNotifiers[id]?.dispose();
-           _stateNotifiers.remove(id);
-           return true;
-        }
-        return false;
-      },
-    );
+    _panelStates.removeWhere((id, _) {
+      if (!currentIds.contains(id) && !_preservedIds.contains(id)) {
+        _stateNotifiers[id]?.dispose();
+        _stateNotifiers.remove(id);
+        return true;
+      }
+      return false;
+    });
 
     _animationControllers.removeWhere((id, controller) {
       if (!currentIds.contains(id)) {
@@ -177,12 +175,15 @@ class PanelStateManager extends ChangeNotifier {
     final state = _panelStates[id];
     if (state != null) {
       // Reconstruct to force null override
-      _updateState(id, PanelRuntimeState(
-        size: newSize,
-        visible: state.visible,
-        collapsed: state.collapsed,
-        fixedPixelSizeOverride: null,
-      ));
+      _updateState(
+        id,
+        PanelRuntimeState(
+          size: newSize,
+          visible: state.visible,
+          collapsed: state.collapsed,
+          fixedPixelSizeOverride: null,
+        ),
+      );
     }
   }
 

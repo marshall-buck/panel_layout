@@ -16,11 +16,11 @@ class InternalLayoutAdapter extends InlinePanel {
     required super.child,
     super.key,
   }) : super(
-          initialCollapsed: false,
-          headerHeight: 0.0,
-          panelBoxDecoration: null,
-          resizable: false,
-        );
+         initialCollapsed: false,
+         headerHeight: 0.0,
+         panelBoxDecoration: null,
+         resizable: false,
+       );
 
   /// Standard widgets wrapped in this adapter always have a layout weight of 1.0.
   double get layoutWeight => 1.0;

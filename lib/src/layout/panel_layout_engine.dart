@@ -10,7 +10,6 @@ import '../state/panel_state_manager.dart';
 import '../core/exceptions.dart';
 import '../models/panel_style.dart';
 
-
 /// A pure logic class responsible for calculating layout parameters
 /// and preparing data for the [PanelArea] widget.
 class PanelLayoutEngine {

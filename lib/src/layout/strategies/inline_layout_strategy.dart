@@ -40,7 +40,9 @@ class InlineLayoutStrategy {
       final override = p.state.fixedPixelSizeOverride;
 
       // Check for layoutWeight on InternalLayoutAdapter
-      final weight = config is InternalLayoutAdapter ? config.layoutWeight : null;
+      final weight = config is InternalLayoutAdapter
+          ? config.layoutWeight
+          : null;
 
       if (weight != null && override == null) {
         // Flexible: Sum up animated weight
@@ -76,9 +78,9 @@ class InlineLayoutStrategy {
         }
 
         // Fixed or Content?
-        final isFixed = (isHorizontal
-            ? config.width != null
-            : config.height != null) || override != null;
+        final isFixed =
+            (isHorizontal ? config.width != null : config.height != null) ||
+            override != null;
 
         final BoxConstraints constraints;
 

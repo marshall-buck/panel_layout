@@ -9,8 +9,6 @@ Finder findPanel(String id) => find.byWidgetPredicate(
 );
 
 void main() {
-
-
   testWidgets('InlinePanel works with ListView (unbounded height)', (
     tester,
   ) async {

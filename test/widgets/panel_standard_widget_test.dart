@@ -6,7 +6,9 @@ import 'package:flutter_panels/src/widgets/internal/internal_layout_adapter.dart
 
 void main() {
   group('Standard Widget Support', () {
-    testWidgets('Wraps standard widgets in InternalLayoutAdapter', (tester) async {
+    testWidgets('Wraps standard widgets in InternalLayoutAdapter', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -40,7 +42,9 @@ void main() {
       );
     });
 
-    testWidgets('Standard widgets share space equally (Flex 1.0)', (tester) async {
+    testWidgets('Standard widgets share space equally (Flex 1.0)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -88,8 +92,10 @@ void main() {
       expect(find.byType(PanelResizeHandle), findsNothing);
     });
 
-    testWidgets('Resize handle between InlinePanel and Standard Widget', (tester) async {
-       await tester.pumpWidget(
+    testWidgets('Resize handle between InlinePanel and Standard Widget', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: SizedBox(
@@ -111,7 +117,7 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.byType(PanelResizeHandle), findsOneWidget);
-      
+
       final contentSize = tester.getSize(find.byKey(const Key('content')));
       // 800 - 200 - 8 (handle) = 592
       expect(contentSize.width, 592.0);

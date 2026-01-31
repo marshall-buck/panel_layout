@@ -75,12 +75,12 @@ class ResolvedPanel extends Equatable {
 
   @override
   List<Object?> get props => [
-        config,
-        state,
-        visualFactor,
-        collapseFactor,
-        collapsedSize,
-      ];
+    config,
+    state,
+    visualFactor,
+    collapseFactor,
+    collapsedSize,
+  ];
 }
 
 /// A unique identifier for a resize handle between two panels.
