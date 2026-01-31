@@ -81,7 +81,9 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     final contentOpacity = (factor * (1.0 - collapseFactor)).clamp(0.0, 1.0);
 
-    Widget childWidget = config;
+    // OPTIMIZATION: Wrap content in RepaintBoundary to cache rasterization during animations.
+    // This is crucial for performance when animating Opacity of complex children (like Lists).
+    Widget childWidget = RepaintBoundary(child: config);
     
     // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully opaque
     if (contentOpacity < 1.0) {
