@@ -10,6 +10,7 @@ import '../layout/panel_area_delegate.dart';
 import '../layout/panel_resizing.dart';
 import '../layout/panel_layout_engine.dart';
 import '../controllers/panel_area_controller.dart';
+import '../core/performance_monitor.dart';
 import 'widgets.dart';
 import 'animation/animated_panel.dart';
 import 'internal/panel_resize_handle.dart';
@@ -104,6 +105,7 @@ class _PanelLayoutState extends State<PanelArea>
 
   @override
   void initState() {
+    PerformanceMonitor.instant('PanelArea.initState');
     super.initState();
     _processedChildren = _processChildren(widget.children);
     _cachedAxis = _engine.validateAndComputeAxis(_processedChildren);
@@ -280,6 +282,7 @@ class _PanelLayoutState extends State<PanelArea>
 
   @override
   void didUpdateWidget(PanelArea oldWidget) {
+    PerformanceMonitor.instant('PanelArea.didUpdateWidget');
     super.didUpdateWidget(oldWidget);
     _processedChildren = _processChildren(widget.children);
     _cachedAxis = _engine.validateAndComputeAxis(_processedChildren);
@@ -301,6 +304,7 @@ class _PanelLayoutState extends State<PanelArea>
 
   @override
   void dispose() {
+    PerformanceMonitor.instant('PanelArea.dispose');
     _effectiveController.detach();
     _internalController?.dispose();
     _stateManager.dispose();
@@ -348,6 +352,7 @@ class _PanelLayoutState extends State<PanelArea>
 
   @override
   Widget build(BuildContext context) {
+    PerformanceMonitor.start('PanelArea.build');
     final config = widget.style ?? const PanelStyle();
     final axis = _cachedAxis;
     final uniquePanelConfigs = <PanelId, BasePanel>{};
@@ -357,11 +362,13 @@ class _PanelLayoutState extends State<PanelArea>
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        PerformanceMonitor.instant('PanelArea.LayoutBuilder constraints: $constraints');
         _lastConstraints = constraints;
 
         // 1. Build Layout Children
         // We no longer calculate layoutData here to avoid redundant work.
         // Handles are created for all valid pairs; the delegate handles visibility/layout.
+        PerformanceMonitor.start('PanelArea.buildWidgets');
         final children = <Widget>[
           ..._buildPanelWidgets(uniquePanelConfigs),
           ..._buildResizeHandles(
@@ -370,11 +377,14 @@ class _PanelLayoutState extends State<PanelArea>
             uniqueConfigs: uniquePanelConfigs,
           ),
         ];
+        PerformanceMonitor.end('PanelArea.buildWidgets');
 
         final sortedChildren = _engine.sortChildren(
           unsorted: children,
           configs: uniquePanelConfigs,
         );
+        
+        PerformanceMonitor.end('PanelArea.build');
 
         return PanelScope(
           controller: _effectiveController,
@@ -523,6 +533,7 @@ class _PanelLayoutState extends State<PanelArea>
     ResolvedPanel prevData,
     ResolvedPanel nextData,
   ) {
+    PerformanceMonitor.start('PanelArea._handleResize');
     // Calculate fresh ratio and data since we don't rebuild
     if (_lastConstraints == null) return;
 
@@ -558,5 +569,6 @@ class _PanelLayoutState extends State<PanelArea>
     for (final entry in changes.entries) {
       _stateManager.updateSize(entry.key, entry.value);
     }
+    PerformanceMonitor.end('PanelArea._handleResize');
   }
 }

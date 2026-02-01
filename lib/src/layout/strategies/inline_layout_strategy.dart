@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../../core/debug_flag.dart';
+import '../../core/performance_monitor.dart';
 import '../../models/panel_id.dart';
 import '../../widgets/panels/inline_panel.dart';
 import '../../widgets/internal/internal_layout_adapter.dart';
@@ -33,6 +34,7 @@ class InlineLayoutStrategy {
     double totalWeight = 0;
     final flexiblePanels = <ResolvedPanel>[];
 
+    PerformanceMonitor.start('InlineStrategy.Pass1');
     // Pass 1: Measure Fixed and Content
     for (final p in inlineIds) {
       final config = p.config as InlinePanel;
@@ -98,7 +100,10 @@ class InlineLayoutStrategy {
               : BoxConstraints(maxWidth: crossSpace);
         }
 
+        PerformanceMonitor.start('LayoutChild:${config.id.value}');
         final s = context.layoutChild(config.id, constraints);
+        PerformanceMonitor.end('LayoutChild:${config.id.value}');
+
         usedMainSpace += isHorizontal ? s.width : s.height;
         panelRects[config.id] = Offset.zero & s;
         panelLayoutLog(
@@ -106,7 +111,9 @@ class InlineLayoutStrategy {
         );
       }
     }
+    PerformanceMonitor.end('InlineStrategy.Pass1');
 
+    PerformanceMonitor.start('InlineStrategy.Pass1b');
     // --- 1b. Measure Handles ---
     final handleSizes = <HandleLayoutId, Size>{};
 
@@ -131,7 +138,9 @@ class InlineLayoutStrategy {
         }
       }
     }
+    PerformanceMonitor.end('InlineStrategy.Pass1b');
 
+    PerformanceMonitor.start('InlineStrategy.Pass2');
     // Pass 2: Measure Flexible
     final freeSpace = (totalMainSpace - usedMainSpace).clamp(
       0.0,
@@ -148,7 +157,9 @@ class InlineLayoutStrategy {
       final s = context.layoutChild(p.config.id, constraints);
       panelRects[p.config.id] = Offset.zero & s;
     }
+    PerformanceMonitor.end('InlineStrategy.Pass2');
 
+    PerformanceMonitor.start('InlineStrategy.Pass3');
     // Pass 3: Position Inline Items (Panels + Handles)
     double currentPos = 0.0;
 
@@ -181,6 +192,7 @@ class InlineLayoutStrategy {
         }
       }
     }
+    PerformanceMonitor.end('InlineStrategy.Pass3');
 
     return panelRects;
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
 /// A global flag to enable verbose logging for the panel layout system.
 ///
@@ -19,6 +20,6 @@ bool kEnablePanelLayoutLogs = false;
 /// Logs are only printed if [kDebugMode] is true AND [kEnablePanelLayoutLogs] is true.
 void panelLayoutLog(String message) {
   if (kDebugMode && kEnablePanelLayoutLogs) {
-    debugPrint('[PanelArea] $message');
+    developer.log('[PanelArea] $message');
   }
 }

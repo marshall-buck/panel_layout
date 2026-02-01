@@ -176,6 +176,57 @@ void main() {
     });
 
     testWidgets(
+      'PERFORMANCE: Each panel must have a RepaintBoundary to isolate rasterization',
+      (tester) async {
+        // DECISION: RepaintBoundary is essential for panels because they often contain
+        // complex content (like ListViews) that should not be repainted whenever
+        // a handle is moved or a neighboring panel animates.
+        //
+        // WHY: Isolating each panel into its own layer ensures that only the
+        // panels actually changing size/opacity are repainted. Static panels
+        // remain cached in their respective layers.
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: PanelArea(
+              children: [
+                InlinePanel(
+                  id: const PanelId('left'),
+                  anchor: PanelAnchor.left,
+                  width: 100,
+                  child: Container(key: const Key('left_content')),
+                ),
+                InlinePanel(
+                  id: const PanelId('right'),
+                  anchor: PanelAnchor.right,
+                  width: 100,
+                  child: Container(key: const Key('right_content')),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        // Verify both panels have RepaintBoundaries
+        expect(
+          find.ancestor(
+            of: find.byKey(const Key('left_content')),
+            matching: find.byType(RepaintBoundary),
+          ),
+          findsAtLeastNWidgets(1),
+        );
+
+        expect(
+          find.ancestor(
+            of: find.byKey(const Key('right_content')),
+            matching: find.byType(RepaintBoundary),
+          ),
+          findsAtLeastNWidgets(1),
+        );
+      },
+    );
+
+    testWidgets(
       'AnimatedHorizontalPanel: Uses SingleChildScrollView for Layout Safety',
       (tester) async {
         // Regression test for Infinite Height / Overflow warnings.

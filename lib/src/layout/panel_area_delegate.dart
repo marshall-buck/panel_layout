@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 import '../core/debug_flag.dart';
+import '../core/performance_monitor.dart';
 import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
 import '../state/panel_state_manager.dart';
@@ -47,26 +48,35 @@ class PanelAreaDelegate extends MultiChildLayoutDelegate
 
   @override
   void performLayout(Size size) {
+    PerformanceMonitor.start('PanelAreaDelegate.performLayout');
+    
+    PerformanceMonitor.start('Engine.createLayoutData');
     // Generate fresh layout data from state
     final panels = engine.createLayoutData(
       uniquePanelConfigs: configs,
       config: style,
       stateManager: stateManager,
     );
+    PerformanceMonitor.end('Engine.createLayoutData');
 
+    PerformanceMonitor.start('Engine.calculateLayoutOrder');
     // Sort panels based on dependency order (AnchorTo) for the Inline Strategy.
     // This ensures that if Panel B is anchored to Panel A, A appears first in the list.
     final orderedPanels = engine.calculateLayoutOrder(panels);
+    PerformanceMonitor.end('Engine.calculateLayoutOrder');
 
     panelLayoutLog('Delegate performLayout with ${panels.length} panels');
 
+    PerformanceMonitor.start('InlineStrategy.layout');
     final inlineRects = _inlineStrategy.layout(
       context: this,
       size: size,
       panels: orderedPanels, // Pass the ordered list
       axis: axis,
     );
+    PerformanceMonitor.end('InlineStrategy.layout');
 
+    PerformanceMonitor.start('OverlayStrategy.layout');
     _overlayStrategy.layout(
       context: this,
       size: size,
@@ -74,14 +84,25 @@ class PanelAreaDelegate extends MultiChildLayoutDelegate
       inlineRects: inlineRects,
       textDirection: textDirection,
     );
+    PerformanceMonitor.end('OverlayStrategy.layout');
+    
+    PerformanceMonitor.end('PanelAreaDelegate.performLayout');
   }
 
   @override
   bool shouldRelayout(PanelAreaDelegate oldDelegate) {
     // If configs or style change, we must relayout.
     // Changes to state are handled by super(relayout: stateManager).
-    return oldDelegate.configs != configs ||
-        oldDelegate.style != style ||
+    
+    // OPTIMIZATION: Check for map equality instead of identity.
+    // PanelArea.build creates a new Map every time, so identity check always fails.
+    if (oldDelegate.configs != configs) {
+      if (!mapEquals(oldDelegate.configs, configs)) {
+        return true;
+      }
+    }
+
+    return oldDelegate.style != style ||
         oldDelegate.axis != axis ||
         oldDelegate.textDirection != textDirection;
   }

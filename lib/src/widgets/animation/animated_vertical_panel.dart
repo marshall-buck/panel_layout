@@ -153,8 +153,15 @@ class AnimatedVerticalPanel extends StatelessWidget {
           state.size - headerHeight,
         ), // Use passed headerHeight
         maxHeight: math.max(0.0, state.size - headerHeight),
-        // REMOVE RepaintBoundary: Logic fix for raster thrashing
-        child: config.child,
+        // PERFORMANCE OPTIMIZATION: RepaintBoundary
+        //
+        // DECISION: We explicitly wrap the panel content in a RepaintBoundary.
+        //
+        // WHY: Top/Bottom panels frequently house complex toolbars or logs.
+        // Wrapping in RepaintBoundary isolates these from the rest of the
+        // layout, ensuring that sibling animations or global rebuilds
+        // do not force a costly repaint of the panel's inner content.
+        child: RepaintBoundary(child: config.child),
       ),
     );
 

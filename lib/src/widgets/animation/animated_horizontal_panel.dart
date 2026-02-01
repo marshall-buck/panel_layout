@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import '../../core/performance_monitor.dart';
 import '../../models/panel_enums.dart';
 import '../../state/panel_runtime_state.dart';
 import '../../models/panel_style.dart';
@@ -37,10 +38,14 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    PerformanceMonitor.start('AnimatedHorizontalPanel.build:${config.id.value}');
     final factor = visibilityAnimation.value;
     final collapseFactor = collapseAnimation.value;
-
+    // ... rest of method ...
+    
+    // Copying content to match exact expectation for replacement
     if (factor <= 0 && !state.visible) {
+      PerformanceMonitor.end('AnimatedHorizontalPanel.build:${config.id.value}');
       return const SizedBox.shrink();
     }
 
@@ -81,8 +86,20 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     final contentOpacity = (factor * (1.0 - collapseFactor)).clamp(0.0, 1.0);
 
-    // REMOVE RepaintBoundary: It causes raster cache thrashing during resize.
-    Widget childWidget = config;
+    // PERFORMANCE OPTIMIZATION: RepaintBoundary
+    //
+    // DECISION: We explicitly wrap the panel content in a RepaintBoundary.
+    //
+    // WHY: Side panels often contain high-cost widgets like ListViews or complex
+    // forms. Without a RepaintBoundary, every tick of a visibility animation
+    // (fade/slide) or every pixel of a manual resize would trigger a full
+    // repaint of the entire panel's content.
+    //
+    // By isolating the panel into its own layer:
+    // 1. Static panels don't repaint when siblings animate.
+    // 2. Fading panels only update their layer's opacity (raster cache stays valid).
+    // 3. Resizing only invalidates the specific panel being resized.
+    Widget childWidget = RepaintBoundary(child: config);
 
     // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully opaque
     if (contentOpacity < 1.0) {
@@ -149,12 +166,14 @@ class AnimatedHorizontalPanel extends StatelessWidget {
     final bool shouldClip =
         factor < 1.0 || (config.clipContent) || collapseFactor > 0.0;
 
-    return SizedBox(
+    final result = SizedBox(
       width: hasFixedWidth ? animatedSize : null,
       height: config
           .height, // Pass through fixed height if any, else null (flexible)
       child: shouldClip ? ClipRect(child: content) : content,
     );
+    PerformanceMonitor.end('AnimatedHorizontalPanel.build:${config.id.value}');
+    return result;
   }
 
   Widget _buildRailLayer({

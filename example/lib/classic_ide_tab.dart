@@ -1,5 +1,6 @@
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:flutter_panels/flutter_panels.dart';
 
 class ClassicIdeTab extends StatefulWidget {
@@ -9,8 +10,12 @@ class ClassicIdeTab extends StatefulWidget {
   State<ClassicIdeTab> createState() => _ClassicIdeTabState();
 }
 
-class _ClassicIdeTabState extends State<ClassicIdeTab> {
+class _ClassicIdeTabState extends State<ClassicIdeTab>
+    with AutomaticKeepAliveClientMixin {
   final _controller = PanelAreaController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -20,6 +25,8 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    developer.log('[PERF] ClassicIdeTab.build');
     return PanelArea(
       controller: _controller,
       style: kAppPanelStyle, // Apply global config
@@ -47,7 +54,7 @@ class _ClassicIdeTabState extends State<ClassicIdeTab> {
           padding: const EdgeInsets.all(16),
           alignment: Alignment.topLeft,
           child: const Text(
-            'void main(){\n  print("Hello World");\n}',
+            'void main(){\n  developer.log("Hello World");\n}',
             style: TextStyle(fontFamily: 'monospace', fontSize: 14),
           ),
         ),

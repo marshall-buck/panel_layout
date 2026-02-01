@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import '../core/performance_monitor.dart';
 import '../models/panel_id.dart';
 import '../widgets/panels/base_panel.dart';
 import '../widgets/internal/internal_layout_adapter.dart';
@@ -136,6 +137,7 @@ class PanelStateManager extends ChangeNotifier {
   }
 
   void _updateState(PanelId id, PanelRuntimeState newState) {
+    PerformanceMonitor.instant('PanelStateManager._updateState for $id');
     _panelStates[id] = newState;
     _stateNotifiers[id]?.value = newState;
     notifyListeners();

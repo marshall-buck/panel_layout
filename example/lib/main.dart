@@ -3,6 +3,7 @@ import 'package:example/overlays_tab.dart';
 import 'package:example/scoped_tab.dart';
 import 'package:example/vertical_split_tab.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:flutter_panels/flutter_panels.dart';
 import 'user_content_tab.dart';
 
@@ -59,9 +60,12 @@ class ExampleHome extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Panel Layout Gallery'),
-          bottom: const TabBar(
+          bottom: TabBar(
+            onTap: (index) {
+              developer.log('[PERF] TabBar tapped index: $index');
+            },
             isScrollable: true,
-            tabs: [
+            tabs: const [
               Tab(text: 'Classic IDE', icon: Icon(Icons.grid_view)),
               Tab(text: 'Vertical Split', icon: Icon(Icons.splitscreen)),
               Tab(text: 'Overlays', icon: Icon(Icons.layers)),

@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_panels/flutter_panels.dart';
 
-class ScopedTab extends StatelessWidget {
+class ScopedTab extends StatefulWidget {
   const ScopedTab({super.key});
 
   @override
+  State<ScopedTab> createState() => _ScopedTabState();
+}
+
+class _ScopedTabState extends State<ScopedTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return PanelArea(
       // Outer Layout Style: Dark Theme
       style: PanelStyle(

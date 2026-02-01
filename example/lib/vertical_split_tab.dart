@@ -2,11 +2,21 @@ import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_panels/flutter_panels.dart';
 
-class VerticalSplitTab extends StatelessWidget {
+class VerticalSplitTab extends StatefulWidget {
   const VerticalSplitTab({super.key});
 
   @override
+  State<VerticalSplitTab> createState() => _VerticalSplitTabState();
+}
+
+class _VerticalSplitTabState extends State<VerticalSplitTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return PanelArea(
       style: kAppPanelStyle,
       children: [

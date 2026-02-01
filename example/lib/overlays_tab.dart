@@ -9,9 +9,13 @@ class OverlaysTab extends StatefulWidget {
   State<OverlaysTab> createState() => _OverlaysTabState();
 }
 
-class _OverlaysTabState extends State<OverlaysTab> {
+class _OverlaysTabState extends State<OverlaysTab>
+    with AutomaticKeepAliveClientMixin {
   final _rootController = PanelAreaController();
   final _innerController = PanelAreaController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -22,6 +26,7 @@ class _OverlaysTabState extends State<OverlaysTab> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     // ROOT LAYOUT: Vertical
     // Manages the Top Bar, the Content Area, and Global Overlays.
     return PanelArea(

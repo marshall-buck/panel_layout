@@ -6,11 +6,21 @@ import 'main.dart'; // To access kAppPanelStyle
 // Tab 5: User Content
 // Demonstrates: Standard Widgets as panels (filling available space)
 // -----------------------------------------------------------------------------
-class UserContentTab extends StatelessWidget {
+class UserContentTab extends StatefulWidget {
   const UserContentTab({super.key});
 
   @override
+  State<UserContentTab> createState() => _UserContentTabState();
+}
+
+class _UserContentTabState extends State<UserContentTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     // ROOT LAYOUT (Vertical)
     // 1. Top Panel
     // 2. Main Content Area (Nested Horizontal Layout)
