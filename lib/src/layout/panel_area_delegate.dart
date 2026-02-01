@@ -54,12 +54,16 @@ class PanelAreaDelegate extends MultiChildLayoutDelegate
       stateManager: stateManager,
     );
 
+    // Sort panels based on dependency order (AnchorTo) for the Inline Strategy.
+    // This ensures that if Panel B is anchored to Panel A, A appears first in the list.
+    final orderedPanels = engine.calculateLayoutOrder(panels);
+
     panelLayoutLog('Delegate performLayout with ${panels.length} panels');
 
     final inlineRects = _inlineStrategy.layout(
       context: this,
       size: size,
-      panels: panels,
+      panels: orderedPanels, // Pass the ordered list
       axis: axis,
     );
 

@@ -359,28 +359,15 @@ class _PanelLayoutState extends State<PanelArea>
       builder: (context, constraints) {
         _lastConstraints = constraints;
 
-        // 1. Prepare data for the layout delegate
-        final layoutData = _engine.createLayoutData(
-          uniquePanelConfigs: uniquePanelConfigs,
-          config: config,
-          stateManager: _stateManager,
-        );
-
-        // 2. Calculate Pixel-to-Weight Ratio
-        final pixelToWeightRatio = _engine.calculatePixelToWeightRatio(
-          layoutData: layoutData,
-          constraints: constraints,
-          axis: axis,
-          config: config,
-        );
-
-        // 3. Build Layout Children
+        // 1. Build Layout Children
+        // We no longer calculate layoutData here to avoid redundant work.
+        // Handles are created for all valid pairs; the delegate handles visibility/layout.
         final children = <Widget>[
           ..._buildPanelWidgets(uniquePanelConfigs),
           ..._buildResizeHandles(
-            layoutData: layoutData,
+            panels: _processedChildren,
             axis: axis,
-            pixelToWeightRatio: pixelToWeightRatio,
+            uniqueConfigs: uniquePanelConfigs,
           ),
         ];
 
@@ -445,43 +432,83 @@ class _PanelLayoutState extends State<PanelArea>
   }
 
   List<Widget> _buildResizeHandles({
-    required List<ResolvedPanel> layoutData,
+    required List<BasePanel> panels,
     required Axis axis,
-    required double pixelToWeightRatio,
+    required Map<PanelId, BasePanel> uniqueConfigs,
   }) {
     final widgets = <Widget>[];
-    final dockedPanels = layoutData
-        .where((d) => d.config is InlinePanel)
-        .toList();
+    // Use unique configs to ensure we match the layout engine's list and avoid duplicate IDs
+    final dockedPanels = uniqueConfigs.values.whereType<InlinePanel>().toList();
 
     for (var i = 0; i < dockedPanels.length - 1; i++) {
       final prev = dockedPanels[i];
       final next = dockedPanels[i + 1];
 
-      // Handle visibility based on static state, but only remove if animation finished
-      if (!prev.state.visible || !next.state.visible) {
-        if (prev.visualFactor <= 0 || next.visualFactor <= 0) continue;
-      }
-
       // Skip resize handle between two InternalLayoutAdapter panels (content fillers)
-      if (prev.config is InternalLayoutAdapter &&
-          next.config is InternalLayoutAdapter) {
+      if (prev is InternalLayoutAdapter && next is InternalLayoutAdapter) {
         continue;
       }
 
-      final handleId = HandleLayoutId(prev.config.id, next.config.id);
+      // Check visibility/animation status to decide if handle should be built.
+      // We do this here to satisfy tests that expect handles to be removed from the tree.
+      // This is a cheap lookup compared to full layout calculation.
+      final prevState = _stateManager.getState(prev.id);
+      final nextState = _stateManager.getState(next.id);
+      _stateManager.getAnimationController(prev.id);
+      _stateManager.getAnimationController(next.id);
+
+      final prevVisible = prevState?.visible ?? true;
+      final nextVisible = nextState?.visible ?? true;
+
+      if (!prevVisible || !nextVisible) {
+        continue;
+      }
+
+      final handleId = HandleLayoutId(prev.id, next.id);
 
       widgets.add(
         LayoutId(
           id: handleId,
           child: PanelResizeHandle(
             axis: axis == Axis.horizontal ? Axis.vertical : Axis.horizontal,
-            resizable: PanelResizing.canResize(
-              prev.config as InlinePanel,
-              next.config as InlinePanel,
-            ),
-            onDragUpdate: (delta) =>
-                _handleResize(delta, prev, next, pixelToWeightRatio),
+            resizable: PanelResizing.canResize(prev, next),
+            onDragUpdate: (delta) {
+              final prevState = _stateManager.getState(prev.id)!;
+              final prevAnim = _stateManager.getAnimationController(prev.id)!;
+              final prevCollapse = _stateManager.getCollapseController(
+                prev.id,
+              )!;
+
+              final nextState = _stateManager.getState(next.id)!;
+              final nextAnim = _stateManager.getAnimationController(next.id)!;
+              final nextCollapse = _stateManager.getCollapseController(
+                next.id,
+              )!;
+
+              final config = widget.style ?? const PanelStyle();
+
+              double getCollapsedSize(InlinePanel p) {
+                final iconSize = p.iconSize ?? config.iconSize;
+                return iconSize + (p.railPadding ?? config.railPadding);
+              }
+
+              final prevResolved = ResolvedPanel(
+                config: prev,
+                state: prevState,
+                visualFactor: prevAnim.value,
+                collapseFactor: prevCollapse.value,
+                collapsedSize: getCollapsedSize(prev),
+              );
+              final nextResolved = ResolvedPanel(
+                config: next,
+                state: nextState,
+                visualFactor: nextAnim.value,
+                collapseFactor: nextCollapse.value,
+                collapsedSize: getCollapsedSize(next),
+              );
+
+              _handleResize(delta, prevResolved, nextResolved);
+            },
             onDragStart: widget.onResizeStart,
             onDragEnd: widget.onResizeEnd,
           ),
@@ -495,7 +522,6 @@ class _PanelLayoutState extends State<PanelArea>
     double delta,
     ResolvedPanel prevData,
     ResolvedPanel nextData,
-    double pixelToWeightRatio,
   ) {
     // Calculate fresh ratio and data since we don't rebuild
     if (_lastConstraints == null) return;

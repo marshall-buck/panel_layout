@@ -153,8 +153,8 @@ class AnimatedVerticalPanel extends StatelessWidget {
           state.size - headerHeight,
         ), // Use passed headerHeight
         maxHeight: math.max(0.0, state.size - headerHeight),
-        // OPTIMIZATION: Wrap content in RepaintBoundary to cache rasterization during animations.
-        child: RepaintBoundary(child: config.child),
+        // REMOVE RepaintBoundary: Logic fix for raster thrashing
+        child: config.child,
       ),
     );
 

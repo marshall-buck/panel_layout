@@ -279,4 +279,38 @@ class PanelLayoutEngine {
 
     return sorted;
   }
+
+  /// Calculates the linear layout order of inline panels, respecting `anchorTo` dependencies.
+  ///
+  /// This ensures that panels anchored to other panels are placed correctly in the sequence.
+  List<ResolvedPanel> calculateLayoutOrder(List<ResolvedPanel> panels) {
+    final ordered = <ResolvedPanel>[];
+    final deferred = <ResolvedPanel>[];
+
+    for (final p in panels) {
+      if (p.config.anchorTo == null) {
+        ordered.add(p);
+      } else {
+        deferred.add(p);
+      }
+    }
+
+    for (final p in deferred) {
+      final targetIndex = ordered.indexWhere(
+        (target) => target.config.id == p.config.anchorTo,
+      );
+      if (targetIndex != -1) {
+        bool insertBefore = p.config.anchor == PanelAnchor.left ||
+            p.config.anchor == PanelAnchor.top;
+        if (insertBefore) {
+          ordered.insert(targetIndex, p);
+        } else {
+          ordered.insert(targetIndex + 1, p);
+        }
+      } else {
+        ordered.add(p);
+      }
+    }
+    return ordered;
+  }
 }

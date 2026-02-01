@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import '../../core/debug_flag.dart';
-import '../../models/panel_enums.dart';
 import '../../models/panel_id.dart';
 import '../../widgets/panels/inline_panel.dart';
 import '../../widgets/internal/internal_layout_adapter.dart';
@@ -26,8 +25,8 @@ class InlineLayoutStrategy {
 
     final inlinePanels = panels.where((p) => p.config is InlinePanel).toList();
 
-    // Sort logic
-    final inlineIds = _orderInlinePanels(inlinePanels);
+    // Trust that the delegate passed them in the correct dependency order.
+    final inlineIds = inlinePanels;
     final panelRects = <PanelId, Rect>{};
 
     double usedMainSpace = 0;
@@ -117,9 +116,19 @@ class InlineLayoutStrategy {
       final handleId = HandleLayoutId(prev.config.id, next.config.id);
 
       if (context.hasChild(handleId)) {
-        final s = context.layoutChild(handleId, BoxConstraints.loose(size));
-        handleSizes[handleId] = s;
-        usedMainSpace += isHorizontal ? s.width : s.height;
+        // Only layout/show handle if both neighbors are effectively visible
+        if ((prev.state.visible || prev.visualFactor > 0) &&
+            (next.state.visible || next.visualFactor > 0)) {
+          final s = context.layoutChild(handleId, BoxConstraints.loose(size));
+          handleSizes[handleId] = s;
+          usedMainSpace += isHorizontal ? s.width : s.height;
+        } else {
+          // Hide handle (0 size)
+          context.layoutChild(
+            handleId,
+            const BoxConstraints.tightFor(width: 0, height: 0),
+          );
+        }
       }
     }
 
@@ -174,44 +183,5 @@ class InlineLayoutStrategy {
     }
 
     return panelRects;
-  }
-
-  /// Orders inline panels based on anchoring dependencies.
-  ///
-  /// This ensures that panels anchored to other panels are processed after their targets.
-  ///
-  /// **Time Complexity**: Approaches O(N^2) in the worst case (reverse dependency chain).
-  /// However, since N (number of panels) is typically very small (< 20), this is negligible
-  /// for UI performance. If N grows significantly, a Topological Sort (O(V+E)) should be used.
-  List<ResolvedPanel> _orderInlinePanels(List<ResolvedPanel> source) {
-    final ordered = <ResolvedPanel>[];
-    final deferred = <ResolvedPanel>[];
-
-    for (final p in source) {
-      if (p.config.anchorTo == null) {
-        ordered.add(p);
-      } else {
-        deferred.add(p);
-      }
-    }
-
-    for (final p in deferred) {
-      final targetIndex = ordered.indexWhere(
-        (target) => target.config.id == p.config.anchorTo,
-      );
-      if (targetIndex != -1) {
-        bool insertBefore =
-            p.config.anchor == PanelAnchor.left ||
-            p.config.anchor == PanelAnchor.top;
-        if (insertBefore) {
-          ordered.insert(targetIndex, p);
-        } else {
-          ordered.insert(targetIndex + 1, p);
-        }
-      } else {
-        ordered.add(p);
-      }
-    }
-    return ordered;
   }
 }

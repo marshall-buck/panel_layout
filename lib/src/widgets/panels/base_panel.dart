@@ -276,7 +276,7 @@ abstract class BasePanel extends StatelessWidget {
 
     return Container(
       decoration: effectiveDecoration,
-      clipBehavior: effectiveDecoration != null ? Clip.hardEdge : Clip.none,
+      clipBehavior: clipContent ? Clip.hardEdge : Clip.none,
       child: buildPanelLayout(context, header, child),
     );
   }

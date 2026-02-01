@@ -81,9 +81,8 @@ class AnimatedHorizontalPanel extends StatelessWidget {
 
     final contentOpacity = (factor * (1.0 - collapseFactor)).clamp(0.0, 1.0);
 
-    // OPTIMIZATION: Wrap content in RepaintBoundary to cache rasterization during animations.
-    // This is crucial for performance when animating Opacity of complex children (like Lists).
-    Widget childWidget = RepaintBoundary(child: config);
+    // REMOVE RepaintBoundary: It causes raster cache thrashing during resize.
+    Widget childWidget = config;
 
     // OPTIMIZATION: Only wrap in Opacity/IgnorePointer if not fully opaque
     if (contentOpacity < 1.0) {
@@ -145,11 +144,16 @@ class AnimatedHorizontalPanel extends StatelessWidget {
       ],
     );
 
+    // Only apply hard clip if animating or explicitly requested.
+    // Reducing clips during idle states helps batching.
+    final bool shouldClip =
+        factor < 1.0 || (config.clipContent) || collapseFactor > 0.0;
+
     return SizedBox(
       width: hasFixedWidth ? animatedSize : null,
       height: config
           .height, // Pass through fixed height if any, else null (flexible)
-      child: ClipRect(child: content),
+      child: shouldClip ? ClipRect(child: content) : content,
     );
   }
 
